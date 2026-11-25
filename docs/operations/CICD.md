@@ -88,22 +88,28 @@ Tạo `/etc/aidevteam/app.env` chứa cấu hình và secret của ứng dụng 
 | Cổng publish cho NPM | `3301` → container `web:3000` |
 | API | Không mở ra LAN. Chỉ `127.0.0.1:3001` trên VPS (health check); `web` gọi `http://api:3001` qua mạng compose |
 | TLS, domain | Kết thúc tại NPM server (Owner quản lý) |
-| IP của NPM server | CHƯA CẤU HÌNH — Owner cung cấp để giới hạn firewall |
+| IP của NPM server | `192.168.250.10` (Owner cung cấp 25/11/2026) |
 
 Cấu hình Proxy Host trên NPM (Owner làm): Scheme `http`, Forward Hostname/IP `192.168.250.30`, Forward Port `3301`; bật SSL (certificate cho domain) và Force SSL.
 
-**Firewall trên VPS — lưu ý quan trọng:** cổng do Docker publish **không đi qua** chuỗi INPUT của ufw/iptables thông thường, nên rule `ufw deny` không chặn được `3301`. Muốn chỉ cho NPM server truy cập, phải đặt rule ở chuỗi `DOCKER-USER`. Tài liệu chính thức: https://docs.docker.com/engine/network/packet-filtering-firewalls/ . Ví dụ (thay `<NPM_IP>`, người vận hành tự chạy và tự cấu hình lưu rule qua reboot):
+**Firewall trên VPS — lưu ý quan trọng:** cổng do Docker publish **không đi qua** chuỗi INPUT của ufw/iptables thông thường, nên rule `ufw deny` không chặn được `3301`. Muốn chỉ cho NPM server (`192.168.250.10`) truy cập, phải đặt rule ở chuỗi `DOCKER-USER`. Tài liệu chính thức: https://docs.docker.com/engine/network/packet-filtering-firewalls/ . Người vận hành tự chạy trên VPS và tự cấu hình lưu rule qua reboot:
 
 ```bash
-sudo iptables -I DOCKER-USER -p tcp -m conntrack --ctorigdstport 3301 --ctdir ORIGINAL ! -s <NPM_IP> -j DROP
+sudo iptables -I DOCKER-USER -p tcp -m conntrack --ctorigdstport 3301 --ctdir ORIGINAL ! -s 192.168.250.10 -j DROP
 ```
 
-Cú pháp trên theo hướng dẫn của Docker tại thời điểm viết; đối chiếu lại tài liệu với phiên bản Docker Engine trên VPS trước khi chạy — **chưa kiểm thử trên VPS**.
+Cú pháp trên theo hướng dẫn của Docker tại thời điểm viết; đối chiếu lại tài liệu với phiên bản Docker Engine trên VPS trước khi chạy (Docker Engine mới có thể dùng backend nftables) — **chưa kiểm thử trên VPS**.
+
+Kiểm tra sau khi đặt rule:
+
+- Từ NPM server (`192.168.250.10`): `curl -I http://192.168.250.30:3301/` → phải có phản hồi HTTP.
+- Từ một máy khác trong LAN: cùng lệnh → phải bị timeout.
+- Từ VPS: `curl -fsS http://127.0.0.1:3001/health/ready` vẫn chạy (loopback không bị ảnh hưởng).
 
 **Ảnh hưởng tới ứng dụng (ghi chú cho P1-05G, P1-06):**
 
 - Đoạn NPM → VPS là HTTP thuần trong LAN. Ứng dụng phải đọc `X-Forwarded-Proto`/`X-Forwarded-For` để biết request gốc là HTTPS (cookie `Secure`, redirect OAuth, audit IP).
-- Chỉ tin header `X-Forwarded-*` khi request đến từ IP của NPM server (cấu hình "trust proxy" giới hạn theo IP), không tin mọi nguồn — nếu không, người trong LAN có thể giả IP/giao thức.
+- Chỉ tin header `X-Forwarded-*` khi request đến từ NPM server `192.168.250.10`, không tin mọi nguồn — nếu không, người trong LAN có thể giả IP/giao thức. Đề xuất biến cấu hình `TRUSTED_PROXY_IPS=192.168.250.10` trong `/etc/aidevteam/app.env` (tên biến chốt ở P1-05G). Lưu ý: request đi qua Docker port mapping có thể mang IP nguồn là IP thật của NPM hoặc IP gateway Docker tùy cấu hình (`userland-proxy`) — **phải kiểm tra trên VPS** IP nguồn mà container nhìn thấy trước khi chốt allowlist.
 - Callback URL của GitHub OAuth App dùng domain công khai trên NPM, không dùng `192.168.250.30`.
 
 ## 4. Quy trình deploy (thủ công, có kiểm chứng — §5.5)
@@ -144,7 +150,7 @@ sudo /opt/aidevteam/deploy.sh --rollback --health-url http://127.0.0.1:3001/heal
 | Tài khoản máy + token đọc package | CHƯA CẤU HÌNH (Owner) |
 | `/etc/aidevteam/app.env` trên VPS | CHƯA CẤU HÌNH (Owner) |
 | Bind `web` ra `192.168.250.30:3301` | `docker compose config` cho kết quả đúng với dữ liệu giả; chưa chạy trên VPS |
-| Firewall `DOCKER-USER` chỉ cho NPM server | CHƯA CẤU HÌNH (cần IP NPM server) |
+| Firewall `DOCKER-USER` chỉ cho NPM server `192.168.250.10` | Lệnh đã soạn; CHƯA CHẠY trên VPS |
 | Proxy Host trên NPM | Owner cấu hình; chưa xác minh |
 | Giờ chạy release train (`execution_time_local`) | `null` → không có job deploy tự động |
 | Branch protection `main` | DEFINED – NOT ENFORCED (plan: free) |
@@ -158,7 +164,7 @@ sudo /opt/aidevteam/deploy.sh --rollback --health-url http://127.0.0.1:3001/heal
 | Lộ token pull trên VPS | Tài khoản máy riêng, chỉ `read:packages`, có hạn; đăng nhập qua stdin |
 | Workflow bị sửa để lấy secret | Workflow không dùng secret ngoài `GITHUB_TOKEN`; job build chỉ có `packages: write` ở job build; cần branch protection + review (O-02) |
 | Action bên thứ ba bị chiếm quyền | Pin theo commit SHA; cập nhật có review |
-| Máy khác trong LAN truy cập thẳng `:3301`, bỏ qua NPM | Rule `DOCKER-USER` chỉ cho IP NPM; ứng dụng chỉ tin `X-Forwarded-*` từ IP NPM |
+| Máy khác trong LAN truy cập thẳng `:3301`, bỏ qua NPM | Rule `DOCKER-USER` chỉ cho `192.168.250.10`; ứng dụng chỉ tin `X-Forwarded-*` từ IP NPM |
 | Lưu lượng NPM → VPS không mã hóa | Chấp nhận trong LAN tin cậy; nếu LAN dùng chung với hệ thống khác, cân nhắc TLS nội bộ (post-0.1) |
 | Container bị khai thác | read-only FS, drop capability, `no-new-privileges`, user non-root (template), port chỉ localhost |
 | Rollback sai do migration DB không tương thích ngược | Script chỉ rollback image, **không** rollback DB. Migration phải tương thích ngược ít nhất 1 phiên bản; rollback DB theo runbook P1-11 |
