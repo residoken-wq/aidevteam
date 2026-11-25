@@ -1,0 +1,30 @@
+# TEMPLATE — not used by CI until copied to apps/<app>/Dockerfile (task P1-01, after ADR-001/002 ACCEPTED).
+# Multi-stage, non-root, build context = repo root (pnpm monorepo).
+#
+# UNVERIFIED items to check at P1-01 time:
+#   - Node major version: must match .nvmrc chosen in P1-01 (22 is a placeholder).
+#   - Pin base image by digest (node:<ver>-bookworm-slim@sha256:...) after choosing the version.
+#   - `pnpm deploy` behaviour changed in pnpm v10 (workspace injection). Check https://pnpm.io/cli/deploy
+#     for the pnpm version pinned in package.json "packageManager".
+#   - Entry point (dist/main.js) and port depend on the framework chosen in ADR-002.
+
+ARG NODE_IMAGE=node:22-bookworm-slim
+
+FROM ${NODE_IMAGE} AS build
+ARG APP
+WORKDIR /repo
+RUN corepack enable
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc* ./
+COPY apps ./apps
+COPY packages ./packages
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter "./apps/${APP}" build
+RUN pnpm --filter "./apps/${APP}" deploy --prod /out
+
+FROM ${NODE_IMAGE} AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=build --chown=node:node /out ./
+USER node
+EXPOSE 3001
+CMD ["node", "dist/main.js"]
