@@ -1,0 +1,131 @@
+# Build container images and publish them to GitHub Container Registry (ghcr.io).
+#
+# - Pull request: build only (no push) to catch Dockerfile breakage.
+# - Push to main / manual run: build + push, tagged by commit SHA, with provenance + SBOM.
+# - This workflow NEVER deploys. The VPS pulls images by digest via deploy/deploy.sh,
+#   run by a human operator after Owner approval (CLAUDE.md §2 rule 1, §5.5).
+# - Auth to ghcr.io uses the workflow's GITHUB_TOKEN only (no personal token — rule 4).
+name: build-image
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      apps: ${{ steps.find.outputs.apps }}
+      has_apps: ${{ steps.find.outputs.has_apps }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Find apps/*/Dockerfile
+        id: find
+        run: |
+          set -euo pipefail
+          # App dir names are restricted to [a-z0-9-] so they are safe in image names and paths.
+          apps=$( { find apps -mindepth 2 -maxdepth 2 -name Dockerfile 2>/dev/null || true; } \
+            | awk -F/ '{print $2}' \
+            | { grep -E '^[a-z0-9][a-z0-9-]*$' || true; } \
+            | sort -u \
+            | python3 -c 'import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))')
+          echo "apps=$apps" >> "$GITHUB_OUTPUT"
+          if [ "$apps" = "[]" ]; then
+            echo "has_apps=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No apps/*/Dockerfile yet (before P1-01). Image build skipped."
+          else
+            echo "has_apps=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: discover
+    if: needs.discover.outputs.has_apps == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.discover.outputs.apps) }}
+    env:
+      PUSH: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Image name (lowercase)
+        id: img
+        run: |
+          owner=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
+          echo "name=ghcr.io/${owner}/aidevteam-${{ matrix.app }}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to ghcr.io
+        if: env.PUSH == 'true'
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Metadata
+        id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+        with:
+          images: ${{ steps.img.outputs.name }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+            type=ref,event=pr
+          labels: |
+            org.opencontainers.image.title=aidevteam-${{ matrix.app }}
+
+      - name: Build (and push on main)
+        id: build
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: apps/${{ matrix.app }}/Dockerfile
+          push: ${{ env.PUSH == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: mode=max
+          sbom: true
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
+
+      - name: Summary (digest for release manifest)
+        if: env.PUSH == 'true'
+        run: |
+          {
+            echo "### ${{ matrix.app }}"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| commit | \`${GITHUB_SHA}\` |"
+            echo "| image | \`${{ steps.img.outputs.name }}\` |"
+            echo "| digest | \`${{ steps.build.outputs.digest }}\` |"
+            echo "| pull | \`${{ steps.img.outputs.name }}@${{ steps.build.outputs.digest }}\` |"
+            echo ""
+            echo "Deploy is NOT automatic. Use deploy/deploy.sh on the VPS after Owner approval of this digest."
+          } >> "$GITHUB_STEP_SUMMARY"

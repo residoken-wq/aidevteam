@@ -1,0 +1,45 @@
+# Production/staging runtime on the VPS. Images are referenced ONLY by digest,
+# supplied by deploy/deploy.sh through release.env (IMAGE_<SERVICE>=ghcr.io/...@sha256:...).
+# App configuration and secrets live in APP_ENV_FILE on the VPS (default /etc/aidevteam/app.env),
+# created by the Owner/operator. It is never committed and never read by deploy.sh.
+#
+# Services below follow the PROPOSED stack (apps/api, apps/web). Align with ADR-001/002 when ACCEPTED.
+#
+# Network (host settings in $DEPLOY_DIR/host.env, see deploy/host.env.example):
+#   - web: published on WEB_PUBLISH_ADDR:WEB_PUBLISH_PORT (production: 192.168.250.30:3301) so the
+#     separate Nginx Proxy Manager (NPM) server can reach it over the LAN. NPM terminates TLS.
+#     Default without host.env is 127.0.0.1 (not reachable from the LAN) — fail safe.
+#   - api: loopback only (127.0.0.1:API_PORT) for health checks on the VPS. Not exposed to the LAN;
+#     web reaches it over the compose network at http://api:3001.
+
+x-hardening: &hardening
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  env_file:
+    - ${APP_ENV_FILE:-/etc/aidevteam/app.env}
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "5"
+
+services:
+  api:
+    <<: *hardening
+    image: ${IMAGE_API:?IMAGE_API must be set by deploy.sh (digest reference)}
+    ports:
+      - "127.0.0.1:${API_PORT:-3001}:3001"
+
+  web:
+    <<: *hardening
+    image: ${IMAGE_WEB:?IMAGE_WEB must be set by deploy.sh (digest reference)}
+    ports:
+      - "${WEB_PUBLISH_ADDR:-127.0.0.1}:${WEB_PUBLISH_PORT:-3301}:3000"
+    depends_on:
+      - api
