@@ -275,7 +275,20 @@ Không viết code ứng dụng trước khi Owner ký baseline.
 
 ## 11. Lệnh dự án
 
-> Chưa có. Điền sau P1-01 bằng các lệnh đã chạy thành công.
+> Đã chạy thành công ngày 25/11/2026 với Node 24.22.3, pnpm 10.34.9 (P1-01).
+
+| Việc | Lệnh |
+|---|---|
+| Cài dependency | `pnpm install --frozen-lockfile` |
+| Lint toàn repo | `pnpm lint` |
+| Typecheck (build `packages/*` trước) | `pnpm typecheck` |
+| Test toàn repo | `pnpm test` |
+| Build toàn repo | `pnpm build` |
+| Test riêng một app | `pnpm --filter @aidevteam/api test` |
+| Chạy api đã build | `PORT=3001 node apps/api/dist/main.js` |
+| Chạy web đã build (standalone) | `cd apps/web/.next/standalone && PORT=3000 node apps/web/server.js` |
+| Test script deploy | `bash tests/deploy/test_deploy.sh` |
+| Build image (cần Docker) | `docker build -f apps/api/Dockerfile .` / `docker build -f apps/web/Dockerfile .` — **chưa chạy cục bộ**, CI chạy trên PR |
 
 ---
 
