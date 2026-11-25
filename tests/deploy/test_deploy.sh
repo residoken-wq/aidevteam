@@ -46,6 +46,11 @@ expect "rollback needs previous release" 2 "no previous release"     --rollback 
 printf 'IMAGE_API=%s\n' "$API" > "$TMP/release.prev.env"
 expect "rollback dry-run plan"           0 "DRY-RUN: docker compose" --rollback --health-url "$HEALTH" --dry-run
 
+# host.env is passed to compose before release env when present
+printf 'WEB_PUBLISH_ADDR=192.168.250.30\nWEB_PUBLISH_PORT=3301\n' > "$TMP/host.env"
+expect "dry-run includes host.env"       0 "--env-file $TMP/host.env --env-file" --image "api=$API" --image "web=$WEB" --approval-ref "$APPROVAL" --health-url "http://192.168.250.30:3301/" --dry-run
+rm -f "$TMP/host.env"
+
 # dry-run must not create state files
 if [ ! -e "$TMP/release.env" ] && [ ! -e "$TMP/deploy.log" ] && [ ! -e "$TMP/release.next.env" ]; then
   echo "PASS  dry-run leaves no state files"; pass=$((pass + 1))

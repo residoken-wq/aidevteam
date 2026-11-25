@@ -16,7 +16,7 @@
 #   deploy.sh --rollback --health-url ... [--dry-run]
 #
 # Env:
-#   DEPLOY_DIR   state dir (default /opt/aidevteam). Holds compose.yaml, release.env, release.prev.env, deploy.log
+#   DEPLOY_DIR   state dir (default /opt/aidevteam). Holds compose.yaml, host.env, release.env, release.prev.env, deploy.log
 #   COMPOSE_FILE default "$DEPLOY_DIR/compose.yaml"
 #   HEALTH_RETRIES (default 20), HEALTH_INTERVAL seconds (default 3)
 
@@ -28,6 +28,7 @@ COMPOSE_FILE="${COMPOSE_FILE:-$DEPLOY_DIR/compose.yaml}"
 HEALTH_RETRIES="${HEALTH_RETRIES:-20}"
 HEALTH_INTERVAL="${HEALTH_INTERVAL:-3}"
 RELEASE_ENV="$DEPLOY_DIR/release.env"
+HOST_ENV="$DEPLOY_DIR/host.env"   # host network settings (WEB_PUBLISH_ADDR/PORT...), see deploy/host.env.example
 PREV_ENV="$DEPLOY_DIR/release.prev.env"
 LOG_FILE="$DEPLOY_DIR/deploy.log"
 LOCK_FILE="$DEPLOY_DIR/.deploy.lock"
@@ -102,7 +103,12 @@ if [ "$DRY_RUN" -eq 0 ]; then
   flock -n 9 || die "another deploy is running"
 fi
 
-compose() { run docker compose --project-name aidevteam --env-file "$1" -f "$COMPOSE_FILE" "${@:2}"; }
+compose() { # release env file, then compose args. host.env (if present) is loaded first; release env wins.
+  local -a envs=()
+  [ -f "$HOST_ENV" ] && envs+=(--env-file "$HOST_ENV")
+  envs+=(--env-file "$1")
+  run docker compose --project-name aidevteam "${envs[@]}" -f "$COMPOSE_FILE" "${@:2}"
+}
 
 health_ok() {
   [ "$DRY_RUN" -eq 1 ] && { echo "DRY-RUN: health check ${HEALTH_URLS[*]}"; return 0; }

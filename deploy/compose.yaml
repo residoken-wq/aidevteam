@@ -4,7 +4,13 @@
 # created by the Owner/operator. It is never committed and never read by deploy.sh.
 #
 # Services below follow the PROPOSED stack (apps/api, apps/web). Align with ADR-001/002 when ACCEPTED.
-# Ports bind to 127.0.0.1 only; the existing reverse proxy on the VPS terminates TLS.
+#
+# Network (host settings in $DEPLOY_DIR/host.env, see deploy/host.env.example):
+#   - web: published on WEB_PUBLISH_ADDR:WEB_PUBLISH_PORT (production: 192.168.250.30:3301) so the
+#     separate Nginx Proxy Manager (NPM) server can reach it over the LAN. NPM terminates TLS.
+#     Default without host.env is 127.0.0.1 (not reachable from the LAN) — fail safe.
+#   - api: loopback only (127.0.0.1:API_PORT) for health checks on the VPS. Not exposed to the LAN;
+#     web reaches it over the compose network at http://api:3001.
 
 x-hardening: &hardening
   restart: unless-stopped
@@ -34,6 +40,6 @@ services:
     <<: *hardening
     image: ${IMAGE_WEB:?IMAGE_WEB must be set by deploy.sh (digest reference)}
     ports:
-      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+      - "${WEB_PUBLISH_ADDR:-127.0.0.1}:${WEB_PUBLISH_PORT:-3301}:3000"
     depends_on:
       - api
