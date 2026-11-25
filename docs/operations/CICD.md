@@ -144,7 +144,7 @@ sudo /opt/aidevteam/deploy.sh --rollback --health-url http://127.0.0.1:3001/heal
 | Hạng mục | Trạng thái |
 |---|---|
 | Workflow `ci`, `build-image` | `IMPLEMENTATION_PENDING` — chưa có run trên GitHub |
-| Build image thật | Chưa có `apps/*/Dockerfile` (chờ P1-01, ADR-001/002 ACCEPTED) |
+| Build image thật | `apps/api/Dockerfile`, `apps/web/Dockerfile` thêm ở P1-01. Các bước build đã mô phỏng cục bộ không cần Docker; build Docker thật do CI chạy trên PR P1-01 |
 | Test `deploy.sh` (dry-run, validate) | 17/17 pass cục bộ 25/11/2026 (bash 5.2). **Chưa** chạy với Docker daemon thật |
 | `docker compose config` | Hợp lệ cục bộ (Compose v5.7.1) với dữ liệu giả |
 | Tài khoản máy + token đọc package | CHƯA CẤU HÌNH (Owner) |
