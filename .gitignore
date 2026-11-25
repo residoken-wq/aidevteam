@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.next/
+coverage/
+*.tsbuildinfo
+.turbo/
+# secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+next-env.d.ts

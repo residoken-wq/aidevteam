@@ -39,6 +39,10 @@ services:
   web:
     <<: *hardening
     image: ${IMAGE_WEB:?IMAGE_WEB must be set by deploy.sh (digest reference)}
+    # Next.js writes its runtime cache here; the rest of the filesystem stays read-only.
+    tmpfs:
+      - /tmp
+      - /app/apps/web/.next/cache:uid=1000,gid=1000,mode=0700
     ports:
       - "${WEB_PUBLISH_ADDR:-127.0.0.1}:${WEB_PUBLISH_PORT:-3301}:3000"
     depends_on:

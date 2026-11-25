@@ -1,0 +1,32 @@
+{
+  "name": "@aidevteam/api",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aidevteam/contracts": "workspace:*",
+    "@nestjs/common": "12.6.0",
+    "@nestjs/core": "12.6.0",
+    "@nestjs/platform-express": "12.6.1",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "12.6.1",
+    "@swc/core": "1.16.22",
+    "@types/node": "24.19.3",
+    "@types/supertest": "7.2.1",
+    "supertest": "7.3.2",
+    "typescript": "6.0.3",
+    "unplugin-swc": "2.0.0",
+    "vitest": "5.1.1"
+  }
+}

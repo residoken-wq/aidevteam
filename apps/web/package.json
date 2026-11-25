@@ -1,0 +1,25 @@
+{
+  "name": "@aidevteam/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aidevteam/contracts": "workspace:*",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.3",
+    "@types/react": "19.3.1",
+    "@types/react-dom": "19.3.0",
+    "typescript": "6.0.3",
+    "vitest": "5.1.1"
+  }
+}

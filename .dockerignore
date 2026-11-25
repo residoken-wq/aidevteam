@@ -1,0 +1,16 @@
+# Keep build context minimal and never send secrets to the Docker daemon
+.git
+**/node_modules
+**/dist
+**/.next
+**/coverage
+.env
+.env.*
+**/.env
+**/.env.*
+*.pem
+*.key
+deploy
+docs
+tests
+.github
