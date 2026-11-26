@@ -29,16 +29,27 @@ x-hardening: &hardening
       max-size: "10m"
       max-file: "5"
 
+# Fixed internal subnet so the api can trust exactly the web container as a proxy hop:
+# set TRUSTED_PROXY_IPS to this subnet in app.env (verified 26/11/2026: the Next.js rewrite proxy forwards
+# the X-Forwarded-For it receives from NPM but does not append its own address).
+networks:
+  internal:
+    ipam:
+      config:
+        - subnet: ${INTERNAL_SUBNET:-172.30.250.0/24}
+
 services:
   api:
     <<: *hardening
     image: ${IMAGE_API:?IMAGE_API must be set by deploy.sh (digest reference)}
+    networks: [internal]
     ports:
       - "127.0.0.1:${API_PORT:-3001}:3001"
 
   web:
     <<: *hardening
     image: ${IMAGE_WEB:?IMAGE_WEB must be set by deploy.sh (digest reference)}
+    networks: [internal]
     environment:
       # Not a secret. Server components call the api over the compose network.
       API_INTERNAL_URL: http://api:3001

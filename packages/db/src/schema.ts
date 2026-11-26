@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { bigint, customType, foreignKey, index, jsonb, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import { bigint, customType, foreignKey, index, integer, jsonb, pgTable, primaryKey, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 
 /**
  * Typed Drizzle view of the schema created by migrations/*.up.sql.
@@ -77,6 +77,8 @@ export const sessions = pgTable("sessions", {
   createdAt: ts("created_at").notNull().defaultNow(),
   expiresAt: ts("expires_at").notNull(),
   revokedAt: ts("revoked_at"),
+  /** Org the user is currently working in (P1-06). Tenant scope comes only from here. */
+  activeOrgId: uuid("active_org_id").references(() => orgs.id),
 });
 
 export const auditEvents = pgTable("audit_events", {
@@ -119,6 +121,18 @@ export const oauthLoginStates = pgTable("oauth_login_states", {
   usedAt: ts("used_at"),
 });
 
+export const rateLimitHits = pgTable(
+  "rate_limit_hits",
+  {
+    scope: text("scope").notNull(),
+    /** SHA-256 of the client key (e.g. IP). */
+    bucket: bytea("bucket").notNull(),
+    windowStart: ts("window_start").notNull(),
+    hits: integer("hits").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.scope, t.bucket, t.windowStart] }), index("rate_limit_hits_window_idx").on(t.windowStart)],
+);
+
 export const allTables = {
   orgs,
   users,
@@ -129,4 +143,5 @@ export const allTables = {
   audit_events: auditEvents,
   release_approvals: releaseApprovals,
   oauth_login_states: oauthLoginStates,
+  rate_limit_hits: rateLimitHits,
 } as const;

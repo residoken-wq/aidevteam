@@ -57,8 +57,10 @@ afterAll(async () => {
   await pool.end();
 });
 
-beforeEach(() => {
+beforeEach(async () => {
   github.calls = [];
+  // Every test runs from the same IP; reset the login rate-limit counters (rate limiting has its own tests).
+  await pool.query("DELETE FROM rate_limit_hits");
 });
 
 function cookieFrom(res: request.Response, name: string): string | undefined {
@@ -220,7 +222,7 @@ describe("sessions", () => {
     expect(line).toMatch(/SameSite=Lax/i);
     const token = cookieFrom(res, SESSION_COOKIE)!;
     const me = await request(app.getHttpServer()).get("/auth/me").set("Cookie", `${SESSION_COOKIE}=${token}`).expect(200);
-    expect(me.body).toEqual({ githubUserId: 900000001, githubLogin: "test-user-01" });
+    expect(me.body).toEqual({ githubUserId: 900000001, githubLogin: "test-user-01", orgs: [], activeOrg: null });
     expect((await pool.query("SELECT 1 FROM role_bindings")).rowCount).toBe(0);
     expect(await countAudit("auth.login_succeeded")).toBeGreaterThan(0);
   });

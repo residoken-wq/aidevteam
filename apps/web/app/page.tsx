@@ -1,12 +1,15 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { apiInternalUrl, SESSION_COOKIE } from "../lib/api";
+import { roleLabel } from "../lib/roles";
 
 export const dynamic = "force-dynamic";
 
 interface Me {
   githubUserId: number;
   githubLogin: string | null;
+  orgs: Array<{ slug: string; roles: string[] }>;
+  activeOrg: { slug: string; roles: string[]; permissions: string[] } | null;
 }
 
 async function currentUser(): Promise<Me | null> {
@@ -30,7 +33,32 @@ export default async function HomePage() {
       <p>
         Đã đăng nhập: <strong>{me.githubLogin ?? `GitHub #${me.githubUserId}`}</strong>
       </p>
-      <p>Release 0.1 — chưa có chức năng nghiệp vụ. Quyền thao tác được cấp qua RBAC (P1-06).</p>
+
+      {me.orgs.length === 0 ? (
+        <p role="status">Tài khoản chưa được cấp quyền trong tổ chức nào. Liên hệ quản trị viên để được gán role.</p>
+      ) : me.activeOrg ? (
+        <p>
+          Tổ chức: <strong>{me.activeOrg.slug}</strong> — vai trò: {me.activeOrg.roles.map(roleLabel).join(", ")}
+        </p>
+      ) : (
+        <p role="status">Bạn thuộc nhiều tổ chức. Chọn tổ chức để làm việc:</p>
+      )}
+
+      {me.orgs.length > 1 ? (
+        <ul>
+          {me.orgs.map((o) => (
+            <li key={o.slug}>
+              <form method="post" action="/auth/active-org">
+                <input type="hidden" name="orgSlug" value={o.slug} />
+                <button type="submit" disabled={me.activeOrg?.slug === o.slug}>
+                  {o.slug} ({o.roles.map(roleLabel).join(", ")})
+                </button>
+              </form>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
       <form method="post" action="/auth/logout">
         <button type="submit">Đăng xuất</button>
       </form>

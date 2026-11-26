@@ -23,7 +23,7 @@ Tạo client secret và đưa **thẳng** vào file secret trên VPS (mục 2). 
 | `PUBLIC_BASE_URL` | `https://cc.example.com` | Origin công khai qua NPM, không có path |
 | `GITHUB_OAUTH_CLIENT_ID` | `Iv1.xxxxxxxx` | |
 | `GITHUB_OAUTH_CLIENT_SECRET` | — | Secret |
-| `TRUSTED_PROXY_IPS` | `192.168.250.10` | IP NPM server; xem lưu ý mục 4 |
+| `TRUSTED_PROXY_IPS` | `172.30.250.0/24` | **Subnet mạng nội bộ compose** (`INTERNAL_SUBNET` trong `host.env`), không phải IP NPM — xem mục 5 |
 | `SESSION_TTL_MINUTES` | `480` | Mặc định 480 (8 giờ) — chờ Owner xác nhận |
 
 API thiếu hoặc sai bất kỳ biến bắt buộc nào sẽ **không khởi động** (fail closed); thông báo lỗi chỉ nêu tên biến, không in giá trị.
@@ -41,7 +41,16 @@ Lấy **GitHub user ID số** (không phải username) từ API công khai `http
 docker compose --project-name aidevteam -f /opt/aidevteam/compose.yaml run --rm api node node_modules/@aidevteam/db/dist/allowlist-cli.js add <github_user_id> "Owner"
 ```
 
-Thêm vào allowlist chỉ cho phép đăng nhập; quyền thao tác cấp qua RBAC (P1-06). Gỡ: `… allowlist-cli.js remove <github_user_id>` (thu hồi luôn session đang mở). Mọi thay đổi ghi audit.
+Thêm vào allowlist chỉ cho phép đăng nhập. Cấp quyền thao tác (RBAC, P1-06 — `docs/governance/RBAC_MATRIX.md`):
+
+```bash
+docker compose --project-name aidevteam -f /opt/aidevteam/compose.yaml run --rm api node node_modules/@aidevteam/db/dist/admin-cli.js org create <org-slug> "<Tên tổ chức>"
+```
+
+```bash
+docker compose --project-name aidevteam -f /opt/aidevteam/compose.yaml run --rm api node node_modules/@aidevteam/db/dist/admin-cli.js role grant <github_user_id> <org-slug> org_admin
+```
+ Gỡ: `… allowlist-cli.js remove <github_user_id>` (thu hồi luôn session đang mở). Mọi thay đổi ghi audit.
 
 > Đường dẫn `node_modules/@aidevteam/db/dist/…` trong image api: **chưa kiểm chứng trên image thật** — kiểm tra khi deploy staging lần đầu.
 
@@ -50,4 +59,11 @@ Thêm vào allowlist chỉ cho phép đăng nhập; quyền thao tác cấp qua 
 2. "Đăng nhập bằng GitHub" → trang GitHub hiển thị **không xin quyền truy cập repo**.
 3. Tài khoản trong allowlist → về trang chủ, hiện login GitHub. Tài khoản ngoài allowlist → "chưa được cấp quyền".
 4. Đăng xuất → về `/login`; F5 trang chủ → lại về `/login`.
-5. Kiểm tra IP nguồn mà api nhìn thấy (đi qua NPM → web → api): nếu không phải `192.168.250.10`, điều chỉnh `TRUSTED_PROXY_IPS` — **chưa kiểm chứng** (CICD.md §3.4).
+5. Đăng nhập lặp lại 6 lần trong 15 phút từ cùng một máy → lần thứ 6 nhận "Quá nhiều lần đăng nhập"; một máy khác vẫn đăng nhập được (chứng tỏ đếm đúng theo IP người dùng, không phải IP của NPM/web).
+
+## 5. Vì sao `TRUSTED_PROXY_IPS` là subnet nội bộ
+Đường đi: trình duyệt → NPM (`192.168.250.10`) → `web` (`192.168.250.30:3301`) → `api` (mạng compose).
+Đã kiểm chứng cục bộ ngày 26/11/2026: proxy rewrite của Next.js **chuyển nguyên** `X-Forwarded-For` nhận từ NPM sang api nhưng **không thêm** IP của chính nó. Vì vậy api thấy kết nối đến từ container `web` (thuộc `INTERNAL_SUBNET`), còn IP người dùng là phần tử cuối của `X-Forwarded-For` do NPM thêm vào.
+- Tin subnet nội bộ → `req.ip` = IP người dùng do NPM ghi; giá trị giả mà client tự chèn phía trước bị bỏ qua.
+- **Chưa kiểm chứng:** NPM có đặt `X-Forwarded-For` (dạng `$proxy_add_x_forwarded_for`) hay không — kiểm tra ở bước 5 mục 4. Nếu NPM không đặt, mọi người dùng bị đếm chung một IP (của NPM) → giới hạn 5 lần sẽ áp cho cả hệ thống; khi đó báo lại để điều chỉnh.
+- Cổng `3301` chỉ được để NPM truy cập (rule `DOCKER-USER`, CICD.md §3.4); nếu không, máy khác trong LAN có thể tự đặt `X-Forwarded-For` giả.

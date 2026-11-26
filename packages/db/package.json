@@ -16,9 +16,11 @@
     "test:integration": "vitest run --dir test/integration --no-file-parallelism",
     "migrate": "node dist/cli.js",
     "seed": "node dist/seed-cli.js",
-    "allowlist": "node dist/allowlist-cli.js"
+    "allowlist": "node dist/allowlist-cli.js",
+    "admin": "node dist/admin-cli.js"
   },
   "dependencies": {
+    "@aidevteam/contracts": "workspace:*",
     "drizzle-orm": "0.45.4",
     "pg": "8.23.1"
   },

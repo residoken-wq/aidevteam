@@ -109,7 +109,7 @@ Kiểm tra sau khi đặt rule:
 **Ảnh hưởng tới ứng dụng (ghi chú cho P1-05G, P1-06):**
 
 - Đoạn NPM → VPS là HTTP thuần trong LAN. Ứng dụng phải đọc `X-Forwarded-Proto`/`X-Forwarded-For` để biết request gốc là HTTPS (cookie `Secure`, redirect OAuth, audit IP).
-- Chỉ tin header `X-Forwarded-*` khi request đến từ NPM server `192.168.250.10`, không tin mọi nguồn — nếu không, người trong LAN có thể giả IP/giao thức. Đề xuất biến cấu hình `TRUSTED_PROXY_IPS=192.168.250.10` trong `/etc/aidevteam/app.env` (tên biến chốt ở P1-05G). Lưu ý: request đi qua Docker port mapping có thể mang IP nguồn là IP thật của NPM hoặc IP gateway Docker tùy cấu hình (`userland-proxy`) — **phải kiểm tra trên VPS** IP nguồn mà container nhìn thấy trước khi chốt allowlist.
+- Chỉ tin header `X-Forwarded-*` khi request đến từ NPM server `192.168.250.10`, không tin mọi nguồn — nếu không, người trong LAN có thể giả IP/giao thức. **Cập nhật P1-06 (26/11/2026):** `TRUSTED_PROXY_IPS` phải là subnet mạng nội bộ compose (`INTERNAL_SUBNET`, mặc định `172.30.250.0/24`), không phải IP NPM — xem `AUTH_SETUP.md` §5. Lưu ý: request đi qua Docker port mapping có thể mang IP nguồn là IP thật của NPM hoặc IP gateway Docker tùy cấu hình (`userland-proxy`) — **phải kiểm tra trên VPS** IP nguồn mà container nhìn thấy trước khi chốt allowlist.
 - Callback URL của GitHub OAuth App dùng domain công khai trên NPM, không dùng `192.168.250.30`.
 
 ## 4. Quy trình deploy (thủ công, có kiểm chứng — §5.5)

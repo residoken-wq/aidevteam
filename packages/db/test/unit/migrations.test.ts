@@ -30,6 +30,8 @@ describe("repository migrations", () => {
     for (const m of loadMigrations()) {
       const created = [...m.upSql.matchAll(/CREATE TABLE (\w+)/g)].map((x) => x[1]);
       for (const table of created) expect(m.downSql).toContain(`DROP TABLE IF EXISTS ${table};`);
+      const added = [...m.upSql.matchAll(/ALTER TABLE (\w+) ADD COLUMN (\w+)/g)];
+      for (const [, table, column] of added) expect(m.downSql).toContain(`ALTER TABLE ${table} DROP COLUMN IF EXISTS ${column};`);
     }
   });
 });
