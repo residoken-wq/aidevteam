@@ -133,6 +133,24 @@ export const rateLimitHits = pgTable(
   (t) => [primaryKey({ columns: [t.scope, t.bucket, t.windowStart] }), index("rate_limit_hits_window_idx").on(t.windowStart)],
 );
 
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+    archivedAt: ts("archived_at"),
+  },
+  (t) => [unique("projects_org_slug_unique").on(t.orgId, t.slug), unique("projects_id_org_unique").on(t.id, t.orgId)],
+);
+
 export const allTables = {
   orgs,
   users,
@@ -144,4 +162,5 @@ export const allTables = {
   release_approvals: releaseApprovals,
   oauth_login_states: oauthLoginStates,
   rate_limit_hits: rateLimitHits,
+  projects,
 } as const;
