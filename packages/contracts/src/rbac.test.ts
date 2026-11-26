@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { PERMISSIONS, permissionsFor, ROLE_KEYS, ROLE_PERMISSIONS } from "./rbac";
+import { PERMISSIONS, permissionsFor, PLATFORM_PERMISSIONS, ROLE_KEYS, ROLE_PERMISSIONS } from "./rbac";
 
 describe("permissionsFor", () => {
   it("denies everything for no roles or unknown roles", () => {
@@ -43,5 +43,13 @@ describe("docs/governance/RBAC_MATRIX.md mirrors the code", () => {
       const cell = r[2 + i]!;
       expect(cell === "✅", `${role} / ${perm}`).toBe(ROLE_PERMISSIONS[role].has(perm));
     }
+  });
+});
+
+describe("RBAC_MATRIX.md platform section mirrors the code", () => {
+  it("lists every platform permission exactly once", () => {
+    const md = readFileSync(path.join(__dirname, "../../../docs/governance/RBAC_MATRIX.md"), "utf8");
+    const rows = md.split("\n").filter((l) => /^\| `platform:[a-z_]+:[a-z_]+` \|/.test(l));
+    expect(rows.map((l) => l.split("|")[1]!.trim().replace(/`/g, "")).sort()).toEqual([...PLATFORM_PERMISSIONS].sort());
   });
 });

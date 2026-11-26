@@ -10,6 +10,10 @@ const CONFLICTS: Record<string, string> = {
   workspace_path_in_use: "Thư mục làm việc trùng, nằm trong hoặc chứa thư mục của một worker đang hoạt động.",
   worker_archived: "Worker đã lưu trữ, không sửa được.",
   worker_already_archived: "Worker đã được lưu trữ trước đó.",
+  org_slug_taken: "Mã tổ chức đã tồn tại.",
+  org_archived: "Tổ chức đã lưu trữ, không sửa được.",
+  org_already_archived: "Tổ chức đã được lưu trữ trước đó.",
+  org_not_archived: "Tổ chức đang hoạt động, không cần khôi phục.",
 };
 
 export function apiErrorMessage(status: number, body: unknown): string {

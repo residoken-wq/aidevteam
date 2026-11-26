@@ -222,7 +222,7 @@ describe("sessions", () => {
     expect(line).toMatch(/SameSite=Lax/i);
     const token = cookieFrom(res, SESSION_COOKIE)!;
     const me = await request(app.getHttpServer()).get("/auth/me").set("Cookie", `${SESSION_COOKIE}=${token}`).expect(200);
-    expect(me.body).toEqual({ githubUserId: 900000001, githubLogin: "test-user-01", orgs: [], activeOrg: null });
+    expect(me.body).toEqual({ githubUserId: 900000001, githubLogin: "test-user-01", orgs: [], activeOrg: null, platformPermissions: [] });
     expect((await pool.query("SELECT 1 FROM role_bindings")).rowCount).toBe(0);
     expect(await countAudit("auth.login_succeeded")).toBeGreaterThan(0);
   });

@@ -53,6 +53,8 @@
 | D-2026-11-26-09 | 26/11/2026 | Web proxy `/api/*` → api (session, RBAC, `Origin` vẫn do api kiểm tra) | Người dùng phiên | residoken-wq/aidevteam#12 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 | D-2026-11-26-10 | 26/11/2026 | Thứ tự làm tiếp: P2-07 (provider account) → P2-08 (worker) → … | Người dùng phiên | Trả lời trong phiên | ÁP DỤNG |
 | D-2026-11-26-11 | 26/11/2026 | Danh sách provider 0.1: `anthropic`, `openai` (OpenAI Codex), `google`, `github`, `other` | Người dùng phiên | Trả lời trong phiên (residoken-wq/aidevteam#13) | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
+| D-2026-11-26-13 | 26/11/2026 | P2-03: thêm **platform admin** (người, không phải role trong org; cấp/gỡ bằng CLI có audit) với `platform:org:read`/`platform:org:write` để tạo, đổi tên, lưu trữ, khôi phục org qua UI. Không có quyền xem dữ liệu trong org. **Thay đổi mô hình RBAC Owner đã ký (D-2026-11-26-07 mục 5)** | Người dùng phiên | Trả lời trong phiên | NGƯỜI DÙNG PHIÊN ĐỒNG Ý — **REQUIRES_OWNER_APPROVAL** trước UAT 03/12 |
+| D-2026-11-26-14 | 26/11/2026 | Lưu trữ org: chặn mọi truy cập trong org, **không** thu hồi session (người dùng chọn org khác được), giữ dữ liệu, khôi phục được | Người dùng phiên | Trả lời trong phiên | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 | D-2026-11-26-12 | 26/11/2026 | `viewer` được xem `secret_ref` (tham chiếu, không phải secret; có lộ tên biến môi trường) — chấp nhận | Người dùng phiên | Trả lời trong phiên (residoken-wq/aidevteam#13) | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 
 ## C. Checkpoint go/no-go (CLAUDE.md §5.4)

@@ -100,3 +100,38 @@ export async function listBindings(pool: Pool, orgSlug: string): Promise<Array<{
   );
   return r.rows.map((x) => ({ githubUserId: Number(x.github_user_id), githubLogin: x.github_login, role: x.key }));
 }
+
+/**
+ * Platform administrators (P2-03) manage orgs across tenants but get no access to data inside an org.
+ * Operator-only: there is deliberately no API/UI path to grant this. The user must be on the allowlist.
+ */
+export async function grantPlatformAdmin(pool: Pool, githubUserId: number, note?: string): Promise<boolean> {
+  if (note !== undefined && note.length > 200) throw new Error("note must be at most 200 characters");
+  return tx(pool, async (c) => {
+    const allowed = await c.query("SELECT 1 FROM user_allowlist WHERE github_user_id = $1", [githubUserId]);
+    if (allowed.rowCount === 0) throw new Error("user is not on the sign-in allowlist; add them first");
+    const user = await c.query<{ id: string }>(
+      `INSERT INTO users (github_user_id) VALUES ($1)
+       ON CONFLICT (github_user_id) DO UPDATE SET github_user_id = EXCLUDED.github_user_id RETURNING id`,
+      [githubUserId],
+    );
+    const r = await c.query("INSERT INTO platform_admins (user_id, note) VALUES ($1, $2) ON CONFLICT DO NOTHING", [user.rows[0]!.id, note ?? null]);
+    if (r.rowCount === 1) await audit(c, "admin.platform_admin_granted", null, "github_user", String(githubUserId), {});
+    return r.rowCount === 1;
+  });
+}
+
+export async function revokePlatformAdmin(pool: Pool, githubUserId: number): Promise<boolean> {
+  return tx(pool, async (c) => {
+    const r = await c.query("DELETE FROM platform_admins pa USING users u WHERE pa.user_id = u.id AND u.github_user_id = $1", [githubUserId]);
+    if (r.rowCount === 1) await audit(c, "admin.platform_admin_revoked", null, "github_user", String(githubUserId), {});
+    return r.rowCount === 1;
+  });
+}
+
+export async function listPlatformAdmins(pool: Pool): Promise<Array<{ githubUserId: number; note: string | null }>> {
+  const r = await pool.query<{ github_user_id: string; note: string | null }>(
+    "SELECT u.github_user_id, pa.note FROM platform_admins pa JOIN users u ON u.id = pa.user_id ORDER BY u.github_user_id",
+  );
+  return r.rows.map((x) => ({ githubUserId: Number(x.github_user_id), note: x.note }));
+}

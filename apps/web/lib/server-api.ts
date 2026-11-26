@@ -7,6 +7,8 @@ export interface Me {
   githubLogin: string | null;
   orgs: Array<{ slug: string; roles: string[] }>;
   activeOrg: { slug: string; roles: string[]; permissions: string[] } | null;
+  /** P2-03: non-empty only for operator-granted platform admins. */
+  platformPermissions: string[];
 }
 
 /**
@@ -28,4 +30,8 @@ export async function apiGet<T>(path: string): Promise<T | null> {
 
 export function can(me: Me | null, permission: string): boolean {
   return Boolean(me?.activeOrg?.permissions.includes(permission));
+}
+
+export function canPlatform(me: Me | null, permission: string): boolean {
+  return Boolean(me?.platformPermissions?.includes(permission));
 }

@@ -26,6 +26,8 @@
 | Kiểm tra trùng/lồng `workspace_path` của worker | 2 test AC-4 `workers.test.ts` | P2-08 |
 | Advisory lock cấp org khi tạo worker | Ban đầu test race song song **không** fail → thêm test giữ lock từ DB (tất định) → fail đúng | P2-08 |
 | Lọc `org_id` khi gắn `projectSlug` | `another org's project cannot be attached` | P2-08 |
+| Kiểm tra platform admin trong guard (P2-03) | 2 test AC-2 `platform-orgs.test.ts` | P2-03 |
+| Bỏ lọc org đã lưu trữ khỏi membership | 2 test "archived org" `platform-orgs.test.ts` | P2-03 |
 | Chặn sửa worker đã lưu trữ | `duplicate slug → 409; archived worker cannot be edited…` | P2-08 |
 
 ## 3. Chạy thử end-to-end cục bộ (không phải staging)

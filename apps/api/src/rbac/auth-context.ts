@@ -7,6 +7,8 @@ export interface AuthContext {
   githubUserId: number;
   githubLogin: string | null;
   memberships: OrgMembership[];
+  /** Operator-granted platform admin (P2-03); re-read on every request. Grants nothing inside an org. */
+  platformAdmin: boolean;
   /** Null when the user has no role, or several orgs and none selected. */
   org: OrgContext | null;
 }

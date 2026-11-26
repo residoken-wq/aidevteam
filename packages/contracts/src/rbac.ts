@@ -55,6 +55,13 @@ export const ROLE_PERMISSIONS: Readonly<Record<RoleKey, ReadonlySet<Permission>>
   viewer: new Set<Permission>(READ_ONLY),
 };
 
+/**
+ * Platform permissions (P2-03) belong to operator-granted platform admins (table platform_admins), not to org
+ * roles. They cover managing orgs themselves and grant nothing inside an org. Mirrored in RBAC_MATRIX.md §2.
+ */
+export const PLATFORM_PERMISSIONS = ["platform:org:read", "platform:org:write"] as const;
+export type PlatformPermission = (typeof PLATFORM_PERMISSIONS)[number];
+
 export function isRoleKey(value: string): value is RoleKey {
   return (ROLE_KEYS as readonly string[]).includes(value);
 }

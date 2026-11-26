@@ -21,6 +21,7 @@ export const orgs = pgTable("orgs", {
   name: text("name").notNull(),
   createdAt: ts("created_at").notNull().defaultNow(),
   archivedAt: ts("archived_at"),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
 });
 
 export const users = pgTable("users", {
@@ -198,6 +199,15 @@ export const workers = pgTable(
   ],
 );
 
+/** Operator-granted (CLI) platform administrators: manage orgs, but get no access to data inside an org. */
+export const platformAdmins = pgTable("platform_admins", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id),
+  note: text("note"),
+  createdAt: ts("created_at").notNull().defaultNow(),
+});
+
 export const allTables = {
   orgs,
   users,
@@ -212,4 +222,5 @@ export const allTables = {
   projects,
   provider_accounts: providerAccounts,
   workers,
+  platform_admins: platformAdmins,
 } as const;

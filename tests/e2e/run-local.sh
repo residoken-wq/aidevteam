@@ -27,6 +27,8 @@ node "$ROOT/packages/db/dist/seed-cli.js" >/dev/null 2>&1
 node "$ROOT/packages/db/dist/allowlist-cli.js" add 900000003 e2e >/dev/null 2>&1
 node "$ROOT/packages/db/dist/admin-cli.js" role grant 900000003 org-test-a maintainer >/dev/null 2>&1
 node "$ROOT/packages/db/dist/admin-cli.js" role grant 900000002 org-test-a viewer >/dev/null 2>&1
+node "$ROOT/packages/db/dist/allowlist-cli.js" add 900000005 e2e-platform >/dev/null 2>&1
+node "$ROOT/packages/db/dist/admin-cli.js" platform grant 900000005 e2e >/dev/null 2>&1
 
 session() { # create a fake session row for a seeded fake user, print the raw token
   local t h
@@ -35,12 +37,14 @@ session() { # create a fake session row for a seeded fake user, print the raw to
   psql -w -X -q -d "$DB" -c "INSERT INTO sessions (user_id, token_hash, expires_at) SELECT id, decode('$h','hex'), now() + interval '1 hour' FROM users WHERE github_user_id = $1" >/dev/null
   echo "$t"
 }
-export MAINT_TOKEN="$(session 900000003)" VIEWER_TOKEN="$(session 900000002)"
+export MAINT_TOKEN="$(session 900000003)" VIEWER_TOKEN="$(session 900000002)" PLATFORM_TOKEN="$(session 900000005)"
 
 (cd "$ROOT/apps/api" && PORT=$API_PORT PUBLIC_BASE_URL="$BASE_URL" GITHUB_OAUTH_CLIENT_ID=Iv1.e2efakeclient GITHUB_OAUTH_CLIENT_SECRET=fake-secret-e2e-only-0000000 TRUSTED_PROXY_IPS=127.0.0.1 node dist/main.js >/tmp/e2e-api.log 2>&1) & pids+=($!)
 (cd "$ROOT/apps/web/.next/standalone" && PORT=$WEB_PORT HOSTNAME=127.0.0.1 API_INTERNAL_URL="http://127.0.0.1:$API_PORT" node apps/web/server.js >/tmp/e2e-web.log 2>&1) & pids+=($!)
 for _ in $(seq 1 30); do curl -fs "http://127.0.0.1:$API_PORT/health/ready" >/dev/null && curl -fs "http://127.0.0.1:$WEB_PORT/health" >/dev/null && break; sleep 1; done
 
 status=0
-for t in "$ROOT"/tests/e2e/*.e2e.cjs; do echo "== $(basename "$t")"; node "$t" || status=1; done
+# E2E_ONLY="a b" runs only tests/e2e/<a>.e2e.cjs, <b>.e2e.cjs (in that order) — for debugging.
+if [ -n "${E2E_ONLY:-}" ]; then files=(); for n in $E2E_ONLY; do files+=("$ROOT/tests/e2e/$n.e2e.cjs"); done; else files=("$ROOT"/tests/e2e/*.e2e.cjs); fi
+for t in "${files[@]}"; do echo "== $(basename "$t")"; node "$t" || status=1; done
 exit $status
