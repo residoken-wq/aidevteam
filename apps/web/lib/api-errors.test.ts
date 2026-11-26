@@ -16,3 +16,10 @@ describe("apiErrorMessage", () => {
     expect(apiErrorMessage(500, "<script>")).toBe("Có lỗi xảy ra. Vui lòng thử lại.");
   });
 });
+
+describe("secret-like input", () => {
+  it("explains what to do instead of echoing anything", () => {
+    const msg = apiErrorMessage(422, { issues: [{ path: "secretRef", message: "This looks like a secret value…", problem: "secret_like" }] });
+    expect(msg).toMatch(/không dán secret/i);
+  });
+});

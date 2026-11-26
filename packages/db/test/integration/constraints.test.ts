@@ -128,3 +128,23 @@ describe("seed (AC-4)", () => {
     expect(orgs.rows.map((o) => o.slug).sort()).toEqual(["org-test-a", "org-test-b"]);
   });
 });
+
+describe("provider_accounts.secret_ref (P2-07, defence in depth)", () => {
+  const insert = (ref: string) =>
+    pool.query("INSERT INTO provider_accounts (org_id, slug, name, provider, secret_ref) VALUES ($1, $2, 'X', 'anthropic', $3)", [
+      orgA,
+      `pa-${Math.random().toString(36).slice(2, 10)}`,
+      ref,
+    ]);
+
+  it.each(["env:AIDEV_SECRET_CLAUDE", "file:/run/secrets/claude-key"])("accepts reference %s", async (ref) => {
+    expect((await insert(ref)).rowCount).toBe(1);
+  });
+
+  it.each(["sk-ant-api03-FAKEFAKEFAKEFAKEFAKE", "env:DATABASE_URL", "file:/etc/aidevteam/app.env", "file:/run/secrets/../x"])(
+    "the database itself rejects %s",
+    async (ref) => {
+      await expect(insert(ref)).rejects.toThrow(/check constraint/);
+    },
+  );
+});

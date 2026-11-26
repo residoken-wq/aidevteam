@@ -151,6 +151,27 @@ export const projects = pgTable(
   (t) => [unique("projects_org_slug_unique").on(t.orgId, t.slug), unique("projects_id_org_unique").on(t.id, t.orgId)],
 );
 
+export const providerAccounts = pgTable(
+  "provider_accounts",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    provider: text("provider", { enum: ["anthropic", "openai", "google", "github", "other"] }).notNull(),
+    /** Pointer only (env:AIDEV_SECRET_… or file:/run/secrets/…), never the credential. */
+    secretRef: text("secret_ref").notNull(),
+    description: text("description"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+    archivedAt: ts("archived_at"),
+  },
+  (t) => [unique("provider_accounts_org_slug_unique").on(t.orgId, t.slug), unique("provider_accounts_id_org_unique").on(t.id, t.orgId)],
+);
+
 export const allTables = {
   orgs,
   users,
@@ -163,4 +184,5 @@ export const allTables = {
   oauth_login_states: oauthLoginStates,
   rate_limit_hits: rateLimitHits,
   projects,
+  provider_accounts: providerAccounts,
 } as const;
