@@ -32,7 +32,7 @@ Bạn KHÔNG có và KHÔNG cần giá trị thật. Dev/test dùng mock OAuth s
 Quản lý allowlist qua UI (seed/CLI admin là đủ, hỏi người). Đăng nhập bằng cách khác.
 
 ## Acceptance criteria (bắt buộc theo CLAUDE.md §5.3)
-AC-1 Callback có state sai/thiếu/đã dùng/hết hạn → bị từ chối (4xx), không tạo session, có audit.
+AC-1 Callback có state sai/thiếu/đã dùng/hết hạn → bị từ chối (chuyển về /login?error=state), không tạo session, có audit.
 AC-2 User GitHub hợp lệ nhưng ngoài allowlist → bị từ chối, có audit login_denied.
 AC-3 Session hết hạn → request bảo vệ trả 401.
 AC-4 Logout → session bị xóa phía server; dùng lại cookie cũ → 401.

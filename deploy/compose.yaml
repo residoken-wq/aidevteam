@@ -39,6 +39,9 @@ services:
   web:
     <<: *hardening
     image: ${IMAGE_WEB:?IMAGE_WEB must be set by deploy.sh (digest reference)}
+    environment:
+      # Not a secret. Server components call the api over the compose network.
+      API_INTERNAL_URL: http://api:3001
     # Next.js writes its runtime cache here; the rest of the filesystem stays read-only.
     tmpfs:
       - /tmp

@@ -1,12 +1,12 @@
 import { Logger } from "@nestjs/common";
 import { createApp } from "./bootstrap";
-import { parsePort } from "./config";
+import { loadConfig } from "./config";
 
 async function main(): Promise<void> {
-  const port = parsePort(process.env.PORT);
-  const app = await createApp();
-  await app.listen(port, "0.0.0.0");
-  new Logger("bootstrap").log(`api listening on port ${port}`);
+  const config = loadConfig(process.env);
+  const app = await createApp({ config });
+  await app.listen(config.port, "0.0.0.0");
+  new Logger("bootstrap").log(`api listening on port ${config.port}`);
 }
 
 main().catch((err: unknown) => {
