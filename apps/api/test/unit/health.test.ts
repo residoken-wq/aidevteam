@@ -10,7 +10,7 @@ describe("health endpoints", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    // Pool is lazy and never queried by health endpoints in P1-05G (DB readiness check comes with P1-10).
+    // Points at a port where nothing listens: the database is "down" for these tests.
     app = await createApp({ config: testConfig(), pool: createPool("postgres://unused@127.0.0.1:1/unused_test") });
     await app.init();
   });
@@ -19,9 +19,16 @@ describe("health endpoints", () => {
     await app.close();
   });
 
-  it.each(["/health/live", "/health/ready"])("GET %s returns a contract-valid ok response", async (path) => {
-    const res = await request(app.getHttpServer()).get(path).expect(200);
+  it("live stays 200 when the database is down (no needless container restarts)", async () => {
+    const res = await request(app.getHttpServer()).get("/health/live").expect(200);
     expect(HealthResponseSchema.parse(res.body)).toEqual({ status: "ok", checks: {} });
+    expect(res.headers["cache-control"]).toBe("no-store");
+  });
+
+  it("ready is 503 with only ok/unavailable flags when the database is down", async () => {
+    const res = await request(app.getHttpServer()).get("/health/ready").expect(503);
+    expect(HealthResponseSchema.parse(res.body)).toEqual({ status: "unavailable", checks: { database: "unavailable", migrations: "unavailable" } });
+    expect(JSON.stringify(res.body)).not.toMatch(/ECONNREFUSED|127\.0\.0\.1|postgres|unused/);
   });
 
   it("does not send the x-powered-by header", async () => {

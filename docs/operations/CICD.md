@@ -125,8 +125,10 @@ sudo /opt/aidevteam/deploy.sh --dry-run \
   --image web=ghcr.io/<owner>/aidevteam-web@sha256:<digest-web> \
   --approval-ref https://github.com/<owner>/<repo>/pull/<n>#issuecomment-<id> \
   --health-url http://127.0.0.1:3001/health/ready \
-  --health-url http://192.168.250.30:3301/
+  --health-url http://192.168.250.30:3301/health
 ```
+
+`/health/ready` của api trả **503** khi DB không kết nối được **hoặc** schema chưa ở đúng phiên bản migration mà image mong đợi (P1-10) → chạy migrate **trước** khi deploy image mới (`AUTH_SETUP.md` §3). `/health` của web chỉ kiểm tra container web sống.
 
 5. Bỏ `--dry-run` để deploy. Health check lỗi → script tự quay về bản trước và thoát mã 1.
 6. Rollback chủ động:

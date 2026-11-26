@@ -7,6 +7,7 @@ import { HttpGithubOAuthClient, type GithubOAuthClient } from "./auth/github-cli
 import type { AppConfig } from "./config";
 import { AuditController } from "./audit/audit.controller";
 import { HealthController } from "./health/health.controller";
+import { HealthService } from "./health/health.service";
 import { OrgController } from "./org/org.controller";
 import { RateLimitService } from "./rate-limit";
 import { RbacGuard } from "./rbac/rbac.guard";
@@ -45,6 +46,7 @@ export class AppModule {
           useValue: options.githubClient ?? new HttpGithubOAuthClient(options.config.github.clientId, options.config.github.clientSecret),
         },
         AuthService,
+        HealthService,
         RbacService,
         RateLimitService,
         // Global default-deny guard: every route must declare @Public, @Authenticated or @RequirePermission.
