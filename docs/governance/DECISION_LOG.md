@@ -49,6 +49,9 @@
 | D-2026-11-26-05 | 26/11/2026 | Redaction: không thêm mẫu token nội bộ PACE; chấp nhận che thừa mọi số 12 chữ số đứng riêng (coi như CCCD) | Người dùng phiên | Trả lời trong phiên | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 | D-2026-11-26-06 | 26/11/2026 | Làm Phase 0 rút gọn (tài liệu) trước khi tiếp tục P1-10/P1-11 để Owner có đủ hồ sơ ký ở checkpoint 27/11 | Người dùng phiên | Trả lời trong phiên ("làm tiếp A") | ÁP DỤNG |
 | D-2026-11-26-07 | 26/11/2026 | **Owner ký baseline Phase 0** (phiếu `SIGNOFF_PHASE0.md`, 9 mục): (1) baseline artefact Phase 0; (2) ngoại lệ code trước baseline; (3) ADR-001/002/004; (4) **ADR-003 job table PostgreSQL**; (5) RBAC 3 role; (6) session 8h + 5 lần/15 phút/IP; (7) **máy trạng thái Task và Agent run**; (8) cam kết xác nhận v1.0.2 trước 04/12 hoặc ký ngoại lệ; (9) phạm vi 0.1 + thứ tự cắt giảm | `residoken-wq` (ID 228839459) | residoken-wq/aidevteam#9 review 6068795161 | **OWNER APPROVED** |
+| D-2026-11-26-08 | 26/11/2026 | Đưa E2E trình duyệt (Playwright) vào CI cho các màn hình Release 0.1, hoàn thành trước UAT 03/12 | Người dùng phiên | Trả lời trong phiên (residoken-wq/aidevteam#12) | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
+| D-2026-11-26-09 | 26/11/2026 | Web proxy `/api/*` → api (session, RBAC, `Origin` vẫn do api kiểm tra) | Người dùng phiên | residoken-wq/aidevteam#12 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
+| D-2026-11-26-10 | 26/11/2026 | Thứ tự làm tiếp: P2-07 (provider account) → P2-08 (worker) → … | Người dùng phiên | Trả lời trong phiên | ÁP DỤNG |
 
 ## C. Checkpoint go/no-go (CLAUDE.md §5.4)
 
