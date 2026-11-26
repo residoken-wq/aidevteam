@@ -63,7 +63,7 @@ export default async function HomePage() {
 
       {me.activeOrg ? (
         <nav>
-          <a href="/projects">Dự án</a> · <a href="/provider-accounts">Tài khoản provider</a> · <a href="/workers">Worker</a>
+          <a href="/projects">Dự án</a> · <a href="/agents">Agent</a> · <a href="/provider-accounts">Tài khoản provider</a> · <a href="/workers">Worker</a>
         </nav>
       ) : null}
 
