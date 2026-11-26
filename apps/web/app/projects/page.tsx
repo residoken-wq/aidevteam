@@ -41,7 +41,9 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
               <tbody>
                 {data.items.map((p) => (
                   <tr key={p.slug} data-testid={`project-${p.slug}`}>
-                    <td>{p.slug}</td>
+                    <td>
+                      <Link href={`/projects/${p.slug}/tasks`}>{p.slug}</Link>
+                    </td>
                     <td>{p.name}</td>
                     <td>{p.description ?? ""}</td>
                     <td>{p.archivedAt ? "Đã lưu trữ" : "Đang hoạt động"}</td>

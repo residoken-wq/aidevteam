@@ -11,6 +11,8 @@ const CONFLICTS: Record<string, string> = {
   worker_archived: "Worker đã lưu trữ, không sửa được.",
   worker_already_archived: "Worker đã được lưu trữ trước đó.",
   org_slug_taken: "Mã tổ chức đã tồn tại.",
+  task_status_changed: "Task vừa được chuyển trạng thái ở nơi khác. Bảng đã được tải lại, vui lòng thử lại.",
+  task_closed: "Task đã hoàn thành hoặc đã hủy, không sửa được.",
   agent_slug_taken: "Mã agent đã tồn tại trong tổ chức.",
   agent_archived: "Agent đã lưu trữ, không sửa được.",
   agent_already_archived: "Agent đã được lưu trữ trước đó.",
