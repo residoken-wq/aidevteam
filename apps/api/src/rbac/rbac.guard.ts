@@ -18,7 +18,8 @@ const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
  *  - route without @Public/@Authenticated/@RequirePermission → 403 (even for admins);
  *  - no valid session → 401;
  *  - state-changing methods require Origin === PUBLIC_BASE_URL (CSRF);
- *  - permission routes need an active org whose roles grant the permission → else 403 + audit rbac.denied.
+ *  - permission routes need an active org whose roles grant the permission → else 403 + audit rbac.denied;
+ *  - platform routes need an operator-granted platform admin (P2-03) → else 403 + audit rbac.denied.
  */
 @Injectable()
 export class RbacGuard implements CanActivate {
@@ -43,15 +44,24 @@ export class RbacGuard implements CanActivate {
       throw new ForbiddenException();
     }
 
-    const memberships = await this.rbac.memberships(session.userId);
+    const [memberships, platformAdmin] = await Promise.all([this.rbac.memberships(session.userId), this.rbac.isPlatformAdmin(session.userId)]);
     const org = this.rbac.resolveOrg(memberships, session.activeOrgId);
-    setAuth(req, { ...session, memberships, org });
+    setAuth(req, { ...session, memberships, org, platformAdmin });
 
     if (!rule) {
       await this.deny(session.userId, session.githubUserId, org?.orgId ?? null, "no_access_rule", req);
       throw new ForbiddenException();
     }
     if (rule.kind === "authenticated") return true;
+
+    // Platform routes never use the org context, and org routes never accept platform admin status.
+    if (rule.kind === "platform") {
+      if (!platformAdmin) {
+        await this.deny(session.userId, session.githubUserId, null, "not_platform_admin", req, rule.permission);
+        throw new ForbiddenException();
+      }
+      return true;
+    }
 
     if (!org) {
       await this.deny(session.userId, session.githubUserId, null, memberships.length ? "org_not_selected" : "no_role", req);

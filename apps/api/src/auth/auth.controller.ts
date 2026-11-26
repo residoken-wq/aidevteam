@@ -1,4 +1,5 @@
 import { Body, Controller, ForbiddenException, Get, HttpCode, Inject, Post, Req, Res } from "@nestjs/common";
+import { PLATFORM_PERMISSIONS } from "@aidevteam/contracts";
 import { randomUUID } from "node:crypto";
 import type { Request, Response } from "express";
 import type { AppConfig } from "../config";
@@ -19,6 +20,8 @@ export interface MeResponse {
   githubLogin: string | null;
   orgs: Array<{ slug: string; roles: string[] }>;
   activeOrg: { slug: string; roles: string[]; permissions: string[] } | null;
+  /** Platform permissions (P2-03); empty unless an operator granted platform admin. */
+  platformPermissions: string[];
 }
 
 /**
@@ -90,6 +93,7 @@ export class AuthController {
       githubLogin: a.githubLogin,
       orgs: a.memberships.map((m) => ({ slug: m.orgSlug, roles: m.roles })),
       activeOrg: a.org ? { slug: a.org.orgSlug, roles: a.org.roles, permissions: [...a.org.permissions].sort() } : null,
+      platformPermissions: a.platformAdmin ? [...PLATFORM_PERMISSIONS] : [],
     };
   }
 

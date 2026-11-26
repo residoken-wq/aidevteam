@@ -35,6 +35,12 @@ export class RbacService {
     return r.rows.map((x) => ({ orgId: x.org_id, orgSlug: x.slug, roles: x.roles }));
   }
 
+  /** Platform admin flag, re-read on every request so a CLI revoke takes effect immediately. */
+  async isPlatformAdmin(userId: string): Promise<boolean> {
+    const r = await this.pool.query("SELECT 1 FROM platform_admins WHERE user_id = $1", [userId]);
+    return r.rowCount === 1;
+  }
+
   /**
    * Tenant scope comes only from the session: the session's active org if the user is still a member,
    * otherwise the single org they belong to. Several orgs and none selected → null (must choose).
