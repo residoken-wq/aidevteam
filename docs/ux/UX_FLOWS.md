@@ -12,7 +12,7 @@
 | S-04 | Project: danh sách, tạo/sửa | `/projects` | `project:read` / `project:write` | **Đã có** (P2-10) |
 | S-05 | Agent | `/agents` | `agent:read` / `agent:write` | P2-05 |
 | S-06 | Provider account (chỉ `secret_ref`) | `/provider-accounts` | `provider_account:*` | **Đã có** (P2-07) |
-| S-07 | Worker (chỉ loại mock) | `/workers` | `worker:*` | P2-08 |
+| S-07 | Worker (chỉ loại mock) | `/workers` | `worker:*` | **Đã có** (P2-08) |
 | S-08 | Task: Kanban + chi tiết | `/projects/:slug/tasks` | `task:*` | P3-02/P3-04 |
 | S-09 | Dispatch + danh sách run + log | trong S-08, `/runs/:id` | `dispatch:execute`, `run:read` | P4 |
 | S-10 | Approval Center (chỉ đọc) | `/approvals` | `approval:read` | P6-06 |

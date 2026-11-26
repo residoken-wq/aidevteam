@@ -23,6 +23,10 @@
 | Default deny cho route không khai báo | `a route without an access rule is forbidden…` | #6 |
 | Lọc `org_id` trong truy vấn audit | 2 test cô lập tenant | #6 |
 | Redaction trong logger / audit | `logger.test.ts`, 2 test `redaction.test.ts` | #7 |
+| Kiểm tra trùng/lồng `workspace_path` của worker | 2 test AC-4 `workers.test.ts` | P2-08 |
+| Advisory lock cấp org khi tạo worker | Ban đầu test race song song **không** fail → thêm test giữ lock từ DB (tất định) → fail đúng | P2-08 |
+| Lọc `org_id` khi gắn `projectSlug` | `another org's project cannot be attached` | P2-08 |
+| Chặn sửa worker đã lưu trữ | `duplicate slug → 409; archived worker cannot be edited…` | P2-08 |
 
 ## 3. Chạy thử end-to-end cục bộ (không phải staging)
 - #5: web standalone + api + PostgreSQL qua proxy `/auth/*`: redirect GitHub có PKCE, không scope; session; logout CSRF.
