@@ -10,6 +10,8 @@ interface Me {
   githubLogin: string | null;
   orgs: Array<{ slug: string; roles: string[] }>;
   activeOrg: { slug: string; roles: string[]; permissions: string[] } | null;
+  /** P2-03: non-empty only for operator-granted platform admins. */
+  platformPermissions: string[];
 }
 
 async function currentUser(): Promise<Me | null> {
@@ -62,6 +64,12 @@ export default async function HomePage() {
       {me.activeOrg ? (
         <nav>
           <a href="/projects">Dự án</a> · <a href="/provider-accounts">Tài khoản provider</a> · <a href="/workers">Worker</a>
+        </nav>
+      ) : null}
+
+      {me.platformPermissions?.includes("platform:org:read") ? (
+        <nav aria-label="Quản trị nền tảng">
+          <a href="/platform/orgs">Quản trị tổ chức</a>
         </nav>
       ) : null}
 
