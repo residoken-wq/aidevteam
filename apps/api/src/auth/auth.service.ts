@@ -16,6 +16,7 @@ export interface SessionUser {
   userId: string;
   githubUserId: number;
   githubLogin: string | null;
+  activeOrgId: string | null;
 }
 
 @Injectable()
@@ -115,15 +116,21 @@ export class AuthService {
   /** Resolve a raw session token to an active session (not revoked, not expired, user not disabled). */
   async getSession(sessionToken: string | undefined): Promise<SessionUser | null> {
     if (!sessionToken || !/^[A-Za-z0-9_-]{43}$/.test(sessionToken)) return null;
-    const r = await this.pool.query<{ session_id: string; user_id: string; github_user_id: string; github_login: string | null }>(
-      `SELECT s.id AS session_id, u.id AS user_id, u.github_user_id, u.github_login
+    const r = await this.pool.query<{ session_id: string; user_id: string; github_user_id: string; github_login: string | null; active_org_id: string | null }>(
+      `SELECT s.id AS session_id, u.id AS user_id, u.github_user_id, u.github_login, s.active_org_id
          FROM sessions s JOIN users u ON u.id = s.user_id
         WHERE s.token_hash = $1 AND s.revoked_at IS NULL AND s.expires_at > now() AND u.disabled_at IS NULL`,
       [sha256(sessionToken)],
     );
     const row = r.rows[0];
     if (!row) return null;
-    return { sessionId: row.session_id, userId: row.user_id, githubUserId: Number(row.github_user_id), githubLogin: row.github_login };
+    return {
+      sessionId: row.session_id,
+      userId: row.user_id,
+      githubUserId: Number(row.github_user_id),
+      githubLogin: row.github_login,
+      activeOrgId: row.active_org_id,
+    };
   }
 
   /** Revoke a session server-side. Returns false when the token did not map to an active session. */
@@ -133,6 +140,20 @@ export class AuthService {
     await this.pool.query("UPDATE sessions SET revoked_at = now() WHERE id = $1 AND revoked_at IS NULL", [s.sessionId]);
     await writeAudit(this.pool, { action: "auth.logout", actorUserId: s.userId, actorGithubUserId: s.githubUserId, targetType: "session", targetId: s.sessionId, requestId });
     return true;
+  }
+
+  /** Set the session's active org. The caller must have verified membership. */
+  async setActiveOrg(session: { sessionId: string; userId: string; githubUserId: number }, orgId: string, requestId: string): Promise<void> {
+    await this.pool.query("UPDATE sessions SET active_org_id = $1 WHERE id = $2 AND revoked_at IS NULL", [orgId, session.sessionId]);
+    await writeAudit(this.pool, {
+      action: "auth.org_switched",
+      orgId,
+      actorUserId: session.userId,
+      actorGithubUserId: session.githubUserId,
+      targetType: "session",
+      targetId: session.sessionId,
+      requestId,
+    });
   }
 
   /** Revoke any session presented when a new login completes (prevents session fixation/reuse). */

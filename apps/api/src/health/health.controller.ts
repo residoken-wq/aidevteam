@@ -1,10 +1,12 @@
 import { Controller, Get, HttpCode } from "@nestjs/common";
 import type { HealthResponse } from "@aidevteam/contracts";
+import { Public } from "../rbac/decorators";
 
 /**
  * Health probes (P1-10 adds the database readiness check).
  * Responses follow HealthResponseSchema and never include versions, hosts or error details.
  */
+@Public()
 @Controller("health")
 export class HealthController {
   @Get("live")
