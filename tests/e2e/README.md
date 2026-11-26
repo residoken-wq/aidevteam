@@ -1,0 +1,18 @@
+# Browser E2E (Playwright)
+
+| Test | Phạm vi |
+|---|---|
+| `projects.e2e.cjs` | P2-10 AC-8: tạo → đổi tên → lưu trữ dự án qua UI; lỗi trùng slug; tên chứa HTML hiển thị dạng chữ; viewer không thấy nút ghi và gọi API trực tiếp bị 403 |
+
+## Chạy cục bộ
+
+Cần PostgreSQL (trust auth, DB tạm tên `e2e_ui_test` sẽ bị xóa/tạo lại) và gói `playwright` (có sẵn trong image Claude Code cloud; **chưa** là dependency của repo).
+
+```bash
+PGHOST=127.0.0.1 PGPORT=5432 PGUSER=postgres NODE_PATH="$(npm root -g)" bash tests/e2e/run-local.sh
+```
+
+Runner build api + web, migrate + seed dữ liệu giả, tạo session giả cho user seed, chạy api (`:3911`) và web standalone (`:3910`), chạy mọi `*.e2e.cjs`, rồi dừng server.
+
+## Chưa có trong CI
+E2E chưa chạy trong GitHub Actions (cần thêm `@playwright/test` + trình duyệt vào CI). Đề xuất bổ sung trước UAT 03/12 cho các màn hình 0.1.

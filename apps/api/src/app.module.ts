@@ -9,6 +9,7 @@ import { AuditController } from "./audit/audit.controller";
 import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
 import { OrgController } from "./org/org.controller";
+import { ProjectsController } from "./projects/projects.controller";
 import { RateLimitService } from "./rate-limit";
 import { RbacGuard } from "./rbac/rbac.guard";
 import { RbacService } from "./rbac/rbac.service";
@@ -37,7 +38,7 @@ export class AppModule {
     const ownsPool = !options.pool;
     return {
       module: AppModule,
-      controllers: [HealthController, AuthController, OrgController, AuditController, ...(options.extraControllers ?? [])],
+      controllers: [HealthController, AuthController, OrgController, AuditController, ProjectsController, ...(options.extraControllers ?? [])],
       providers: [
         { provide: APP_CONFIG, useValue: options.config },
         { provide: DB_POOL, useValue: options.pool ?? createPool(options.config.databaseUrl) },

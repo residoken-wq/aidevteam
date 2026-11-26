@@ -16,4 +16,10 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "error",
     },
   },
+  {
+    // Standalone CommonJS browser-test scripts (run with node, not bundled): require() and console output are expected.
+    files: ["tests/e2e/**/*.cjs"],
+    languageOptions: { sourceType: "commonjs" },
+    rules: { "@typescript-eslint/no-require-imports": "off", "no-console": "off" },
+  },
 );

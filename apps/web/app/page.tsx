@@ -59,6 +59,12 @@ export default async function HomePage() {
         </ul>
       ) : null}
 
+      {me.activeOrg ? (
+        <nav>
+          <a href="/projects">Dự án</a>
+        </nav>
+      ) : null}
+
       <form method="post" action="/auth/logout">
         <button type="submit">Đăng xuất</button>
       </form>
