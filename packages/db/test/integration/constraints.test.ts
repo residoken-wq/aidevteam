@@ -205,3 +205,49 @@ describe("agents (P2-05, DB backstop)", () => {
     await expect(insert("a-cross-pa", { providerId: pa.rows[0]!.id })).rejects.toThrow(/agents_provider_same_org_fk/);
   });
 });
+
+describe("tasks (P3-02, DB backstop for STATE_MACHINES §1)", () => {
+  let projectA: string;
+  let n = 0;
+  beforeAll(async () => {
+    projectA = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'proj-tasks', 'Tasks') RETURNING id", [orgA])).rows[0]!.id;
+  });
+  const insert = (status = "BACKLOG") =>
+    pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title, status) VALUES ($1, $2, $3, 'T', $4) RETURNING id", [orgA, projectA, ++n, status]);
+  const move = (id: string, status: string, reason: string | null = null) =>
+    pool.query("UPDATE tasks SET status = $2, cancel_reason = $3 WHERE id = $1", [id, status, reason]);
+
+  it("walks the approved path BACKLOG → TODO → IN_PROGRESS → IN_REVIEW → IN_PROGRESS → IN_REVIEW → DONE", async () => {
+    const id = (await insert()).rows[0]!.id;
+    for (const s of ["TODO", "IN_PROGRESS", "IN_REVIEW", "IN_PROGRESS", "IN_REVIEW", "DONE"]) expect((await move(id, s)).rowCount).toBe(1);
+  });
+
+  it("must start in BACKLOG", async () => {
+    await expect(insert("DONE")).rejects.toThrow(/start in BACKLOG/);
+  });
+
+  it.each([
+    ["BACKLOG", "DONE"],
+    ["TODO", "IN_REVIEW"],
+    ["IN_PROGRESS", "DONE"],
+    ["IN_REVIEW", "CANCELLED"],
+  ])("refuses %s → %s", async (from, to) => {
+    const id = (await insert()).rows[0]!.id;
+    const path: Record<string, string[]> = { BACKLOG: [], TODO: ["TODO"], IN_PROGRESS: ["TODO", "IN_PROGRESS"], IN_REVIEW: ["TODO", "IN_PROGRESS", "IN_REVIEW"] };
+    for (const s of path[from]!) await move(id, s);
+    await expect(move(id, to, to === "CANCELLED" ? "r" : null)).rejects.toThrow(/not allowed/);
+  });
+
+  it("terminal states cannot be left; CANCELLED needs a reason and only CANCELLED may have one", async () => {
+    const id = (await insert()).rows[0]!.id;
+    await expect(move(id, "CANCELLED")).rejects.toThrow(/tasks_cancel_reason_iff_cancelled/);
+    expect((await move(id, "CANCELLED", "duplicate")).rowCount).toBe(1);
+    await expect(move(id, "BACKLOG")).rejects.toThrow(/not allowed/);
+  });
+
+  it("org/project/number are immutable and the project must be in the same org", async () => {
+    const id = (await insert()).rows[0]!.id;
+    await expect(pool.query("UPDATE tasks SET number = 999 WHERE id = $1", [id])).rejects.toThrow(/immutable/);
+    await expect(pool.query("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 9999, 'X')", [orgB, projectA])).rejects.toThrow(/tasks_project_same_org_fk/);
+  });
+});

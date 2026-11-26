@@ -236,6 +236,38 @@ export const agents = pgTable(
   ],
 );
 
+export const tasks = pgTable(
+  "tasks",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    projectId: uuid("project_id").notNull(),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    /** Untrusted plain text; never rendered as HTML or treated as instructions. */
+    description: text("description"),
+    status: text("status", { enum: ["BACKLOG", "TODO", "IN_PROGRESS", "IN_REVIEW", "DONE", "CANCELLED"] })
+      .notNull()
+      .default("BACKLOG"),
+    priority: text("priority", { enum: ["low", "medium", "high"] })
+      .notNull()
+      .default("medium"),
+    agentId: uuid("agent_id"),
+    cancelReason: text("cancel_reason"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+  },
+  (t) => [
+    unique("tasks_project_number_unique").on(t.projectId, t.number),
+    foreignKey({ name: "tasks_project_same_org_fk", columns: [t.projectId, t.orgId], foreignColumns: [projects.id, projects.orgId] }),
+    foreignKey({ name: "tasks_agent_same_org_fk", columns: [t.agentId, t.orgId], foreignColumns: [agents.id, agents.orgId] }),
+    index("tasks_org_project_status_idx").on(t.orgId, t.projectId, t.status),
+  ],
+);
+
 export const allTables = {
   orgs,
   users,
@@ -252,4 +284,5 @@ export const allTables = {
   workers,
   platform_admins: platformAdmins,
   agents,
+  tasks,
 } as const;
