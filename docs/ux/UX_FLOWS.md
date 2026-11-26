@@ -17,6 +17,7 @@
 | S-09 | Dispatch + danh sách run + log | trong S-08, `/runs/:id` | `dispatch:execute`, `run:read` | P4 |
 | S-10 | Approval Center (chỉ đọc) | `/approvals` | `approval:read` | P6-06 |
 | S-11 | Audit log | `/audit` | `audit:read` | Có API (P1-06), UI chưa có |
+| S-12 | Quản trị tổ chức (platform admin) | `/platform/orgs` | `platform:org:*` | **Đã có** (P2-03) — chờ Owner duyệt (D-2026-11-26-13) |
 
 ## 2. Luồng chính
 
@@ -29,6 +30,8 @@
 **F-04 Làm việc với task** (maintainer) — S-08 tạo task → kéo thả giữa cột theo STATE_MACHINES §1 (chuyển không hợp lệ → hoàn tác + thông báo) → dispatch tới worker mock → S-09 xem trạng thái/log (log hiển thị dạng text, đã redact).
 
 **F-05 Theo dõi** (viewer trở lên) — S-03 dashboard số liệu thật của org → S-10 xem approval, link sang PR GitHub (không có nút duyệt).
+
+**F-07 Quản trị tổ chức** (platform admin, cấp bằng CLI) — S-02 → S-12 tạo org → (gán role bằng CLI) → đổi tên / lưu trữ (xác nhận; thành viên mất truy cập, dữ liệu giữ nguyên) / khôi phục.
 
 **F-06 Kiểm tra audit** (org_admin) — S-11 danh sách sự kiện của org.
 
