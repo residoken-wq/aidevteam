@@ -1,0 +1,2 @@
+ALTER TABLE orgs DROP COLUMN IF EXISTS updated_at;
+DROP TABLE IF EXISTS platform_admins;

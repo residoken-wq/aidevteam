@@ -10,6 +10,7 @@ const EXPECTED_TABLES = [
   "audit_events",
   "oauth_login_states",
   "orgs",
+  "platform_admins",
   "projects",
   "provider_accounts",
   "rate_limit_hits",

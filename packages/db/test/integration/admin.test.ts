@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createOrg, grantRole, listBindings, revokeRole } from "../../src/admin";
+import { createOrg, grantPlatformAdmin, grantRole, listBindings, listPlatformAdmins, revokePlatformAdmin, revokeRole } from "../../src/admin";
 import { addToAllowlist } from "../../src/allowlist";
 import { migrateUp } from "../../src/migrate";
 import { resetSchema, testPool } from "./helpers";
@@ -40,5 +40,23 @@ describe("operator administration", () => {
 
   it("validates org slugs", async () => {
     await expect(createOrg(pool, "Bad Slug", "x")).rejects.toThrow(/slug/);
+  });
+});
+
+describe("platform administrators (P2-03)", () => {
+  it("grants once to an allowlisted user, audited, and revokes", async () => {
+    expect(await grantPlatformAdmin(pool, 900000020, "ops on-call")).toBe(true);
+    expect(await grantPlatformAdmin(pool, 900000020)).toBe(false);
+    expect(await listPlatformAdmins(pool)).toEqual([{ githubUserId: 900000020, note: "ops on-call" }]);
+    expect(await revokePlatformAdmin(pool, 900000020)).toBe(true);
+    expect(await revokePlatformAdmin(pool, 900000020)).toBe(false);
+    expect(await listPlatformAdmins(pool)).toEqual([]);
+    const a = await pool.query("SELECT action FROM audit_events WHERE action LIKE 'admin.platform_admin_%' ORDER BY id");
+    expect(a.rows.map((x) => x.action)).toEqual(["admin.platform_admin_granted", "admin.platform_admin_revoked"]);
+  });
+
+  it("refuses users who are not on the allowlist", async () => {
+    await expect(grantPlatformAdmin(pool, 900000029)).rejects.toThrow(/allowlist/);
+    expect(await listPlatformAdmins(pool)).toEqual([]);
   });
 });
