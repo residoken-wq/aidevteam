@@ -93,3 +93,27 @@ jobs:
         env:
           TEST_DATABASE_URL: postgres://postgres@localhost:5432/aidevteam_test
         run: pnpm test:integration
+
+      - name: Backup/restore test (PostgreSQL)
+        if: steps.detect.outputs.node == 'true'
+        env:
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+        run: |
+          set -euo pipefail
+          # Client tools must match the server MAJOR version (16): a newer pg_dump writes settings PostgreSQL 16
+          # rejects on restore, and the runner image does not ship a 16 client. Run the clients from the SAME
+          # pinned image as the service container via small wrappers placed first on PATH.
+          img="postgres:16-bookworm@sha256:cd0e9518bda5f2ea667ff84d22795d089720c883f288e215d97ce57437e8ef37"
+          docker pull -q "$img"
+          bindir="$RUNNER_TEMP/pg16bin"; mkdir -p "$bindir"
+          for tool in pg_dump pg_restore psql; do
+            printf '%s\n' '#!/usr/bin/env bash' \
+              "exec docker run --rm -i --network host -u \"\$(id -u):\$(id -g)\" -v /tmp:/tmp -v \"\$RUNNER_TEMP:\$RUNNER_TEMP\" -v \"\$PWD:\$PWD\" -w \"\$PWD\" -e PGHOST -e PGPORT -e PGUSER -e PGDATABASE $img $tool \"\$@\"" \
+              > "$bindir/$tool"
+            chmod +x "$bindir/$tool"
+          done
+          export PATH="$bindir:$PATH" TMPDIR=/tmp
+          pg_dump --version
+          bash tests/backup/test_backup_restore.sh

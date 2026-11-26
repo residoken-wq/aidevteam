@@ -293,6 +293,9 @@ Không viết code ứng dụng trước khi Owner ký baseline.
 | Seed dữ liệu giả (bị chặn khi `NODE_ENV=production`) | `DATABASE_URL=… pnpm --filter @aidevteam/db seed` |
 | Thêm/gỡ người được đăng nhập (ghi audit; gỡ = thu hồi session) | `DATABASE_URL=… pnpm --filter @aidevteam/db allowlist add <github_user_id> [ghi chú]` / `… allowlist remove <github_user_id>` |
 | Tạo org / gán, gỡ, liệt kê role (ghi audit; role: `org_admin`, `maintainer`, `viewer`) | `DATABASE_URL=… pnpm --filter @aidevteam/db admin org create <slug> <tên>` / `… admin role grant <github_user_id> <org_slug> <role>` / `… admin role revoke …` / `… admin role list <org_slug>` |
+| Backup DB (operator; mật khẩu chỉ qua `.pgpass`) | `PGHOST=… PGUSER=… PGDATABASE=… BACKUP_DIR=… deploy/backup.sh` |
+| Restore vào DB rỗng | `PGHOST=… PGUSER=… deploy/restore.sh --file <…dump> --target-db <db_rỗng> --yes` |
+| Test backup/restore (cần PostgreSQL + `pnpm build:packages`) | `PGHOST=… PGPORT=… PGUSER=… bash tests/backup/test_backup_restore.sh` |
 | Test script deploy | `bash tests/deploy/test_deploy.sh` |
 | Build image (cần Docker) | `docker build -f apps/api/Dockerfile .` / `docker build -f apps/web/Dockerfile .` — **chưa chạy cục bộ**, CI chạy trên PR |
 

@@ -65,7 +65,7 @@ sudo mkdir -p /opt/aidevteam /etc/aidevteam
 ```
 
 ```bash
-sudo cp deploy/compose.yaml deploy/deploy.sh /opt/aidevteam/
+sudo cp deploy/compose.yaml deploy/deploy.sh deploy/backup.sh deploy/restore.sh /opt/aidevteam/
 ```
 
 ```bash
