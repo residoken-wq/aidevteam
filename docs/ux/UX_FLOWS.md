@@ -9,7 +9,7 @@
 | S-01 | Đăng nhập | `/login` | Công khai | **Đã có** (P1-05G) |
 | S-02 | Trang chủ / chọn tổ chức | `/` | Đã đăng nhập | **Đã có** (P1-06) |
 | S-03 | Dashboard tổng quan | `/dashboard` | `dashboard:read` | P2-02 |
-| S-04 | Project: danh sách, tạo/sửa | `/projects` | `project:read` / `project:write` | P2-10 |
+| S-04 | Project: danh sách, tạo/sửa | `/projects` | `project:read` / `project:write` | **Đã có** (P2-10) |
 | S-05 | Agent | `/agents` | `agent:read` / `agent:write` | P2-05 |
 | S-06 | Provider account (chỉ `secret_ref`) | `/provider-accounts` | `provider_account:*` | P2-07 |
 | S-07 | Worker (chỉ loại mock) | `/workers` | `worker:*` | P2-08 |
