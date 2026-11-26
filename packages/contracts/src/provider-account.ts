@@ -7,7 +7,8 @@ import { SecretRefSchema } from "./secret-ref";
  * org id in the body is rejected. A pasted credential fails SecretRefSchema with problem "secret_like".
  * Release 0.1 never contacts the provider (no "test connection").
  */
-export const PROVIDERS = ["anthropic", "google", "github", "other"] as const;
+/** "openai" covers OpenAI Codex (D-2026-11-26-11). */
+export const PROVIDERS = ["anthropic", "openai", "google", "github", "other"] as const;
 export const ProviderSchema = z.enum(PROVIDERS);
 
 export const ProviderAccountCreateSchema = z

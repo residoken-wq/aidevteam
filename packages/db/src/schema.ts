@@ -160,7 +160,7 @@ export const providerAccounts = pgTable(
       .references(() => orgs.id),
     slug: text("slug").notNull(),
     name: text("name").notNull(),
-    provider: text("provider", { enum: ["anthropic", "google", "github", "other"] }).notNull(),
+    provider: text("provider", { enum: ["anthropic", "openai", "google", "github", "other"] }).notNull(),
     /** Pointer only (env:AIDEV_SECRET_… or file:/run/secrets/…), never the credential. */
     secretRef: text("secret_ref").notNull(),
     description: text("description"),

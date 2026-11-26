@@ -52,6 +52,8 @@
 | D-2026-11-26-08 | 26/11/2026 | Đưa E2E trình duyệt (Playwright) vào CI cho các màn hình Release 0.1, hoàn thành trước UAT 03/12 | Người dùng phiên | Trả lời trong phiên (residoken-wq/aidevteam#12) | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 | D-2026-11-26-09 | 26/11/2026 | Web proxy `/api/*` → api (session, RBAC, `Origin` vẫn do api kiểm tra) | Người dùng phiên | residoken-wq/aidevteam#12 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 | D-2026-11-26-10 | 26/11/2026 | Thứ tự làm tiếp: P2-07 (provider account) → P2-08 (worker) → … | Người dùng phiên | Trả lời trong phiên | ÁP DỤNG |
+| D-2026-11-26-11 | 26/11/2026 | Danh sách provider 0.1: `anthropic`, `openai` (OpenAI Codex), `google`, `github`, `other` | Người dùng phiên | Trả lời trong phiên (residoken-wq/aidevteam#13) | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
+| D-2026-11-26-12 | 26/11/2026 | `viewer` được xem `secret_ref` (tham chiếu, không phải secret; có lộ tên biến môi trường) — chấp nhận | Người dùng phiên | Trả lời trong phiên (residoken-wq/aidevteam#13) | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 
 ## C. Checkpoint go/no-go (CLAUDE.md §5.4)
 

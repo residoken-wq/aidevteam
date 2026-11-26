@@ -153,6 +153,11 @@ describe("AC-4 / AC-7 secrets never stored, returned or logged", () => {
     }
   });
 
+  it("accepts openai (Codex) as a provider", async () => {
+    const res = await write("post", "/provider-accounts", "maintA").send({ ...valid("codex-main"), provider: "openai" }).expect(201);
+    expect(res.body.provider).toBe("openai");
+  });
+
   it("unknown providers and extra fields such as apiKey are refused", async () => {
     await write("post", "/provider-accounts", "maintA").send({ ...valid("aws"), provider: "aws" }).expect(422);
     const res = await write("post", "/provider-accounts", "maintA").send({ ...valid("extra"), apiKey: FAKE_KEY }).expect(422);

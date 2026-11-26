@@ -21,6 +21,12 @@ describe("ProviderAccountCreateSchema", () => {
   });
 });
 
+describe("providers", () => {
+  it.each(["anthropic", "openai", "google", "github", "other"])("accepts %s", (provider) => {
+    expect(ProviderAccountCreateSchema.safeParse({ ...valid, provider }).success).toBe(true);
+  });
+});
+
 describe("ProviderAccountUpdateSchema", () => {
   it("allows rotating the reference but not the provider or slug", () => {
     expect(ProviderAccountUpdateSchema.parse({ secretRef: "file:/run/secrets/claude-new" })).toEqual({ secretRef: "file:/run/secrets/claude-new" });

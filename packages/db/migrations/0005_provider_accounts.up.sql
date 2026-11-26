@@ -7,7 +7,7 @@ CREATE TABLE provider_accounts (
   org_id             uuid NOT NULL REFERENCES orgs (id),
   slug               text NOT NULL CHECK (slug ~ '^[a-z0-9][a-z0-9-]{1,62}$'),
   name               text NOT NULL CHECK (char_length(btrim(name)) BETWEEN 1 AND 120),
-  provider           text NOT NULL CHECK (provider IN ('anthropic', 'google', 'github', 'other')),
+  provider           text NOT NULL CHECK (provider IN ('anthropic', 'openai', 'google', 'github', 'other')),
   secret_ref         text NOT NULL CHECK (
                        secret_ref ~ '^env:AIDEV_SECRET_[A-Z0-9_]{1,64}$'
                        OR (secret_ref ~ '^file:/run/secrets/[a-z0-9][a-z0-9._-]{0,63}$' AND position('..' IN secret_ref) = 0)
