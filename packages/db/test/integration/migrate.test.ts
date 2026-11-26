@@ -20,6 +20,7 @@ const EXPECTED_TABLES = [
   "sessions",
   "user_allowlist",
   "users",
+  "workers",
 ];
 
 describe("migrations up/down (AC-1)", () => {

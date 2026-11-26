@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { bigint, customType, foreignKey, index, integer, jsonb, pgTable, primaryKey, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, customType, foreignKey, index, integer, jsonb, pgTable, primaryKey, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 
 /**
  * Typed Drizzle view of the schema created by migrations/*.up.sql.
@@ -172,6 +172,32 @@ export const providerAccounts = pgTable(
   (t) => [unique("provider_accounts_org_slug_unique").on(t.orgId, t.slug), unique("provider_accounts_id_org_unique").on(t.id, t.orgId)],
 );
 
+export const workers = pgTable(
+  "workers",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    type: text("type", { enum: ["mock"] }).notNull(),
+    workspacePath: text("workspace_path").notNull(),
+    projectId: uuid("project_id"),
+    enabled: boolean("enabled").notNull().default(true),
+    description: text("description"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+    archivedAt: ts("archived_at"),
+  },
+  (t) => [
+    unique("workers_org_slug_unique").on(t.orgId, t.slug),
+    unique("workers_id_org_unique").on(t.id, t.orgId),
+    foreignKey({ name: "workers_project_same_org_fk", columns: [t.projectId, t.orgId], foreignColumns: [projects.id, projects.orgId] }),
+  ],
+);
+
 export const allTables = {
   orgs,
   users,
@@ -185,4 +211,5 @@ export const allTables = {
   rate_limit_hits: rateLimitHits,
   projects,
   provider_accounts: providerAccounts,
+  workers,
 } as const;

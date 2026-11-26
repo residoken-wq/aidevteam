@@ -148,3 +148,28 @@ describe("provider_accounts.secret_ref (P2-07, defence in depth)", () => {
     },
   );
 });
+
+describe("workers (P2-08, DB backstop)", () => {
+  const insert = (slug: string, path: string, type = "mock", org = orgA) =>
+    pool.query("INSERT INTO workers (org_id, slug, name, type, workspace_path) VALUES ($1, $2, 'W', $3, $4)", [org, slug, type, path]);
+
+  it("accepts a mock worker with a normalised absolute path", async () => {
+    expect((await insert("w-ok", "/srv/workers/w-ok")).rowCount).toBe(1);
+  });
+
+  it.each(["relative/path", "/srv/../etc", "/srv/./x", "/srv//x", "/srv/x/", "/", "/srv/x y"])("rejects workspace path %j", async (path) => {
+    await expect(insert(`w-${Math.random().toString(36).slice(2, 8)}`, path)).rejects.toThrow(/check constraint/);
+  });
+
+  it("rejects non-mock types and duplicate active paths in the same org", async () => {
+    await expect(insert("w-real", "/srv/workers/real", "agy")).rejects.toThrow(/check constraint/);
+    await expect(insert("w-dup", "/srv/workers/w-ok")).rejects.toThrow(/duplicate key/);
+  });
+
+  it("rejects attaching a worker to another org's project", async () => {
+    const p = await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'proj-b-worker', 'P B') RETURNING id", [orgB]);
+    await expect(
+      pool.query("INSERT INTO workers (org_id, slug, name, type, workspace_path, project_id) VALUES ($1, 'w-x', 'W', 'mock', '/srv/w-x', $2)", [orgA, p.rows[0]!.id]),
+    ).rejects.toThrow(/workers_project_same_org_fk/);
+  });
+});
