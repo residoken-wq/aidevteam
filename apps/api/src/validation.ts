@@ -11,7 +11,11 @@ export function parseOr422<S extends z.ZodType>(schema: S, value: unknown): z.ou
   throw new UnprocessableEntityException({
     statusCode: 422,
     message: "validation_failed",
-    issues: r.error.issues.map((i) => ({ path: i.path.map(String).join("."), message: i.message })),
+    issues: r.error.issues.map((i) => {
+      // A machine-readable problem code (e.g. "secret_like") lets the UI explain what to do; it is a code, not input.
+      const problem = (i as { params?: { problem?: unknown } }).params?.problem;
+      return { path: i.path.map(String).join("."), message: i.message, ...(typeof problem === "string" ? { problem } : {}) };
+    }),
   });
 }
 
