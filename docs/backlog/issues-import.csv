@@ -1,0 +1,39 @@
+id,title,labels,status,notes
+P0-01,[P0-01] Source inventory,release-0.1;phase:0,DONE_PENDING_REVIEW,docs/reports/SOURCE_INVENTORY.md — 8 nguồn SOURCE_MISSING
+P0-02,[P0-02] Environment inventory,release-0.1;phase:0,DONE_PENDING_REVIEW,docs/reports/ENVIRONMENT_INVENTORY.md
+P0-03,[P0-03] Threat model,release-0.1;phase:0,DONE_PENDING_REVIEW,docs/operations/THREAT_MODEL.md
+P0-04,[P0-04] Provider compliance,release-0.1;phase:0,DONE_PENDING_REVIEW,docs/operations/PROVIDER_COMPLIANCE.md
+P0-05,[P0-05] ADR-001..005,release-0.1;phase:0,DONE_PENDING_REVIEW,"ADR-001/002/004 ACCEPTED (người dùng phiên), ADR-003 PROPOSED, ADR-005 ACCEPTED (Owner)"
+P0-06,[P0-06] RBAC matrix,release-0.1;phase:0,DONE_PENDING_OWNER,docs/governance/RBAC_MATRIX.md — cần Owner duyệt
+P0-07,[P0-07] UX flows,release-0.1;phase:0,DONE_PENDING_REVIEW,docs/ux/UX_FLOWS.md
+P0-08,[P0-08] Backlog import,release-0.1;phase:0,DONE_PENDING_REVIEW,File này; chỉ gồm Task ID có trong CLAUDE.md (Master Plan SOURCE_MISSING)
+P1-01,[P1-01] Repo skeleton,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#3
+P1-02,[P1-02] CI lint/typecheck/test,release-0.1;phase:1,MERGED,"residoken-wq/aidevteam#2, #3"
+P1-04,[P1-04] DB schema + migration có rollback,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#4
+P1-05,[P1-05] Đăng nhập Entra ID OIDC,post-0.1;phase:1,REMOVED (O-12),Thay bằng P1-05G
+P1-05G,[P1-05G] Đăng nhập GitHub OAuth (ADR-005),release-0.1;phase:1,MERGED,"residoken-wq/aidevteam#5, #6 (rate limit); cần Owner đăng ký OAuth App"
+P1-06,[P1-06] RBAC default deny,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#6; ma trận chờ Owner
+P1-07,[P1-07] Secret reference + redaction,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#7
+P1-08,[P1-08] Audit append-only,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#4
+P1-09,[P1-09] CI SCA + required checks,release-0.1;phase:1,PARTIAL,"CI/CD có (#2); chưa có SCA, secret scan; branch protection DEFINED – NOT ENFORCED"
+P1-10,[P1-10] Health probe (DB readiness),release-0.1;phase:1,TODO,"/health có, chưa kiểm tra DB"
+P1-11,[P1-11] Backup/restore cơ bản,release-0.1;phase:1,TODO,
+P2-02,[P2-02] Dashboard tổng quan,release-0.1;phase:2,TODO,
+P2-03,[P2-03] CRUD org (ánh xạ chưa xác minh),release-0.1;phase:2,TODO,Hiện tạo org bằng CLI
+P2-04,[P2-04] Role editor nâng cao,post-0.1;phase:2,TODO,0.1 dùng CLI
+P2-05,[P2-05] CRUD agent (ánh xạ chưa xác minh),release-0.1;phase:2,TODO,
+P2-06,[P2-06] Org chart kéo thả,post-0.1;phase:2,TODO,
+P2-07,[P2-07] CRUD provider account (ánh xạ chưa xác minh),release-0.1;phase:2,TODO,Dùng SecretRefSchema
+P2-08,[P2-08] CRUD worker (ánh xạ chưa xác minh),release-0.1;phase:2,TODO,Chỉ mock
+P2-10,[P2-10] CRUD project (ánh xạ chưa xác minh),release-0.1;phase:2,TODO,
+P3-02,[P3-02] Task CRUD + trạng thái,release-0.1;phase:3,TODO,Cần duyệt STATE_MACHINES §1
+P3-04,[P3-04] Kanban cơ bản,release-0.1;phase:3,TODO,
+P4-01,[P4-01] Dispatch tới mock worker,release-0.1;phase:4,TODO,Cần duyệt ADR-003
+P4-03,[P4-03] Agent run lifecycle (rút gọn),release-0.1;phase:4,TODO,
+P4-07,[P4-07] Xem log/run (rút gọn),release-0.1;phase:4,TODO,
+P4-12,[P4-12] Legacy adapter router v0.1,post-0.1;phase:4,OPTIONAL,Chỉ sau khi O-06 giải quyết
+P6-05,[P6-05] Approval service xác minh comment,post-0.1;phase:6,TODO,
+P6-06,[P6-06] Approval Center chỉ đọc (rút gọn),release-0.1;phase:6,TODO,O-07
+P6-07,[P6-07] Protected environment reviewer,post-0.1;phase:6,NOT AVAILABLE ON PLAN,O-01
+P6-08,[P6-08] Approval verification (deploy-time),post-0.1;phase:6,TODO,
+P10-06,[P10-06] Production gate (Master Plan),post-0.1;phase:10,NOT AVAILABLE ON PLAN,O-01; thay bằng phương án B

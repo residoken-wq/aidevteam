@@ -1,0 +1,424 @@
+{
+  "generated": "2026-11-26",
+  "note": "Không tạo issue trên GitHub (CLAUDE.md §7 P0-08). Danh sách chưa đầy đủ: chỉ Task ID được nhắc trong CLAUDE.md.",
+  "items": [
+    {
+      "id": "P0-01",
+      "title": "[P0-01] Source inventory",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE_PENDING_REVIEW",
+      "notes": "docs/reports/SOURCE_INVENTORY.md — 8 nguồn SOURCE_MISSING",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P0-02",
+      "title": "[P0-02] Environment inventory",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE_PENDING_REVIEW",
+      "notes": "docs/reports/ENVIRONMENT_INVENTORY.md",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P0-03",
+      "title": "[P0-03] Threat model",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE_PENDING_REVIEW",
+      "notes": "docs/operations/THREAT_MODEL.md",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P0-04",
+      "title": "[P0-04] Provider compliance",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE_PENDING_REVIEW",
+      "notes": "docs/operations/PROVIDER_COMPLIANCE.md",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P0-05",
+      "title": "[P0-05] ADR-001..005",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE_PENDING_REVIEW",
+      "notes": "ADR-001/002/004 ACCEPTED (người dùng phiên), ADR-003 PROPOSED, ADR-005 ACCEPTED (Owner)",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P0-06",
+      "title": "[P0-06] RBAC matrix",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE_PENDING_OWNER",
+      "notes": "docs/governance/RBAC_MATRIX.md — cần Owner duyệt",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P0-07",
+      "title": "[P0-07] UX flows",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE_PENDING_REVIEW",
+      "notes": "docs/ux/UX_FLOWS.md",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P0-08",
+      "title": "[P0-08] Backlog import",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE_PENDING_REVIEW",
+      "notes": "File này; chỉ gồm Task ID có trong CLAUDE.md (Master Plan SOURCE_MISSING)",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-01",
+      "title": "[P1-01] Repo skeleton",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#3",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-02",
+      "title": "[P1-02] CI lint/typecheck/test",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#2, #3",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-04",
+      "title": "[P1-04] DB schema + migration có rollback",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#4",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-05",
+      "title": "[P1-05] Đăng nhập Entra ID OIDC",
+      "labels": [
+        "post-0.1",
+        "phase:1"
+      ],
+      "status": "REMOVED (O-12)",
+      "notes": "Thay bằng P1-05G",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-05G",
+      "title": "[P1-05G] Đăng nhập GitHub OAuth (ADR-005)",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#5, #6 (rate limit); cần Owner đăng ký OAuth App",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-06",
+      "title": "[P1-06] RBAC default deny",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#6; ma trận chờ Owner",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-07",
+      "title": "[P1-07] Secret reference + redaction",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#7",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-08",
+      "title": "[P1-08] Audit append-only",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#4",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-09",
+      "title": "[P1-09] CI SCA + required checks",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "PARTIAL",
+      "notes": "CI/CD có (#2); chưa có SCA, secret scan; branch protection DEFINED – NOT ENFORCED",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-10",
+      "title": "[P1-10] Health probe (DB readiness)",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "TODO",
+      "notes": "/health có, chưa kiểm tra DB",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P1-11",
+      "title": "[P1-11] Backup/restore cơ bản",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P2-02",
+      "title": "[P2-02] Dashboard tổng quan",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P2-03",
+      "title": "[P2-03] CRUD org (ánh xạ chưa xác minh)",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "Hiện tạo org bằng CLI",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P2-04",
+      "title": "[P2-04] Role editor nâng cao",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "0.1 dùng CLI",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P2-05",
+      "title": "[P2-05] CRUD agent (ánh xạ chưa xác minh)",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P2-06",
+      "title": "[P2-06] Org chart kéo thả",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P2-07",
+      "title": "[P2-07] CRUD provider account (ánh xạ chưa xác minh)",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "Dùng SecretRefSchema",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P2-08",
+      "title": "[P2-08] CRUD worker (ánh xạ chưa xác minh)",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "Chỉ mock",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P2-10",
+      "title": "[P2-10] CRUD project (ánh xạ chưa xác minh)",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P3-02",
+      "title": "[P3-02] Task CRUD + trạng thái",
+      "labels": [
+        "release-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "Cần duyệt STATE_MACHINES §1",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P3-04",
+      "title": "[P3-04] Kanban cơ bản",
+      "labels": [
+        "release-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P4-01",
+      "title": "[P4-01] Dispatch tới mock worker",
+      "labels": [
+        "release-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "Cần duyệt ADR-003",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P4-03",
+      "title": "[P4-03] Agent run lifecycle (rút gọn)",
+      "labels": [
+        "release-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P4-07",
+      "title": "[P4-07] Xem log/run (rút gọn)",
+      "labels": [
+        "release-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P4-12",
+      "title": "[P4-12] Legacy adapter router v0.1",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "OPTIONAL",
+      "notes": "Chỉ sau khi O-06 giải quyết",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P6-05",
+      "title": "[P6-05] Approval service xác minh comment",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P6-06",
+      "title": "[P6-06] Approval Center chỉ đọc (rút gọn)",
+      "labels": [
+        "release-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "O-07",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P6-07",
+      "title": "[P6-07] Protected environment reviewer",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "NOT AVAILABLE ON PLAN",
+      "notes": "O-01",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P6-08",
+      "title": "[P6-08] Approval verification (deploy-time)",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "P10-06",
+      "title": "[P10-06] Production gate (Master Plan)",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "NOT AVAILABLE ON PLAN",
+      "notes": "O-01; thay bằng phương án B",
+      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    }
+  ]
+}
