@@ -5,14 +5,18 @@
   "description": "PostgreSQL schema (Drizzle), up/down SQL migrations and fake seed data",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "migrations"],
+  "files": [
+    "dist",
+    "migrations"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --dir test/unit",
     "test:integration": "vitest run --dir test/integration --no-file-parallelism",
     "migrate": "node dist/cli.js",
-    "seed": "node dist/seed-cli.js"
+    "seed": "node dist/seed-cli.js",
+    "allowlist": "node dist/allowlist-cli.js"
   },
   "dependencies": {
     "drizzle-orm": "0.45.4",

@@ -109,6 +109,16 @@ export const releaseApprovals = pgTable("release_approvals", {
   recordedAt: ts("recorded_at").notNull().defaultNow(),
 });
 
+export const oauthLoginStates = pgTable("oauth_login_states", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  /** SHA-256 of the OAuth `state` value. */
+  stateHash: bytea("state_hash").notNull().unique(),
+  codeVerifier: text("code_verifier").notNull(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  expiresAt: ts("expires_at").notNull(),
+  usedAt: ts("used_at"),
+});
+
 export const allTables = {
   orgs,
   users,
@@ -118,4 +128,5 @@ export const allTables = {
   sessions,
   audit_events: auditEvents,
   release_approvals: releaseApprovals,
+  oauth_login_states: oauthLoginStates,
 } as const;

@@ -26,10 +26,11 @@ describe("repository migrations", () => {
     });
   });
 
-  it("down migrations drop everything their up migration creates (0001)", () => {
-    const m = loadMigrations()[0]!;
-    const created = [...m.upSql.matchAll(/CREATE TABLE (\w+)/g)].map((x) => x[1]);
-    for (const table of created) expect(m.downSql).toContain(`DROP TABLE IF EXISTS ${table};`);
+  it("each down migration drops every table its up migration creates", () => {
+    for (const m of loadMigrations()) {
+      const created = [...m.upSql.matchAll(/CREATE TABLE (\w+)/g)].map((x) => x[1]);
+      for (const table of created) expect(m.downSql).toContain(`DROP TABLE IF EXISTS ${table};`);
+    }
   });
 });
 

@@ -8,6 +8,7 @@ import { resetSchema, tableNames, testPool } from "./helpers";
 
 const EXPECTED_TABLES = [
   "audit_events",
+  "oauth_login_states",
   "orgs",
   "release_approvals",
   "role_bindings",
