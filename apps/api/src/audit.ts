@@ -1,3 +1,4 @@
+import { redactDeep } from "@aidevteam/contracts";
 import type { Pool } from "@aidevteam/db";
 
 export interface AuditEvent {
@@ -8,7 +9,7 @@ export interface AuditEvent {
   targetType?: string | null;
   targetId?: string | null;
   requestId?: string | null;
-  /** Must not contain tokens, codes, emails, phone numbers or national ids. */
+  /** Redacted again before storage (defence in depth), but callers must still not put secrets here. */
   metadata?: Record<string, string | number | boolean | null>;
 }
 
@@ -24,7 +25,7 @@ export async function writeAudit(pool: Pool, e: AuditEvent): Promise<void> {
       e.targetType ?? null,
       e.targetId ?? null,
       e.requestId ?? null,
-      JSON.stringify(e.metadata ?? {}),
+      JSON.stringify(redactDeep(e.metadata ?? {})),
     ],
   );
 }
