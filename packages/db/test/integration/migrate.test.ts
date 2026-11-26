@@ -7,6 +7,7 @@ import { loadMigrations, migrateDown, migrateUp, migrationStatus } from "../../s
 import { resetSchema, tableNames, testPool } from "./helpers";
 
 const EXPECTED_TABLES = [
+  "agents",
   "audit_events",
   "oauth_login_states",
   "orgs",
