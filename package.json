@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "typecheck": "pnpm build:packages && pnpm -r typecheck",
     "test": "pnpm build:packages && pnpm -r test",
-    "test:integration": "pnpm build:packages && pnpm -r --if-present test:integration"
+    "test:integration": "pnpm build:packages && pnpm -r --workspace-concurrency=1 --if-present test:integration"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
