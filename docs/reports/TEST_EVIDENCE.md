@@ -28,6 +28,10 @@
 | Lọc `org_id` khi gắn `projectSlug` | `another org's project cannot be attached` | P2-08 |
 | Kiểm tra platform admin trong guard (P2-03) | 2 test AC-2 `platform-orgs.test.ts` | P2-03 |
 | Bỏ lọc org đã lưu trữ khỏi membership | 2 test "archived org" `platform-orgs.test.ts` | P2-03 |
+| Kiểm tra vòng lặp báo cáo của agent | 2 test AC-4 `agents.test.ts` | P2-05 |
+| Advisory lock cấp org khi đổi cấp trên | `concurrent manager changes cannot create a cycle` | P2-05 |
+| Lọc `org_id` khi gắn provider account / cấp trên | `another org's provider account or manager…` | P2-05 |
+| Chặn lưu trữ agent còn cấp dưới | `an agent with active reports cannot be archived…` | P2-05 |
 | Chặn sửa worker đã lưu trữ | `duplicate slug → 409; archived worker cannot be edited…` | P2-08 |
 
 ## 3. Chạy thử end-to-end cục bộ (không phải staging)

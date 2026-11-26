@@ -208,6 +208,34 @@ export const platformAdmins = pgTable("platform_admins", {
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 
+export const agents = pgTable(
+  "agents",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    title: text("title"),
+    model: text("model"),
+    providerAccountId: uuid("provider_account_id"),
+    reportsToAgentId: uuid("reports_to_agent_id"),
+    enabled: boolean("enabled").notNull().default(true),
+    description: text("description"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+    archivedAt: ts("archived_at"),
+  },
+  (t) => [
+    unique("agents_org_slug_unique").on(t.orgId, t.slug),
+    unique("agents_id_org_unique").on(t.id, t.orgId),
+    foreignKey({ name: "agents_provider_same_org_fk", columns: [t.providerAccountId, t.orgId], foreignColumns: [providerAccounts.id, providerAccounts.orgId] }),
+    foreignKey({ name: "agents_manager_same_org_fk", columns: [t.reportsToAgentId, t.orgId], foreignColumns: [t.id, t.orgId] }),
+  ],
+);
+
 export const allTables = {
   orgs,
   users,
@@ -223,4 +251,5 @@ export const allTables = {
   provider_accounts: providerAccounts,
   workers,
   platform_admins: platformAdmins,
+  agents,
 } as const;

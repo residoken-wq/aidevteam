@@ -7,3 +7,4 @@ export * from "./redact";
 export * from "./secret-ref";
 export * from "./worker";
 export * from "./org";
+export * from "./agent";

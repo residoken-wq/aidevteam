@@ -173,3 +173,35 @@ describe("workers (P2-08, DB backstop)", () => {
     ).rejects.toThrow(/workers_project_same_org_fk/);
   });
 });
+
+describe("agents (P2-05, DB backstop)", () => {
+  const insert = (slug: string, extra: { org?: string; model?: string | null; providerId?: string | null; managerId?: string | null } = {}) =>
+    pool.query<{ id: string }>(
+      "INSERT INTO agents (org_id, slug, name, model, provider_account_id, reports_to_agent_id) VALUES ($1, $2, 'A', $3, $4, $5) RETURNING id",
+      [extra.org ?? orgA, slug, extra.model ?? null, extra.providerId ?? null, extra.managerId ?? null],
+    );
+
+  it("accepts an agent with a manager in the same org", async () => {
+    const lead = await insert("a-lead", { model: "claude-sonnet-x.y" });
+    expect((await insert("a-dev", { managerId: lead.rows[0]!.id })).rowCount).toBe(1);
+  });
+
+  it.each(["has space", "semi;colon", "-leading", "x".repeat(101)])("rejects model %j", async (model) => {
+    await expect(insert(`a-${Math.random().toString(36).slice(2, 8)}`, { model })).rejects.toThrow(/check constraint/);
+  });
+
+  it("rejects reporting to itself", async () => {
+    const a = await insert("a-self");
+    await expect(pool.query("UPDATE agents SET reports_to_agent_id = id WHERE id = $1", [a.rows[0]!.id])).rejects.toThrow(/agents_not_own_manager/);
+  });
+
+  it("rejects a manager or provider account from another org", async () => {
+    const bLead = await insert("a-b-lead", { org: orgB });
+    await expect(insert("a-cross-mgr", { managerId: bLead.rows[0]!.id })).rejects.toThrow(/agents_manager_same_org_fk/);
+    const pa = await pool.query<{ id: string }>(
+      "INSERT INTO provider_accounts (org_id, slug, name, provider, secret_ref) VALUES ($1, 'pa-b-agent', 'P', 'anthropic', 'env:AIDEV_SECRET_PA_B_AGENT') RETURNING id",
+      [orgB],
+    );
+    await expect(insert("a-cross-pa", { providerId: pa.rows[0]!.id })).rejects.toThrow(/agents_provider_same_org_fk/);
+  });
+});
