@@ -1,6 +1,6 @@
 # State machines (O-04)
 
-> Ngày: 26/11/2026 · Trạng thái: **`PROPOSED` — tên trạng thái chưa đối chiếu policy**.
+> Ngày: 26/11/2026 · Trạng thái: **§1 Task và §2 Agent run `OWNER APPROVED` (26/11/2026, D-2026-11-26-07)**; §3–§5 `PROPOSED` — tên trạng thái release chưa đối chiếu policy.
 > O-04 yêu cầu tên trạng thái release lấy theo policy, nhưng `RELEASE_POLICY.md` v1.0.1 và v1.0.2 đang `SOURCE_MISSING`. Mọi tên dưới đây là đề xuất; cột "Tên theo policy" để trống cho tới khi có file policy.
 > Code chỉ được dùng các máy trạng thái này sau khi Owner duyệt; mọi chuyển trạng thái đi qua endpoint riêng, cập nhật có điều kiện `WHERE status = :from` và ghi audit.
 

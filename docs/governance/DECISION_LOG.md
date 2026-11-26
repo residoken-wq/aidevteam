@@ -31,29 +31,30 @@
 | D-OWN-18 | 2FA tài khoản Owner | Chưa bật, rủi ro chấp nhận tạm thời (R-11) | THỐNG NHẤT (v1.0.2) |
 | D-OWN-19 | Antigravity | `internal_data_approval: APPROVED`, `provider_terms: UNVERIFIED` (O-06) | XEM O-06 |
 | D-OWN-20 | Tài khoản Claude | 2–3 tài khoản cho người, API key cho automation (O-10) | THỐNG NHẤT |
-| D-OWN-21 | Tech stack | Theo ADR — xem D-2026-11-25-02, D-2026-11-25-05; ADR-003 PROPOSED | XEM DƯỚI |
+| D-OWN-21 | Tech stack | ADR-001/002/003/004/005 — xem mục B và D-2026-11-26-07 | OWNER APPROVED (26/11) |
 
 ## B. Quyết định phát sinh trong quá trình thực hiện
 
 | ID | Ngày | Quyết định | Người quyết | Bằng chứng | Trạng thái |
 |---|---|---|---|---|---|
-| D-2026-11-25-01 | 25/11/2026 | Cho phép bắt đầu code Phase 1 (từ P1-01) **trước khi** Owner ký baseline Phase 0 — ngoại lệ với CLAUDE.md §7 | Người dùng phiên, xác nhận có đồng ý của Owner | Trả lời trong phiên; residoken-wq/aidevteam#3 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý — **chờ `residoken-wq` xác nhận** |
-| D-2026-11-25-02 | 25/11/2026 | ADR-001 (Next.js) và ADR-002 (NestJS + Zod, pnpm, Node 24 LTS) → `ACCEPTED` | Người dùng phiên | residoken-wq/aidevteam#3 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý — chờ `residoken-wq` xác nhận |
+| D-2026-11-25-01 | 25/11/2026 | Cho phép bắt đầu code Phase 1 (từ P1-01) **trước khi** Owner ký baseline Phase 0 — ngoại lệ với CLAUDE.md §7 | Người dùng phiên; **Owner ký 26/11** | residoken-wq/aidevteam#3; residoken-wq/aidevteam#9 review 6068795161 (mục 2) | **OWNER APPROVED** |
+| D-2026-11-25-02 | 25/11/2026 | ADR-001 (Next.js) và ADR-002 (NestJS + Zod, pnpm, Node 24 LTS) → `ACCEPTED` | Người dùng phiên; **Owner ký 26/11** | residoken-wq/aidevteam#3; residoken-wq/aidevteam#9 review 6068795161 (mục 3) | **OWNER APPROVED** |
 | D-2026-11-25-03 | 25/11/2026 | PR có CI xanh → Claude hỏi; người dùng đồng ý rõ ràng từng PR → Claude thực hiện thao tác merge. Câu trả lời đồng ý = quyết định review của người dùng (không phải review của Claude) | Người dùng phiên | Trả lời trong phiên | ÁP DỤNG |
 | D-2026-11-25-04 | 25/11/2026 | CI/CD: GitHub build image lên ghcr.io; VPS `192.168.250.30` pull theo digest, chạy thủ công sau approval; web publish `:3301` cho NPM `192.168.250.10` | Người dùng phiên | residoken-wq/aidevteam#2 | ĐÃ MERGE |
-| D-2026-11-25-05 | 25/11/2026 | ADR-004: Drizzle ORM + migration SQL up/down tự quản lý → `ACCEPTED` | Người dùng phiên | residoken-wq/aidevteam#4 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý — chờ `residoken-wq` xác nhận |
-| D-2026-11-26-01 | 26/11/2026 | Session hết hạn tuyệt đối sau 480 phút (8 giờ); cookie `SameSite=Lax` | Người dùng phiên | residoken-wq/aidevteam#5 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý — chờ `residoken-wq` xác nhận |
-| D-2026-11-26-02 | 26/11/2026 | Giới hạn đăng nhập 5 lần / 15 phút / IP; vượt → 429 + audit | Người dùng phiên | residoken-wq/aidevteam#6 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý — chờ `residoken-wq` xác nhận |
-| D-2026-11-26-03 | 26/11/2026 | RBAC 0.1: 3 role `org_admin`/`maintainer`/`viewer` (`RBAC_MATRIX.md`); mặc định từ chối; gán role bằng CLI có audit | Người dùng phiên | residoken-wq/aidevteam#6 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý — **CLAUDE.md §7: RBAC cần Owner duyệt** |
+| D-2026-11-25-05 | 25/11/2026 | ADR-004: Drizzle ORM + migration SQL up/down tự quản lý → `ACCEPTED` | Người dùng phiên; **Owner ký 26/11** | residoken-wq/aidevteam#4; residoken-wq/aidevteam#9 review 6068795161 (mục 3) | **OWNER APPROVED** |
+| D-2026-11-26-01 | 26/11/2026 | Session hết hạn tuyệt đối sau 480 phút (8 giờ); cookie `SameSite=Lax` | Người dùng phiên; **Owner ký 26/11** | residoken-wq/aidevteam#5; residoken-wq/aidevteam#9 review 6068795161 (mục 6) | **OWNER APPROVED** |
+| D-2026-11-26-02 | 26/11/2026 | Giới hạn đăng nhập 5 lần / 15 phút / IP; vượt → 429 + audit | Người dùng phiên; **Owner ký 26/11** | residoken-wq/aidevteam#6; residoken-wq/aidevteam#9 review 6068795161 (mục 6) | **OWNER APPROVED** |
+| D-2026-11-26-03 | 26/11/2026 | RBAC 0.1: 3 role `org_admin`/`maintainer`/`viewer` (`RBAC_MATRIX.md`); mặc định từ chối; gán role bằng CLI có audit | Người dùng phiên; **Owner ký 26/11** | residoken-wq/aidevteam#6; residoken-wq/aidevteam#9 review 6068795161 (mục 5) | **OWNER APPROVED** |
 | D-2026-11-26-04 | 26/11/2026 | `secret_ref`: `env:AIDEV_SECRET_<NAME>` hoặc `file:/run/secrets/<name>`; 0.1 không resolve secret | Người dùng phiên | residoken-wq/aidevteam#7 | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 | D-2026-11-26-05 | 26/11/2026 | Redaction: không thêm mẫu token nội bộ PACE; chấp nhận che thừa mọi số 12 chữ số đứng riêng (coi như CCCD) | Người dùng phiên | Trả lời trong phiên | NGƯỜI DÙNG PHIÊN ĐỒNG Ý |
 | D-2026-11-26-06 | 26/11/2026 | Làm Phase 0 rút gọn (tài liệu) trước khi tiếp tục P1-10/P1-11 để Owner có đủ hồ sơ ký ở checkpoint 27/11 | Người dùng phiên | Trả lời trong phiên ("làm tiếp A") | ÁP DỤNG |
+| D-2026-11-26-07 | 26/11/2026 | **Owner ký baseline Phase 0** (phiếu `SIGNOFF_PHASE0.md`, 9 mục): (1) baseline artefact Phase 0; (2) ngoại lệ code trước baseline; (3) ADR-001/002/004; (4) **ADR-003 job table PostgreSQL**; (5) RBAC 3 role; (6) session 8h + 5 lần/15 phút/IP; (7) **máy trạng thái Task và Agent run**; (8) cam kết xác nhận v1.0.2 trước 04/12 hoặc ký ngoại lệ; (9) phạm vi 0.1 + thứ tự cắt giảm | `residoken-wq` (ID 228839459) | residoken-wq/aidevteam#9 review 6068795161 | **OWNER APPROVED** |
 
 ## C. Checkpoint go/no-go (CLAUDE.md §5.4)
 
 | Checkpoint | Ngày | Quyết định | Người quyết | Ghi chú |
 |---|---|---|---|---|
-| Phase 0 rút gọn | 26–27/11 | **CHỜ OWNER** | `residoken-wq` | Hồ sơ: `docs/reports/PHASE_0_REPORT.md`; ký theo `docs/governance/SIGNOFF_PHASE0.md` (review Approve trên PR phiếu ký) |
+| Phase 0 rút gọn | 26/11/2026 | **GO — OWNER APPROVED ALL 1-9** | `residoken-wq` (GitHub user ID 228839459) | Review [6068795161](https://github.com/residoken-wq/aidevteam/pull/9#pullrequestreview-6068795161) nội dung `/signoff-phase0 APPROVE ALL 1-9`, 05:02:08Z, commit `f3dc9e5` (kèm review Approve không ghi chú 6068765839, 04:58:23Z). Xác minh qua GitHub API: login, ID số, `author_association: OWNER`, `state: APPROVED` |
 | Đầu vào hạ tầng | 27/11 | **CHỜ OWNER** | `residoken-wq` | Thiếu: domain, phiên bản DB, OAuth App |
 | Feature freeze | 02/12 | — | | |
 | Staging + UAT | 03/12 | — | | |

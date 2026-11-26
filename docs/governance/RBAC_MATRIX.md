@@ -1,6 +1,6 @@
 # RBAC Matrix — Release 0.1
 
-> **Trạng thái:** `APPROVED_BY_SESSION_USER` (26/11/2026, DECISION_LOG D-2026-11-26-03) — **chờ Owner `residoken-wq` xác nhận**.
+> **Trạng thái:** `OWNER APPROVED` — `residoken-wq` ký 26/11/2026 (DECISION_LOG D-2026-11-26-07, residoken-wq/aidevteam#9).
 > Nguồn sự thật trong code: `packages/contracts/src/rbac.ts`. Test `rbac.test.ts` **fail** nếu bảng dưới đây lệch với code.
 
 ## Nguyên tắc

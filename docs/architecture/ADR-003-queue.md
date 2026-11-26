@@ -1,6 +1,6 @@
 # ADR-003: Queue / dispatch cho Release 0.1 — job table trong PostgreSQL
 
-- **Trạng thái:** `PROPOSED` (26/11/2026) — cần Owner duyệt trước khi làm P4
+- **Trạng thái:** `ACCEPTED` — Owner `residoken-wq` duyệt 26/11/2026 (DECISION_LOG D-2026-11-26-07, residoken-wq/aidevteam#9)
 - **Liên quan:** P4-01, P4-03, P4-07 (rút gọn), CLAUDE.md §7 (định hướng), §6.2 (bài học router v0.1)
 
 ## Bối cảnh
