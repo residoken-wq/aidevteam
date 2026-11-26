@@ -32,6 +32,10 @@
 | Advisory lock cấp org khi đổi cấp trên | `concurrent manager changes cannot create a cycle` | P2-05 |
 | Lọc `org_id` khi gắn provider account / cấp trên | `another org's provider account or manager…` | P2-05 |
 | Chặn lưu trữ agent còn cấp dưới | `an agent with active reports cannot be archived…` | P2-05 |
+| Cập nhật trạng thái task có điều kiện `WHERE status = expectedFrom` | 3 test (stale 409, đồng thời, audit) `tasks.test.ts` | P3-02 |
+| Kiểm tra chuyển trạng thái ở API (còn trigger DB) | 6 test 422; trigger DB vẫn chặn nhưng trả 500 → giữ cả hai lớp | P3-02 |
+| Lọc `org_id` khi giao task cho agent | `another org's agent cannot be assigned` | P3-02 |
+| Khóa đánh số task theo project | `parallel creates get distinct consecutive numbers` | P3-02 |
 | Chặn sửa worker đã lưu trữ | `duplicate slug → 409; archived worker cannot be edited…` | P2-08 |
 
 ## 3. Chạy thử end-to-end cục bộ (không phải staging)
