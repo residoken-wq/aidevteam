@@ -13,6 +13,7 @@ import { ProjectsController } from "./projects/projects.controller";
 import { ProviderAccountsController } from "./provider-accounts/provider-accounts.controller";
 import { WorkersController } from "./workers/workers.controller";
 import { AgentsController } from "./agents/agents.controller";
+import { TasksController } from "./tasks/tasks.controller";
 import { PlatformOrgsController } from "./platform/platform-orgs.controller";
 import { RateLimitService } from "./rate-limit";
 import { RbacGuard } from "./rbac/rbac.guard";
@@ -42,7 +43,7 @@ export class AppModule {
     const ownsPool = !options.pool;
     return {
       module: AppModule,
-      controllers: [HealthController, AuthController, OrgController, AuditController, ProjectsController, ProviderAccountsController, WorkersController, AgentsController, PlatformOrgsController, ...(options.extraControllers ?? [])],
+      controllers: [HealthController, AuthController, OrgController, AuditController, ProjectsController, ProviderAccountsController, WorkersController, AgentsController, TasksController, PlatformOrgsController, ...(options.extraControllers ?? [])],
       providers: [
         { provide: APP_CONFIG, useValue: options.config },
         { provide: DB_POOL, useValue: options.pool ?? createPool(options.config.databaseUrl) },
