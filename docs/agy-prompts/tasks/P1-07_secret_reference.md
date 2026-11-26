@@ -21,7 +21,7 @@ Provider account / worker chỉ lưu tham chiếu tới secret nằm trong secre
 Rotation hooks. Resolve secret thật lúc runtime cho worker thật.
 
 ## Acceptance criteria
-AC-1 Tạo provider account với secret_ref hợp lệ → lưu đúng ref.
+AC-1 Tạo provider account với secret_ref hợp lệ → lưu đúng ref. (Endpoint provider account thuộc P2-07; P1-07 cung cấp `SecretRefSchema` + test ở mức schema.)
 AC-2 Gửi giá trị giống token thật vào trường secret_ref → 422, giá trị không xuất hiện trong log/response.
 AC-3 Test quét response API + log capture: không có chuỗi secret giả dùng trong test.
 AC-4 Redactor che được các mẫu: token giả, email giả, SĐT giả, CCCD giả (dữ liệu test rõ ràng là giả).
