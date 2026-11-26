@@ -8,7 +8,7 @@
 | Hạng mục | Giá trị |
 |---|---|
 | Công cụ | `deploy/backup.sh`, `deploy/restore.sh` (pg_dump/pg_restore, định dạng custom `-Fc`) |
-| Phiên bản client | `pg_dump` cùng major hoặc mới hơn server; server production: `UNVERIFIED` |
+| Phiên bản client | `pg_dump`/`pg_restore` **cùng major** với server (script chặn nếu khác). Lý do: CI 26/11 — `pg_dump` mới hơn ghi `SET transaction_timeout` mà PostgreSQL 16 không nhận → restore thất bại. Server production: `UNVERIFIED` |
 | Nơi lưu mặc định | `BACKUP_DIR=/var/backups/aidevteam` (thư mục 700, file 600) |
 | Số bản giữ lại | `BACKUP_KEEP=14` (mặc định) |
 | Tần suất | `CHƯA CẤU HÌNH` |

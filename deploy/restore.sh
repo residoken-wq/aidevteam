@@ -45,6 +45,12 @@ actual="$(sha256sum "$FILE" | awk '{print $1}')"
 [[ "$expected" =~ ^[0-9a-f]{64}$ ]] || die "checksum file is malformed"
 [ "$expected" = "$actual" ] || die "checksum mismatch — archive is corrupted or was modified"
 
+major_of() { "$1" --version | head -1 | sed -nE 's/^[^0-9]*([0-9]+).*/\1/p'; }
+server_major="$("$PSQL" -w -X -q -A -t -d "$TARGET" -c "SELECT current_setting('server_version_num')::int / 10000")" \
+  || die "cannot connect to target database '$TARGET' (create it first)"
+client_major="$(major_of "$PG_RESTORE")"
+[ "$client_major" = "$server_major" ] || die "pg_restore major version $client_major != server major $server_major; use the matching client"
+
 tables="$("$PSQL" -w -X -q -A -t -d "$TARGET" -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")" \
   || die "cannot connect to target database '$TARGET' (create it first)"
 [ "$tables" = "0" ] || die "target database '$TARGET' is not empty ($tables tables in public); refusing to overwrite"

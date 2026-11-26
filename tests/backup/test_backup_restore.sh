@@ -71,6 +71,26 @@ out="$(bash "$ROOT/deploy/restore.sh" --file "$TMP/aidevteam-20000101T000000Z.du
 out="$(PGPASSWORD=should-not-be-used PGDATABASE=$SRC bash "$ROOT/deploy/backup.sh" 2>&1)"; rc=$?
 [ $rc -ne 0 ] && grep -q "PGPASSWORD is not allowed" <<<"$out" && ! grep -q "should-not-be-used" <<<"$out" && ok "refuses PGPASSWORD without echoing it" || ko "refuses PGPASSWORD" "$out"
 
+# --- client/server major version must match (CI regression: pg_dump 17+ archive not restorable into 16) ---
+cat > "$TMP/fake_pg_dump" <<'FAKE'
+#!/usr/bin/env bash
+if [ "${1:-}" = "--version" ]; then echo "pg_dump (PostgreSQL) 99.1"; exit 0; fi
+exec pg_dump "$@"
+FAKE
+chmod +x "$TMP/fake_pg_dump"
+before="$(find "$BACKUP_DIR" -maxdepth 1 -name 'aidevteam-*.dump' | wc -l)"
+out="$(PG_DUMP="$TMP/fake_pg_dump" PGDATABASE=$SRC bash "$ROOT/deploy/backup.sh" 2>&1)"; rc=$?
+after="$(find "$BACKUP_DIR" -maxdepth 1 -name 'aidevteam-*.dump' | wc -l)"
+[ $rc -ne 0 ] && grep -q "major version 99 != server major" <<<"$out" && [ "$before" = "$after" ] && ok "backup refuses a client of another major version" || ko "version guard (backup)" "$out"
+cat > "$TMP/fake_pg_restore" <<'FAKE'
+#!/usr/bin/env bash
+if [ "${1:-}" = "--version" ]; then echo "pg_restore (PostgreSQL) 99.1"; exit 0; fi
+exec pg_restore "$@"
+FAKE
+chmod +x "$TMP/fake_pg_restore"
+out="$(PG_RESTORE="$TMP/fake_pg_restore" bash "$ROOT/deploy/restore.sh" --file "$file" --target-db $DST2 --yes 2>&1)"; rc=$?
+[ $rc -ne 0 ] && grep -q "major version 99 != server major" <<<"$out" && ok "restore refuses a client of another major version" || ko "version guard (restore)" "$out"
+
 # --- retention: keep newest BACKUP_KEEP, never touch other files ------------------------------------------
 for s in 20260101T000000Z 20260102T000000Z 20260103T000000Z; do : > "$BACKUP_DIR/aidevteam-$s.dump"; : > "$BACKUP_DIR/aidevteam-$s.dump.sha256"; done
 : > "$BACKUP_DIR/keep-me.txt"

@@ -19,6 +19,7 @@ BACKUP_DIR="${BACKUP_DIR:-/var/backups/aidevteam}"
 BACKUP_KEEP="${BACKUP_KEEP:-14}"
 PG_DUMP="${PG_DUMP:-pg_dump}"
 PG_RESTORE="${PG_RESTORE:-pg_restore}"
+PSQL="${PSQL:-psql}"
 NAME_RE='^aidevteam-[0-9]{8}T[0-9]{6}Z\.dump$'
 
 die() { echo "ERROR: $*" >&2; exit 2; }
@@ -31,6 +32,16 @@ log() { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*"; }
 [[ "$BACKUP_KEEP" =~ ^[1-9][0-9]{0,3}$ ]] || die "BACKUP_KEEP must be a positive integer"
 command -v "$PG_DUMP" >/dev/null || die "pg_dump not found"
 command -v "$PG_RESTORE" >/dev/null || die "pg_restore not found"
+command -v "$PSQL" >/dev/null || die "psql not found"
+
+# Client tools must be the SAME major version as the server: a newer pg_dump writes settings the older server
+# rejects on restore (seen in CI: pg_dump 17+ emits "SET transaction_timeout", unknown to PostgreSQL 16).
+major_of() { "$1" --version | head -1 | sed -nE 's/^[^0-9]*([0-9]+).*/\1/p'; }
+server_major="$("$PSQL" -w -X -q -A -t -c "SELECT current_setting('server_version_num')::int / 10000")" || die "cannot connect to the database"
+for tool in "$PG_DUMP" "$PG_RESTORE"; do
+  client_major="$(major_of "$tool")"
+  [ "$client_major" = "$server_major" ] || die "$(basename "$tool") major version $client_major != server major $server_major; use the matching client (e.g. /usr/lib/postgresql/$server_major/bin)"
+done
 
 mkdir -p "$BACKUP_DIR"
 chmod 700 "$BACKUP_DIR"
