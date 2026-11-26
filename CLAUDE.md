@@ -291,6 +291,7 @@ Không viết code ứng dụng trước khi Owner ký baseline.
 | Migrate | `DATABASE_URL=… pnpm --filter @aidevteam/db migrate status` / `… migrate up` |
 | Rollback migration (xóa dữ liệu, bị chặn khi `NODE_ENV=production`) | `DATABASE_URL=… pnpm --filter @aidevteam/db migrate down 1 --yes-destroy-data` |
 | Seed dữ liệu giả (bị chặn khi `NODE_ENV=production`) | `DATABASE_URL=… pnpm --filter @aidevteam/db seed` |
+| Thêm/gỡ người được đăng nhập (ghi audit; gỡ = thu hồi session) | `DATABASE_URL=… pnpm --filter @aidevteam/db allowlist add <github_user_id> [ghi chú]` / `… allowlist remove <github_user_id>` |
 | Test script deploy | `bash tests/deploy/test_deploy.sh` |
 | Build image (cần Docker) | `docker build -f apps/api/Dockerfile .` / `docker build -f apps/web/Dockerfile .` — **chưa chạy cục bộ**, CI chạy trên PR |
 
