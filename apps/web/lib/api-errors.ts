@@ -6,6 +6,10 @@ const CONFLICTS: Record<string, string> = {
   provider_account_slug_taken: "Mã tài khoản provider đã tồn tại trong tổ chức.",
   provider_account_archived: "Tài khoản provider đã lưu trữ, không sửa được.",
   provider_account_already_archived: "Tài khoản provider đã được lưu trữ trước đó.",
+  worker_slug_or_path_taken: "Mã worker hoặc thư mục làm việc đã tồn tại trong tổ chức.",
+  workspace_path_in_use: "Thư mục làm việc trùng, nằm trong hoặc chứa thư mục của một worker đang hoạt động.",
+  worker_archived: "Worker đã lưu trữ, không sửa được.",
+  worker_already_archived: "Worker đã được lưu trữ trước đó.",
 };
 
 export function apiErrorMessage(status: number, body: unknown): string {

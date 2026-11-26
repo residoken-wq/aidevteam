@@ -5,3 +5,4 @@ export * from "./provider-account";
 export * from "./rbac";
 export * from "./redact";
 export * from "./secret-ref";
+export * from "./worker";

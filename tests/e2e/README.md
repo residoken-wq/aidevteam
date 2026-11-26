@@ -3,6 +3,7 @@
 | Test | Phạm vi |
 |---|---|
 | `provider-accounts.e2e.cjs` | P2-07: tạo → dán nhầm secret bị từ chối, có hướng dẫn và bị xóa khỏi trang → đổi tham chiếu → lưu trữ; viewer chỉ đọc |
+| `workers.e2e.cjs` | P2-08: tạo worker mock gắn dự án → đường dẫn lồng nhau / thư mục hệ thống bị từ chối → tắt/bật → lưu trữ giải phóng đường dẫn; viewer chỉ đọc |
 | `projects.e2e.cjs` | P2-10 AC-8: tạo → đổi tên → lưu trữ dự án qua UI; lỗi trùng slug; tên chứa HTML hiển thị dạng chữ; viewer không thấy nút ghi và gọi API trực tiếp bị 403 |
 
 ## Chạy cục bộ
