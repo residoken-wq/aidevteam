@@ -53,7 +53,7 @@
 
 | Checkpoint | Ngày | Quyết định | Người quyết | Ghi chú |
 |---|---|---|---|---|
-| Phase 0 rút gọn | 26–27/11 | **CHỜ OWNER** | `residoken-wq` | Hồ sơ: `docs/reports/PHASE_0_REPORT.md` |
+| Phase 0 rút gọn | 26–27/11 | **CHỜ OWNER** | `residoken-wq` | Hồ sơ: `docs/reports/PHASE_0_REPORT.md`; ký theo `docs/governance/SIGNOFF_PHASE0.md` (review Approve trên PR phiếu ký) |
 | Đầu vào hạ tầng | 27/11 | **CHỜ OWNER** | `residoken-wq` | Thiếu: domain, phiên bản DB, OAuth App |
 | Feature freeze | 02/12 | — | | |
 | Staging + UAT | 03/12 | — | | |
