@@ -287,6 +287,10 @@ Không viết code ứng dụng trước khi Owner ký baseline.
 | Test riêng một app | `pnpm --filter @aidevteam/api test` |
 | Chạy api đã build | `PORT=3001 node apps/api/dist/main.js` |
 | Chạy web đã build (standalone) | `cd apps/web/.next/standalone && PORT=3000 node apps/web/server.js` |
+| Test tích hợp DB (cần PostgreSQL, tên DB phải kết thúc `_test`) | `TEST_DATABASE_URL=postgres://…/aidevteam_test pnpm test:integration` |
+| Migrate | `DATABASE_URL=… pnpm --filter @aidevteam/db migrate status` / `… migrate up` |
+| Rollback migration (xóa dữ liệu, bị chặn khi `NODE_ENV=production`) | `DATABASE_URL=… pnpm --filter @aidevteam/db migrate down 1 --yes-destroy-data` |
+| Seed dữ liệu giả (bị chặn khi `NODE_ENV=production`) | `DATABASE_URL=… pnpm --filter @aidevteam/db seed` |
 | Test script deploy | `bash tests/deploy/test_deploy.sh` |
 | Build image (cần Docker) | `docker build -f apps/api/Dockerfile .` / `docker build -f apps/web/Dockerfile .` — **chưa chạy cục bộ**, CI chạy trên PR |
 
