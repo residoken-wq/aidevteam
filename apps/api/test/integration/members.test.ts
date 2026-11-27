@@ -144,6 +144,9 @@ describe("AC-2 Cross-org isolation", () => {
   });
 
   it("granting or revoking in org A does not affect role bindings in org B", async () => {
+    // 900000005 has role in org B
+    await grantRole(pool, 900000005, "org-test-b", "viewer");
+
     const countBBefore = await pool.query<{ count: string }>(
       "SELECT count(*) FROM role_bindings rb JOIN orgs o ON o.id = rb.org_id WHERE o.slug = 'org-test-b'",
     );

@@ -221,8 +221,10 @@ export class MembersController {
       }
 
       const del = await c.query(
-        "DELETE FROM role_bindings WHERE org_id = $1 AND user_id = $2 AND role_id = $3",
-        [org.orgId, targetUserId, roleId],
+        `DELETE FROM role_bindings rb
+           USING roles r
+          WHERE rb.role_id = r.id AND rb.org_id = $1 AND rb.user_id = $2 AND r.key = $3`,
+        [org.orgId, targetUserId, input.role],
       );
       const changed = del.rowCount === 1;
       if (changed) {
