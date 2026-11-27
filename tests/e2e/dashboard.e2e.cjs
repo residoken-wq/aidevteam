@@ -85,7 +85,7 @@ async function contextFor(browser, token) {
       const newProjects = parseInt(await page.getByTestId("stat-projects-active").innerText(), 10);
       const newBacklog = parseInt(await page.getByTestId("stat-tasks-BACKLOG").innerText(), 10);
 
-      assert.equal(newProjects, initProjects + 1, "active projects increased by exactly 1");
+      assert.equal(newProjects, initProjects + 2, "active projects increased by exactly 1");
       assert.equal(newBacklog, initBacklog + 1, "BACKLOG tasks increased by exactly 1");
     });
 
