@@ -3,3 +3,5 @@
 af6fa8430bb2d1645c9c9c543857e43ee368fa3d:apps/api/test/integration/runs.test.ts:generic-api-key:432
 # Fake JWT ({"sub":"test"}, signature "signaturefake") used by the redact unit test.
 ced75139fe37c9138c1518e891f420c854ef5d27:packages/contracts/src/redact.test.ts:jwt:12
+# Fake GitHub-PAT-shaped string in the dev.env validator negative test (P1-02, commit 0245c41; now built at runtime).
+0245c41e210502790816d3efd31933e858c9c42a:tests/dev/test_dev_compose.mjs:github-pat:240

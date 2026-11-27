@@ -1,0 +1,84 @@
+name: aidevteam-dev
+
+# ==============================================================================
+# Development Docker Compose environment (DEV ONLY)
+# Loopback-only binding, fake credentials, trust auth for PostgreSQL.
+# For production hardening and digest deployment, see deploy/compose.yaml.
+# ==============================================================================
+
+services:
+  postgres:
+    # Pin by digest identical to CI PostgreSQL service (.github/workflows/ci.yml)
+    image: postgres:16-bookworm@sha256:cd0e9518bda5f2ea667ff84d22795d089720c883f288e215d97ce57437e8ef37
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      # DEV ONLY: Trust authentication is strictly permitted because ports are bound
+      # exclusively to loopback (127.0.0.1). NEVER use in production or LAN-exposed environments.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      # Bound to 127.0.0.1 loopback only to avoid external network exposure.
+      # Default port 55433 avoids conflict with standard test container on 55432.
+      - "127.0.0.1:${DEV_PG_PORT:-55433}:5432"
+    volumes:
+      - aidevteam-dev-pg:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
+
+  api:
+    profiles: ["app"]
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - dev.env
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgres://postgres@postgres:5432/aidevteam_dev
+    ports:
+      - "127.0.0.1:${DEV_API_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
+
+  web:
+    profiles: ["app"]
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - dev.env
+    environment:
+      PORT: 3000
+      API_INTERNAL_URL: http://api:3001
+    ports:
+      - "127.0.0.1:${DEV_WEB_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_started
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
+      - /app/apps/web/.next/cache:uid=1000,gid=1000,mode=0700
+
+volumes:
+  aidevteam-dev-pg:
+    name: aidevteam-dev-pg
