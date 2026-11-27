@@ -1,40 +1,115 @@
-id,title,labels,status,notes
-P0-01,[P0-01] Source inventory,release-0.1;phase:0,DONE,docs/reports/SOURCE_INVENTORY.md — 8 nguồn SOURCE_MISSING · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)
-P0-02,[P0-02] Environment inventory,release-0.1;phase:0,DONE,docs/reports/ENVIRONMENT_INVENTORY.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)
-P0-03,[P0-03] Threat model,release-0.1;phase:0,DONE,docs/operations/THREAT_MODEL.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)
-P0-04,[P0-04] Provider compliance,release-0.1;phase:0,DONE,docs/operations/PROVIDER_COMPLIANCE.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)
-P0-05,[P0-05] ADR-001..005,release-0.1;phase:0,DONE,"ADR-001/002/004 ACCEPTED (người dùng phiên), ADR-003 PROPOSED, ADR-005 ACCEPTED (Owner) · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)"
-P0-06,[P0-06] RBAC matrix,release-0.1;phase:0,DONE,docs/governance/RBAC_MATRIX.md — cần Owner duyệt · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)
-P0-07,[P0-07] UX flows,release-0.1;phase:0,DONE,docs/ux/UX_FLOWS.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)
-P0-08,[P0-08] Backlog import,release-0.1;phase:0,DONE,File này; chỉ gồm Task ID có trong CLAUDE.md (Master Plan SOURCE_MISSING) · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)
-P1-01,[P1-01] Repo skeleton,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#3
-P1-02,[P1-02] CI lint/typecheck/test,release-0.1;phase:1,MERGED,"residoken-wq/aidevteam#2, #3"
-P1-04,[P1-04] DB schema + migration có rollback,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#4
-P1-05,[P1-05] Đăng nhập Entra ID OIDC,post-0.1;phase:1,REMOVED (O-12),Thay bằng P1-05G
-P1-05G,[P1-05G] Đăng nhập GitHub OAuth (ADR-005),release-0.1;phase:1,MERGED,"residoken-wq/aidevteam#5, #6 (rate limit); cần Owner đăng ký OAuth App"
-P1-06,[P1-06] RBAC default deny,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#6; ma trận chờ Owner
-P1-07,[P1-07] Secret reference + redaction,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#7
-P1-08,[P1-08] Audit append-only,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#4
-P1-09,[P1-09] CI SCA + required checks,release-0.1;phase:1,MERGED,"residoken-wq/aidevteam#24; branch protection DEFINED – NOT ENFORCED (plan: free); Đã có: CI ci (lint/typecheck/test/integration/backup) + build image (residoken-wq/aidevteam#2, #3). Còn: SCA, secret scan, BRANCH_PROTECTION.md"
-P1-10,[P1-10] Health probe (DB readiness),release-0.1;phase:1,MERGED,residoken-wq/aidevteam#10
-P1-11,[P1-11] Backup/restore cơ bản,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#11
-P2-02,[P2-02] Dashboard tổng quan,release-0.1;phase:2,MERGED,residoken-wq/aidevteam#20; E2E dashboard.e2e.cjs xanh trong CI (QA-01, #21)
-P2-03,[P2-03] CRUD org (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#15 · platform admin REQUIRES_OWNER_APPROVAL (D-2026-11-26-13)
-P2-04,[P2-04] Role editor nâng cao,post-0.1;phase:2,MERGED,"residoken-wq/aidevteam#29; role editor /members, member:read/write chỉ org_admin (REQUIRES_OWNER_APPROVAL)"
-P2-05,[P2-05] CRUD agent (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#16
-P2-06,[P2-06] Org chart kéo thả,post-0.1;phase:2,MERGED,"residoken-wq/aidevteam#30; /agents/chart: cây báo cáo, kéo thả + select bàn phím"
-P2-07,[P2-07] CRUD provider account (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#13
-P2-08,[P2-08] CRUD worker (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#14
-P2-10,[P2-10] CRUD project (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#12
-P3-02,[P3-02] Task CRUD + trạng thái,release-0.1;phase:3,MERGED,residoken-wq/aidevteam#17
-P3-04,[P3-04] Kanban cơ bản,release-0.1;phase:3,MERGED,residoken-wq/aidevteam#17
-P4-01,[P4-01] Dispatch tới mock worker,release-0.1;phase:4,MERGED,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
-P4-03,[P4-03] Agent run lifecycle (rút gọn),release-0.1;phase:4,MERGED,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
-P4-07,[P4-07] Xem log/run (rút gọn),release-0.1;phase:4,MERGED,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
-P4-12,[P4-12] Legacy adapter router v0.1,post-0.1;phase:4,OPTIONAL,Chỉ sau khi O-06 giải quyết
-P6-05,[P6-05] Approval service xác minh comment,post-0.1;phase:6,TODO,
-P6-06,[P6-06] Approval Center chỉ đọc (rút gọn),release-0.1;phase:6,MERGED,O-07; residoken-wq/aidevteam#23; E2E approvals.e2e.cjs xanh trong CI
-P6-07,[P6-07] Protected environment reviewer,post-0.1;phase:6,NOT AVAILABLE ON PLAN,O-01
-P6-08,[P6-08] Approval verification (deploy-time),post-0.1;phase:6,TODO,
-P10-06,[P10-06] Production gate (Master Plan),post-0.1;phase:10,NOT AVAILABLE ON PLAN,O-01; thay bằng phương án B
-QA-01,[QA-01] E2E trình duyệt (Playwright) chạy trong CI,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#21 (job e2e; AC-2 run 45986565988); D-2026-11-26-08 — trước UAT 03/12. Không phải Task ID của Master Plan
+id,title,labels,status,notes,coverage,depends_on,acceptance
+P0-01,[P0-01] Kiểm kê tài liệu gốc và source/router v0.1,"release-0.1;phase:0",DONE,docs/reports/SOURCE_INVENTORY.md — 8 nguồn SOURCE_MISSING · Owner ký baseline 26/11 (residoken-wq/aidevteam#9),,—,"Liệt kê file/version/checksum, missing sources; phân biệt mock-tested và live-tested"
+P0-02,"[P0-02] Kiểm kê repository, hosting, domain, CI, accounts","release-0.1;phase:0",DONE,docs/reports/ENVIRONMENT_INVENTORY.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9),,P0-01,"Không ghi secret; đánh dấu thông số chưa cấu hình"
+P0-03,[P0-03] Threat model multi-agent/multi-project,"release-0.1;phase:0",DONE,docs/operations/THREAT_MODEL.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9),,P0-01,"Cover prompt injection, creds, tenant leak, CI bypass, audit tampering"
+P0-04,[P0-04] License/commercial terms matrix cho Anthropic/Google/AGY,"release-0.1;phase:0",DONE,docs/operations/PROVIDER_COMPLIANCE.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9),,P0-01,"Trạng thái approved/unverified/prohibited per provider; không suy diễn"
+P0-05,[P0-05] Chốt ADR framework/backend/queue/ORM,"release-0.1;phase:0",DONE,"ADR-001/002/004 ACCEPTED (người dùng phiên), ADR-003 PROPOSED, ADR-005 ACCEPTED (Owner) · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",,P0-02,"Mỗi ADR có tradeoffs, reason, rollback, Owner visibility"
+P0-06,[P0-06] Chốt RBAC matrix và dữ liệu/retention,"release-0.1;phase:0",DONE,docs/governance/RBAC_MATRIX.md — cần Owner duyệt · Owner ký baseline 26/11 (residoken-wq/aidevteam#9),,P0-03,"Owner approval required; default deny; tenant scoping"
+P0-07,[P0-07] Thiết kế wireframes/UX flows,"release-0.1;phase:0",DONE,docs/ux/UX_FLOWS.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9),,P0-01,Org chart/project/task/approval journeys reviewed
+P0-08,[P0-08] Tạo project backlog/issues/milestones,"release-0.1;phase:0",DONE,"File này; chỉ gồm Task ID có trong CLAUDE.md (Master Plan SOURCE_MISSING) · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",,P0-05,"Giữ IDs, dependencies, phase labels, PR references"
+P0-09,[P0-09] Owner baseline signoff,release-0.1;phase:0,DONE,D-2026-11-26-07: Owner ký baseline Phase 0 (SIGNOFF_PHASE0.md),,"P0-04,P0-06,P0-08","Ghi approval scope; không đồng nghĩa approve production"
+P1-01,[P1-01] Bootstrap monorepo/web/backend/shared packages,"release-0.1;phase:1",MERGED,residoken-wq/aidevteam#3,,P0-05,"Install/build dev pass, lint/test commands documented"
+P1-02,[P1-02] Docker Compose dev environment,"post-0.1;phase:1",TODO,"ID cũ P1-02 trong backlog = ""CI lint/typecheck/test"" (đã merge, nay thuộc P1-09). Master Plan P1-02 = Docker Compose dev: chưa làm (dev hiện dùng PostgreSQL trong WSL; deploy/compose.yaml là bản deploy).",,P1-01,"One-command local boot; no secrets committed"
+P1-03,[P1-03] OpenAPI schemas + SDK client generation,"post-0.1;phase:1",TODO,,,P1-01,"Contract tests validate schema; error formats"
+P1-04,"[P1-04] Database schema, migrations and seed","release-0.1;phase:1",MERGED,residoken-wq/aidevteam#4,,"P1-01,P0-06","Idempotent seed; rollback migration tested"
+P1-05,[P1-05] OIDC with Entra ID and session handling,"post-0.1;phase:1",REMOVED (O-12),Thay bằng P1-05G,,P1-01,"Unauthenticated rejected; session expiry; dev-only mock isolated"
+P1-05G,[P1-05G] Đăng nhập GitHub OAuth (ADR-005),"release-0.1;phase:1",MERGED,"residoken-wq/aidevteam#5, #6 (rate limit); cần Owner đăng ký OAuth App",,,
+P1-06,[P1-06] RBAC/ABAC policy middleware,"release-0.1;phase:1",MERGED,"residoken-wq/aidevteam#6; ma trận chờ Owner",,"P1-05,P1-04","Negative tests on cross-org, cross-project, role spoofing"
+P1-07,"[P1-07] Secret references, vault interface, rotation hooks","release-0.1;phase:1",MERGED,residoken-wq/aidevteam#7,partial: rotation hooks,P1-02,Secret values never appear in API/log/browser
+P1-08,"[P1-08] Append-only audit store, correlation IDs","release-0.1;phase:1",MERGED,residoken-wq/aidevteam#4,partial: tamper-evident controls,P1-04,"Actions logged; tamper-evident controls specified"
+P1-09,[P1-09] CI pipeline lint/typecheck/unit/SCA/SAST,"release-0.1;phase:1",MERGED,"residoken-wq/aidevteam#24; branch protection DEFINED – NOT ENFORCED (plan: free); Đã có: CI ci (lint/typecheck/test/integration/backup) + build image (residoken-wq/aidevteam#2, #3). Còn: SCA, secret scan, BRANCH_PROTECTION.md","partial: SAST; required checks mới DEFINED – NOT ENFORCED (plan: free)",P1-01,"Required checks defined; no bypass admin default"
+P1-10,[P1-10] Backup/restore & data retention baseline,"release-0.1;phase:1",MERGED,residoken-wq/aidevteam#11 · (backlog cũ ghi nhầm ID P1-11),,P1-04,Restore rehearsal on nonproduction instance
+P1-11,"[P1-11] Global error-handling, tracing, health probes","release-0.1;phase:1",MERGED,residoken-wq/aidevteam#10 · (backlog cũ ghi nhầm ID P1-10),partial: request tracing (đã có readiness/liveness),P1-01,Readiness/liveness and request tracing pass
+QA-01,[QA-01] E2E trình duyệt (Playwright) chạy trong CI,"release-0.1;phase:1",MERGED,"residoken-wq/aidevteam#21 (job e2e; AC-2 run 45986565988); D-2026-11-26-08 — trước UAT 03/12. Không phải Task ID của Master Plan",,,
+P2-01,[P2-01] App shell/sidebar/header/route guards,"post-0.1;phase:2",TODO,,,P1-05,"Responsive; OIDC; unauthorized navigation blocked"
+P2-02,[P2-02] Overview dashboard initial widgets,"release-0.1;phase:2",MERGED,"residoken-wq/aidevteam#20; E2E dashboard.e2e.cjs xanh trong CI (QA-01, #21)",,"P2-01,P1-04","Real API loading/empty/error states; no fictitious production status"
+P2-03,[P2-03] Organization CRUD and membership,"release-0.1;phase:2",MERGED,residoken-wq/aidevteam#15 · platform admin REQUIRES_OWNER_APPROVAL (D-2026-11-26-13),,P1-06,"Scoped permissions; optimistic updates rollback"
+P2-04,[P2-04] Role/permission editor + policy preview,"post-0.1;phase:2",MERGED,"residoken-wq/aidevteam#29; role editor /members, member:read/write chỉ org_admin (REQUIRES_OWNER_APPROVAL)",partial: policy preview,P2-03,"Deny escalations; audit all updates"
+P2-05,[P2-05] Agent definitions & instances CRUD,"release-0.1;phase:2",MERGED,residoken-wq/aidevteam#16,partial: capabilities/versions tách khỏi credential — ánh xạ chưa xác minh,P2-03,"Role, capabilities, versions distinct from credentials"
+P2-06,[P2-06] Visual org chart and role assignment,"post-0.1;phase:2",MERGED,"residoken-wq/aidevteam#30; /agents/chart: cây báo cáo, kéo thả + select bàn phím",,"P2-04,P2-05","Hierarchy change saved, validated, audit logged"
+P2-07,[P2-07] Provider account registry secret refs,"release-0.1;phase:2",MERGED,residoken-wq/aidevteam#13,,"P1-07,P2-05","No plaintext tokens; licensing state visible"
+P2-08,[P2-08] Worker pool inventory + health placeholders,"release-0.1;phase:2",MERGED,residoken-wq/aidevteam#14,,P2-05,"Real heartbeat/unknown state; no pretend online"
+P2-09,[P2-09] Bind agent-account-worker-project rules,"post-0.1;phase:2",TODO,,,"P2-07,P2-08",Reject unlicensed/unhealthy/incompatible bindings
+P2-10,"[P2-10] Project CRUD, environments, repository mapping","release-0.1;phase:2",MERGED,residoken-wq/aidevteam#12,,P2-03,"Repo validation; org isolation; audit"
+P2-11,"[P2-11] Settings, profile, locale, accessibility","post-0.1;phase:2",TODO,,,P2-01,"Keyboard navigation, a11y checks"
+P2-12,[P2-12] Org/agent/project authorization E2E tests,"post-0.1;phase:2",TODO,,,"P2-03,P2-09,P2-10",Cross-tenant deny and assigned-project access verified
+P3-01,[P3-01] Epics/milestones/sprints schema/API,"post-0.1;phase:3",TODO,,,P2-10,"Project-scoped; pagination, audit"
+P3-02,"[P3-02] Task schema, CRUD and status transitions","release-0.1;phase:3",MERGED,residoken-wq/aidevteam#17,,P3-01,"Illegal transitions rejected; idempotency keys"
+P3-03,[P3-03] Task dependency DAG validation,"post-0.1;phase:3",TODO,,,P3-02,"Cycle detection; blocked tasks cannot dispatch"
+P3-04,"[P3-04] Kanban with filters, drag/drop, task drawer","release-0.1;phase:3",MERGED,residoken-wq/aidevteam#17,"partial: filters, task drawer, giữ scroll/filter",P3-02,"Server-enforced transitions, preserve scroll/filter state"
+P3-05,[P3-05] Agent assignment & capacity policy,"post-0.1;phase:3",TODO,,,"P3-02,P2-09",No assignment if role/capability/project mismatch
+P3-06,[P3-06] Task contract JSON schema and prompts,"post-0.1;phase:3",TODO,,,P3-02,"Schema validated; forbidden paths & criteria included"
+P3-07,[P3-07] Task activity timeline/comments/attachments,"post-0.1;phase:3",TODO,,,"P3-02,P1-08","Events immutable order, sanitized attachments"
+P3-08,[P3-08] Global task search/filter + project stats,"post-0.1;phase:3",TODO,,,P3-04,"Filters org/project/assignee/state; RBAC respected"
+P3-09,"[P3-09] Manual dispatch, pause, cancel requests UI","post-0.1;phase:3",TODO,,,P3-05,"Confirm critical actions, only authorized operator"
+P3-10,[P3-10] Task E2E acceptance flows,"post-0.1;phase:3",TODO,,,"P3-04,P3-07","Create→assign→block→ready, no access bypass"
+P4-01,[P4-01] Design provider adapter interface,"release-0.1;phase:4",MERGED,"residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",partial: provider adapter interface đầy đủ (capabilities/auth/license metadata) — 0.1 chỉ có dispatch mock,"P0-04,P3-06","Capabilities/auth/license metadata; mock fallback"
+P4-02,[P4-02] Durable queue state machine and scheduler,"post-0.1;phase:4",TODO,,,"P4-01,P1-04","Restart recovery, at-least-once delivery with dedupe"
+P4-03,[P4-03] Mock coding worker for integration tests,"release-0.1;phase:4",MERGED,"residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",partial: ánh xạ chưa xác minh: 0.1 làm agent run lifecycle rút gọn với mock worker,P4-01,"Deterministic outputs, failures, cancellations"
+P4-04,"[P4-04] Worker leases, heartbeat, concurrency limits","post-0.1;phase:4",TODO,,,P4-02,Lease expiry handling and orphaned job recovery
+P4-05,[P4-05] Git worktree manager / locks / cleanup,"post-0.1;phase:4",TODO,,,P4-04,"No shared worktree; no main branch modification"
+P4-06,"[P4-06] Isolated runner images, UID, filesystem/network policy","post-0.1;phase:4",TODO,,,P4-04,"No docker.sock/secrets; egress and ACL tests"
+P4-07,"[P4-07] Run logs, artifacts, stream, cancellation","release-0.1;phase:4",MERGED,"residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01","partial: stream real-time, artifacts, kill cả process tree (0.1 rút gọn)",P4-02,"Redacted real-time logs; cancel kills subprocess tree"
+P4-08,"[P4-08] Retry/backoff, timeout, circuit breaker, DLQ","post-0.1;phase:4",TODO,,,P4-02,"Failure paths deterministic; no infinite retry"
+P4-09,[P4-09] Integrate Claude Manager via approved API/SDK,"post-0.1;phase:4",TODO,,,"P4-01,P0-04","Authenticates, schema-valid result, no deployment privileges"
+P4-10,[P4-10] Integrate a permitted coding API/SDK adapter,"post-0.1;phase:4",TODO,,,"P4-01,P0-04","License check, min perms, explicit account binding"
+P4-11,[P4-11] AGY CLI experimental compatibility test (gated),"post-0.1;phase:4",TODO,,,"P4-01,P0-04","Only if provider terms allow; verify flags/JSON/login/exit codes"
+P4-12,[P4-12] Wrap existing router v0.1 as legacy adapter (optional),"post-0.1;phase:4",OPTIONAL,Chỉ sau khi O-06 giải quyết,,P4-11,"Only after legal/security clearance, not required for MVP"
+P4-13,[P4-13] Multi-worker contention/load/failure testing,"post-0.1;phase:4",TODO,,,"P4-04,P4-07","No duplicate writes, stable worktree locks"
+P5-01,[P5-01] Register GitHub App + permission matrix,"post-0.1;phase:5",TODO,,,"P0-04,P1-07","Least privilege, installation verified by Owner"
+P5-02,[P5-02] Webhook receiver signature/replay/dedupe,"post-0.1;phase:5",TODO,,,P5-01,Tampered & replayed events rejected
+P5-03,[P5-03] Sync repos/issues/PR/checks/status,"post-0.1;phase:5",TODO,,,P5-02,Consistent eventual sync and retry
+P5-04,[P5-04] Generate issue from approved task contract,"post-0.1;phase:5",TODO,,,"P3-06,P5-03","Task ID, criteria, security boundaries present"
+P5-05,[P5-05] Create feature branch/worktree & PR linkage,"post-0.1;phase:5",TODO,,,"P4-05,P5-03",PR carries task ID and base/head SHA
+P5-06,[P5-06] Claude code-review adapter and structured verdict,"post-0.1;phase:5",TODO,,,"P4-09,P5-05",Clear PASS/CHANGES_REQUIRED/INCONCLUSIVE evidence
+P5-07,[P5-07] Trusted claude-review status check publishing,"post-0.1;phase:5",TODO,,,P5-06,"Source app pinning, cannot spoof PASS"
+P5-08,[P5-08] Auto fix-review loop capped retries,"post-0.1;phase:5",TODO,,,"P5-06,P4-08","Retry ceiling; BLOCKED with feedback and human escalation"
+P5-09,[P5-09] CI + staging deploy + smoke/E2E,"post-0.1;phase:5",TODO,,,P5-07,Preview URL & artifacts accessible only authorized
+P5-10,[P5-10] Security scans/branch rulesets validation,"post-0.1;phase:5",TODO,,,P5-09,Bot approval cannot substitute required human gate
+P5-11,[P5-11] Project GitHub/PR/checks UI,"post-0.1;phase:5",TODO,,,P5-03,"Display actual checks, SHA, failures"
+P6-01,[P6-01] Import policy v1.0.1 & versioned evaluator,"post-0.1;phase:6",TODO,,,"P1-06,P5-09",Fail closed on missing/unrecognized policy
+P6-02,[P6-02] Release manifest builder + SHA/digest,"post-0.1;phase:6",TODO,,,"P6-01,P5-03",Stable digest with deterministic canonicalization
+P6-03,[P6-03] Daily train aggregator per project,"post-0.1;phase:6",TODO,,,P6-02,"No >1 train/day/project; no runtime until time configured"
+P6-04,[P6-04] Hotfix workflow incident/branch/targeted QA,"post-0.1;phase:6",TODO,,,"P6-01,P5-09","hotfix/<incident_id>; separate approval"
+P6-05,[P6-05] Approval request/decision API and receipts,"post-0.1;phase:6",TODO,,,"P6-02,P1-08","Trusted Owner identity, immutable receipt"
+P6-06,[P6-06] Approval Center UX and pending queues,"release-0.1;phase:6",MERGED,"O-07; residoken-wq/aidevteam#23; E2E approvals.e2e.cjs xanh trong CI","partial: pending queues; 0.1 chỉ đọc (O-07)",P6-05,"Diff, SHA, digest, pipeline run, rollback visible"
+P6-07,[P6-07] GitHub protected production environment,"post-0.1;phase:6",NOT AVAILABLE ON PLAN,O-01,,P6-05,"Reviewer residoken-wq, self-review policy checked"
+P6-08,[P6-08] CI deploy gate bound to SHA+digest+run,"post-0.1;phase:6",TODO,,,"P6-02,P6-07",Mismatch approval rejects at runtime
+P6-09,[P6-09] Approval invalidation & expiration path,"post-0.1;phase:6",TODO,,,P6-05,SHA/manifest/run change instantly revokes eligibility
+P6-10,[P6-10] Emergency escalation notification only,"post-0.1;phase:6",TODO,,,P6-04,"Teams never records approval; owner absent -> pause"
+P6-11,[P6-11] Post-deploy healthcheck/rollback/postmortem,"post-0.1;phase:6",TODO,,,P6-08,Failure rollback and incident evidence preserved
+P6-12,[P6-12] Acceptance tests for 8 policy gates,"post-0.1;phase:6",TODO,,,"P6-08,P6-09","All 8 tests from §6.3 pass; Owner signoff"
+P7-01,[P7-01] Agent live status & heartbeat view,"post-0.1;phase:7",TODO,,,"P4-04,P4-07",Shows unknown/offline/queued/running precisely
+P7-02,[P7-02] Task execution metrics/SLIs and alerts,"post-0.1;phase:7",TODO,,,P4-07,"Latency, failure, stuck tasks, backlog measured"
+P7-03,[P7-03] Usage/token/cost estimation pipeline,"post-0.1;phase:7",TODO,,,P4-01,Separate estimates from provider invoices
+P7-04,[P7-04] Executive project/portfolio dashboard,"post-0.1;phase:7",TODO,,,"P3-08,P7-02","Filters project/org/time; drilldown to evidence"
+P7-05,[P7-05] Approval/release calendar + audit explorer,"post-0.1;phase:7",TODO,,,"P6-06,P1-08",Owner can export immutable receipts
+P7-06,[P7-06] Notification rules & digest (Teams optional),"post-0.1;phase:7",TODO,,,P7-02,"Dedup, no sensitive leak, never as approval source"
+P7-07,"[P7-07] Operational runbook, DR/restore test","post-0.1;phase:7",TODO,,,"P1-10,P7-02","Recovery simulated, alert escalation tested"
+P7-08,[P7-08] Load test & performance budgets,"post-0.1;phase:7",TODO,,,P7-04,Document throughput limits without invented SLA
+P8-01,[P8-01] Product registry / widget SDK specification,"post-0.1;phase:8",TODO,,,P2-10,"Tenant/project/version mapping; safe identity"
+P8-02,[P8-02] Embedded chat UI and channel gateway,"post-0.1;phase:8",TODO,,,P8-01,"Secure embed; conversation continuity"
+P8-03,[P8-03] Product/version-scoped knowledge base RAG,"post-0.1;phase:8",TODO,,,P8-01,"Cite approved docs; no cross-tenant retrieval"
+P8-04,[P8-04] Bug intake evidence and PII masking,"post-0.1;phase:8",TODO,,,P8-02,"Consent/retention; no secrets/PII in tickets by default"
+P8-05,[P8-05] CSKH triage FAQ/user-error/bug/feature/security,"post-0.1;phase:8",TODO,,,"P8-03,P8-04",Confidence/uncertainty and escalation handled
+P8-06,[P8-06] Sentry/PostHog optional evidence connectors,"post-0.1;phase:8",TODO,,,P8-04,"Private replay access, masking, license check"
+P8-07,[P8-07] Duplicate detection and ticket grouping,"post-0.1;phase:8",TODO,,,P8-05,Original tickets preserved & linked
+P8-08,[P8-08] Authorized ticket → engineering task bridge,"post-0.1;phase:8",TODO,,,"P8-05,P3-02",No direct repo writes from untrusted ticket content
+P8-09,"[P8-09] Incident severity routing, SLA and human override","post-0.1;phase:8",TODO,,,P8-08,"SEV1/2 follow hotfix approval, not auto deploy"
+P8-10,[P8-10] Status feedback to end user and closure,"post-0.1;phase:8",TODO,,,"P8-08,P6-11",No false “fixed” until deployed & verified
+P8-11,[P8-11] Pilot HULA ERP end-to-end bug journey,"post-0.1;phase:8",TODO,,,P8-10,User report→triage→task→QA→approved release→closure
+P9-01,[P9-01] Codex docs adapter via permitted SDK/API,"post-0.1;phase:9",TODO,,,"P4-01,P0-04","Approved execution mode; no untrusted prod access"
+P9-02,[P9-02] Release-linked docs/FAQ/change log templates,"post-0.1;phase:9",TODO,,,"P9-01,P6-02",References exact deployed version/SHA
+P9-03,[P9-03] Playwright guided screenshot/video capture,"post-0.1;phase:9",TODO,,,"P5-09,P9-02","Mask sensitive data; stable demo dataset"
+P9-04,[P9-04] FFmpeg processing/subtitle/TTS integration,"post-0.1;phase:9",TODO,,,P9-03,"Audio rights/consent, captions, deterministic assets"
+P9-05,[P9-05] Documentation review/approval & publishing,"post-0.1;phase:9",TODO,,,P9-02,"Review required; approved artifacts immutable/versioned"
+P9-06,[P9-06] Feedback from CSKH to knowledge base,"post-0.1;phase:9",TODO,,,"P8-05,P9-05","Curated edits; evaluation prevents hallucinated instructions"
+P9-07,[P9-07] Docs/video pilot for product release,"post-0.1;phase:9",TODO,,,"P9-05,P9-04","User can follow guide; all screenshots match release"
+P10-01,[P10-01] Security penetration/abuse tests,"post-0.1;phase:10",TODO,,,"P6-12,P8-11",Fix critical/high before go-live
+P10-02,[P10-02] Cross-tenant and data isolation regression,"post-0.1;phase:10",TODO,,,"P8-11,P9-07","No data leaks; project scoping exhaustive"
+P10-03,[P10-03] Production-like chaos/restart/retry tests,"post-0.1;phase:10",TODO,,,P7-07,"No duplicate run/release; crash recovery"
+P10-04,[P10-04] Owner acceptance/UAT demo and signoff,"post-0.1;phase:10",TODO,,,"P10-01,P10-02,P10-03",All core use cases and policy evidence accepted
+P10-05,[P10-05] Release manifest / rollback / go-no-go,"post-0.1;phase:10",TODO,,,P10-04,"SHA+digest+run bound; exceptions documented"
+P10-06,[P10-06] Production environment gate verification,"post-0.1;phase:10",NOT AVAILABLE ON PLAN,"O-01; thay bằng phương án B",,P10-05,"residoken-wq reviewer; no bypass; approve real run"
+P10-07,[P10-07] Pilot initial release candidate evaluation,"post-0.1;phase:10",TODO,,,P10-06,"Release only if date/time/approval ready; otherwise defer"
+P10-08,[P10-08] Post-release monitoring and lessons learned,"post-0.1;phase:10",TODO,,,P10-07,Health/incident/known issues tracked

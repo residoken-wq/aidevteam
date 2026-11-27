@@ -1,138 +1,244 @@
 {
   "generated": "2026-11-27",
-  "note": "Không tạo issue trên GitHub (CLAUDE.md §7 P0-08). Danh sách chưa đầy đủ: chỉ Task ID được nhắc trong CLAUDE.md. Trạng thái: TODO / IN_PROGRESS / PR_OPEN / MERGED (đã người review + merge) / DONE (tài liệu đã ký). Đếm tiến độ: node scripts/progress.mjs.",
+  "note": "P0-08r: lập lại theo docs/MASTER_IMPLEMENTATION_PLAN.md v1.0.0 (112 task) + 2 task từ quyết định CLAUDE.md (P1-05G, QA-01). Không tạo issue trên GitHub. Trạng thái: TODO / IN_PROGRESS / PR_OPEN / MERGED (đã người review + merge) / DONE (tài liệu đã ký) / REMOVED / OPTIONAL / NOT AVAILABLE ON PLAN. `coverage: partial` = đã merge phần rút gọn của Release 0.1, `remaining` là phần Master Plan còn yêu cầu. Đếm tiến độ: node scripts/progress.mjs.",
   "items": [
     {
       "id": "P0-01",
-      "title": "[P0-01] Source inventory",
+      "title": "[P0-01] Kiểm kê tài liệu gốc và source/router v0.1",
       "labels": [
         "release-0.1",
         "phase:0"
       ],
       "status": "DONE",
       "notes": "docs/reports/SOURCE_INVENTORY.md — 8 nguồn SOURCE_MISSING · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "—",
+        "output": "SOURCE_INVENTORY.md",
+        "acceptance": "Liệt kê file/version/checksum, missing sources; phân biệt mock-tested và live-tested",
+        "responsible": "Claude Manager"
+      }
     },
     {
       "id": "P0-02",
-      "title": "[P0-02] Environment inventory",
+      "title": "[P0-02] Kiểm kê repository, hosting, domain, CI, accounts",
       "labels": [
         "release-0.1",
         "phase:0"
       ],
       "status": "DONE",
       "notes": "docs/reports/ENVIRONMENT_INVENTORY.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-01",
+        "output": "ENVIRONMENT_INVENTORY.md",
+        "acceptance": "Không ghi secret; đánh dấu thông số chưa cấu hình",
+        "responsible": "DevOps Lead"
+      }
     },
     {
       "id": "P0-03",
-      "title": "[P0-03] Threat model",
+      "title": "[P0-03] Threat model multi-agent/multi-project",
       "labels": [
         "release-0.1",
         "phase:0"
       ],
       "status": "DONE",
       "notes": "docs/operations/THREAT_MODEL.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-01",
+        "output": "THREAT_MODEL.md",
+        "acceptance": "Cover prompt injection, creds, tenant leak, CI bypass, audit tampering",
+        "responsible": "Security Lead"
+      }
     },
     {
       "id": "P0-04",
-      "title": "[P0-04] Provider compliance",
+      "title": "[P0-04] License/commercial terms matrix cho Anthropic/Google/AGY",
       "labels": [
         "release-0.1",
         "phase:0"
       ],
       "status": "DONE",
       "notes": "docs/operations/PROVIDER_COMPLIANCE.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-01",
+        "output": "PROVIDER_COMPLIANCE.md",
+        "acceptance": "Trạng thái approved/unverified/prohibited per provider; không suy diễn",
+        "responsible": "Legal + Architect"
+      }
     },
     {
       "id": "P0-05",
-      "title": "[P0-05] ADR-001..005",
+      "title": "[P0-05] Chốt ADR framework/backend/queue/ORM",
       "labels": [
         "release-0.1",
         "phase:0"
       ],
       "status": "DONE",
       "notes": "ADR-001/002/004 ACCEPTED (người dùng phiên), ADR-003 PROPOSED, ADR-005 ACCEPTED (Owner) · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-02",
+        "output": "ADR-001..004.md",
+        "acceptance": "Mỗi ADR có tradeoffs, reason, rollback, Owner visibility",
+        "responsible": "Architect"
+      }
     },
     {
       "id": "P0-06",
-      "title": "[P0-06] RBAC matrix",
+      "title": "[P0-06] Chốt RBAC matrix và dữ liệu/retention",
       "labels": [
         "release-0.1",
         "phase:0"
       ],
       "status": "DONE",
       "notes": "docs/governance/RBAC_MATRIX.md — cần Owner duyệt · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-03",
+        "output": "RBAC_MATRIX.md",
+        "acceptance": "Owner approval required; default deny; tenant scoping",
+        "responsible": "Security + Owner"
+      }
     },
     {
       "id": "P0-07",
-      "title": "[P0-07] UX flows",
+      "title": "[P0-07] Thiết kế wireframes/UX flows",
       "labels": [
         "release-0.1",
         "phase:0"
       ],
       "status": "DONE",
       "notes": "docs/ux/UX_FLOWS.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-01",
+        "output": "UX_FLOWS.md",
+        "acceptance": "Org chart/project/task/approval journeys reviewed",
+        "responsible": "Product Designer"
+      }
     },
     {
       "id": "P0-08",
-      "title": "[P0-08] Backlog import",
+      "title": "[P0-08] Tạo project backlog/issues/milestones",
       "labels": [
         "release-0.1",
         "phase:0"
       ],
       "status": "DONE",
       "notes": "File này; chỉ gồm Task ID có trong CLAUDE.md (Master Plan SOURCE_MISSING) · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-05",
+        "output": "ISSUE_IMPORT.json",
+        "acceptance": "Giữ IDs, dependencies, phase labels, PR references",
+        "responsible": "Claude Manager"
+      }
+    },
+    {
+      "id": "P0-09",
+      "title": "[P0-09] Owner baseline signoff",
+      "labels": [
+        "release-0.1",
+        "phase:0"
+      ],
+      "status": "DONE",
+      "notes": "D-2026-11-26-07: Owner ký baseline Phase 0 (SIGNOFF_PHASE0.md) — không đồng nghĩa approve production",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-04,P0-06,P0-08",
+        "output": "DECISION_LOG.md",
+        "acceptance": "Ghi approval scope; không đồng nghĩa approve production",
+        "responsible": "Owner"
+      }
     },
     {
       "id": "P1-01",
-      "title": "[P1-01] Repo skeleton",
+      "title": "[P1-01] Bootstrap monorepo/web/backend/shared packages",
       "labels": [
         "release-0.1",
         "phase:1"
       ],
       "status": "MERGED",
       "notes": "residoken-wq/aidevteam#3",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-05",
+        "output": "Repo skeleton",
+        "acceptance": "Install/build dev pass, lint/test commands documented",
+        "responsible": "Fullstack Dev"
+      }
     },
     {
       "id": "P1-02",
-      "title": "[P1-02] CI lint/typecheck/test",
+      "title": "[P1-02] Docker Compose dev environment",
       "labels": [
-        "release-0.1",
+        "post-0.1",
         "phase:1"
       ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#2, #3",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "status": "TODO",
+      "notes": "ID cũ P1-02 trong backlog = \"CI lint/typecheck/test\" (đã merge, nay thuộc P1-09). Master Plan P1-02 = Docker Compose dev: chưa làm (dev hiện dùng PostgreSQL trong WSL; deploy/compose.yaml là bản deploy).",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-01",
+        "output": "compose.yaml/.env.example",
+        "acceptance": "One-command local boot; no secrets committed",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P1-03",
+      "title": "[P1-03] OpenAPI schemas + SDK client generation",
+      "labels": [
+        "post-0.1",
+        "phase:1"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-01",
+        "output": "openapi.yaml",
+        "acceptance": "Contract tests validate schema; error formats",
+        "responsible": "Backend Dev"
+      }
     },
     {
       "id": "P1-04",
-      "title": "[P1-04] DB schema + migration có rollback",
+      "title": "[P1-04] Database schema, migrations and seed",
       "labels": [
         "release-0.1",
         "phase:1"
       ],
       "status": "MERGED",
       "notes": "residoken-wq/aidevteam#4",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-01,P0-06",
+        "output": "Migrations/ERD",
+        "acceptance": "Idempotent seed; rollback migration tested",
+        "responsible": "Backend Dev"
+      }
     },
     {
       "id": "P1-05",
-      "title": "[P1-05] Đăng nhập Entra ID OIDC",
+      "title": "[P1-05] OIDC with Entra ID and session handling",
       "labels": [
         "post-0.1",
         "phase:1"
       ],
       "status": "REMOVED (O-12)",
       "notes": "Thay bằng P1-05G",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-01",
+        "output": "Auth module",
+        "acceptance": "Unauthenticated rejected; session expiry; dev-only mock isolated",
+        "responsible": "Security Dev"
+      }
     },
     {
       "id": "P1-05G",
@@ -143,282 +249,117 @@
       ],
       "status": "MERGED",
       "notes": "residoken-wq/aidevteam#5, #6 (rate limit); cần Owner đăng ký OAuth App",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "CLAUDE.md v1.2"
     },
     {
       "id": "P1-06",
-      "title": "[P1-06] RBAC default deny",
+      "title": "[P1-06] RBAC/ABAC policy middleware",
       "labels": [
         "release-0.1",
         "phase:1"
       ],
       "status": "MERGED",
       "notes": "residoken-wq/aidevteam#6; ma trận chờ Owner",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-05,P1-04",
+        "output": "Policy module",
+        "acceptance": "Negative tests on cross-org, cross-project, role spoofing",
+        "responsible": "Security Dev"
+      }
     },
     {
       "id": "P1-07",
-      "title": "[P1-07] Secret reference + redaction",
+      "title": "[P1-07] Secret references, vault interface, rotation hooks",
       "labels": [
         "release-0.1",
         "phase:1"
       ],
       "status": "MERGED",
       "notes": "residoken-wq/aidevteam#7",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-02",
+        "output": "CredentialVault adapter",
+        "acceptance": "Secret values never appear in API/log/browser",
+        "responsible": "Security Dev"
+      },
+      "coverage": "partial",
+      "remaining": "rotation hooks"
     },
     {
       "id": "P1-08",
-      "title": "[P1-08] Audit append-only",
+      "title": "[P1-08] Append-only audit store, correlation IDs",
       "labels": [
         "release-0.1",
         "phase:1"
       ],
       "status": "MERGED",
       "notes": "residoken-wq/aidevteam#4",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-04",
+        "output": "Audit module",
+        "acceptance": "Actions logged; tamper-evident controls specified",
+        "responsible": "Backend Dev"
+      },
+      "coverage": "partial",
+      "remaining": "tamper-evident controls"
     },
     {
       "id": "P1-09",
-      "title": "[P1-09] CI SCA + required checks",
+      "title": "[P1-09] CI pipeline lint/typecheck/unit/SCA/SAST",
       "labels": [
         "release-0.1",
         "phase:1"
       ],
       "status": "MERGED",
       "notes": "residoken-wq/aidevteam#24; branch protection DEFINED – NOT ENFORCED (plan: free); Đã có: CI ci (lint/typecheck/test/integration/backup) + build image (residoken-wq/aidevteam#2, #3). Còn: SCA, secret scan, BRANCH_PROTECTION.md",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-01",
+        "output": "GitHub workflows",
+        "acceptance": "Required checks defined; no bypass admin default",
+        "responsible": "DevOps"
+      },
+      "coverage": "partial",
+      "remaining": "SAST; required checks mới DEFINED – NOT ENFORCED (plan: free)"
     },
     {
       "id": "P1-10",
-      "title": "[P1-10] Health probe (DB readiness)",
+      "title": "[P1-10] Backup/restore & data retention baseline",
       "labels": [
         "release-0.1",
         "phase:1"
       ],
       "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#10",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "notes": "residoken-wq/aidevteam#11 · (backlog cũ ghi nhầm ID P1-11)",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-04",
+        "output": "RUNBOOK_BACKUP.md",
+        "acceptance": "Restore rehearsal on nonproduction instance",
+        "responsible": "DevOps"
+      }
     },
     {
       "id": "P1-11",
-      "title": "[P1-11] Backup/restore cơ bản",
+      "title": "[P1-11] Global error-handling, tracing, health probes",
       "labels": [
         "release-0.1",
         "phase:1"
       ],
       "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#11",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P2-02",
-      "title": "[P2-02] Dashboard tổng quan",
-      "labels": [
-        "release-0.1",
-        "phase:2"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#20; E2E dashboard.e2e.cjs xanh trong CI (QA-01, #21)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P2-03",
-      "title": "[P2-03] CRUD org (ánh xạ chưa xác minh)",
-      "labels": [
-        "release-0.1",
-        "phase:2"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#15 · platform admin REQUIRES_OWNER_APPROVAL (D-2026-11-26-13)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P2-04",
-      "title": "[P2-04] Role editor nâng cao",
-      "labels": [
-        "post-0.1",
-        "phase:2"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#29; role editor /members, member:read/write chỉ org_admin (REQUIRES_OWNER_APPROVAL)",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P2-05",
-      "title": "[P2-05] CRUD agent (ánh xạ chưa xác minh)",
-      "labels": [
-        "release-0.1",
-        "phase:2"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#16",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P2-06",
-      "title": "[P2-06] Org chart kéo thả",
-      "labels": [
-        "post-0.1",
-        "phase:2"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#30; /agents/chart: cây báo cáo, kéo thả + select bàn phím",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P2-07",
-      "title": "[P2-07] CRUD provider account (ánh xạ chưa xác minh)",
-      "labels": [
-        "release-0.1",
-        "phase:2"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#13",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P2-08",
-      "title": "[P2-08] CRUD worker (ánh xạ chưa xác minh)",
-      "labels": [
-        "release-0.1",
-        "phase:2"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#14",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P2-10",
-      "title": "[P2-10] CRUD project (ánh xạ chưa xác minh)",
-      "labels": [
-        "release-0.1",
-        "phase:2"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#12",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P3-02",
-      "title": "[P3-02] Task CRUD + trạng thái",
-      "labels": [
-        "release-0.1",
-        "phase:3"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#17",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P3-04",
-      "title": "[P3-04] Kanban cơ bản",
-      "labels": [
-        "release-0.1",
-        "phase:3"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#17",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P4-01",
-      "title": "[P4-01] Dispatch tới mock worker",
-      "labels": [
-        "release-0.1",
-        "phase:4"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P4-03",
-      "title": "[P4-03] Agent run lifecycle (rút gọn)",
-      "labels": [
-        "release-0.1",
-        "phase:4"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P4-07",
-      "title": "[P4-07] Xem log/run (rút gọn)",
-      "labels": [
-        "release-0.1",
-        "phase:4"
-      ],
-      "status": "MERGED",
-      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P4-12",
-      "title": "[P4-12] Legacy adapter router v0.1",
-      "labels": [
-        "post-0.1",
-        "phase:4"
-      ],
-      "status": "OPTIONAL",
-      "notes": "Chỉ sau khi O-06 giải quyết",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P6-05",
-      "title": "[P6-05] Approval service xác minh comment",
-      "labels": [
-        "post-0.1",
-        "phase:6"
-      ],
-      "status": "TODO",
-      "notes": "",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P6-06",
-      "title": "[P6-06] Approval Center chỉ đọc (rút gọn)",
-      "labels": [
-        "release-0.1",
-        "phase:6"
-      ],
-      "status": "MERGED",
-      "notes": "O-07; residoken-wq/aidevteam#23; E2E approvals.e2e.cjs xanh trong CI",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P6-07",
-      "title": "[P6-07] Protected environment reviewer",
-      "labels": [
-        "post-0.1",
-        "phase:6"
-      ],
-      "status": "NOT AVAILABLE ON PLAN",
-      "notes": "O-01",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P6-08",
-      "title": "[P6-08] Approval verification (deploy-time)",
-      "labels": [
-        "post-0.1",
-        "phase:6"
-      ],
-      "status": "TODO",
-      "notes": "",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
-    },
-    {
-      "id": "P10-06",
-      "title": "[P10-06] Production gate (Master Plan)",
-      "labels": [
-        "post-0.1",
-        "phase:10"
-      ],
-      "status": "NOT AVAILABLE ON PLAN",
-      "notes": "O-01; thay bằng phương án B",
-      "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+      "notes": "residoken-wq/aidevteam#10 · (backlog cũ ghi nhầm ID P1-10)",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-01",
+        "output": "Health/trace middleware",
+        "acceptance": "Readiness/liveness and request tracing pass",
+        "responsible": "Backend Dev"
+      },
+      "coverage": "partial",
+      "remaining": "request tracing (đã có readiness/liveness)"
     },
     {
       "id": "QA-01",
@@ -430,6 +371,1584 @@
       "status": "MERGED",
       "notes": "residoken-wq/aidevteam#21 (job e2e; AC-2 run 45986565988); D-2026-11-26-08 — trước UAT 03/12. Không phải Task ID của Master Plan",
       "source": "DECISION_LOG D-2026-11-26-08"
+    },
+    {
+      "id": "P2-01",
+      "title": "[P2-01] App shell/sidebar/header/route guards",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-05",
+        "output": "Web shell",
+        "acceptance": "Responsive; OIDC; unauthorized navigation blocked",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P2-02",
+      "title": "[P2-02] Overview dashboard initial widgets",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#20; E2E dashboard.e2e.cjs xanh trong CI (QA-01, #21)",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-01,P1-04",
+        "output": "Dashboard page",
+        "acceptance": "Real API loading/empty/error states; no fictitious production status",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P2-03",
+      "title": "[P2-03] Organization CRUD and membership",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#15 · platform admin REQUIRES_OWNER_APPROVAL (D-2026-11-26-13)",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-06",
+        "output": "Org pages/API",
+        "acceptance": "Scoped permissions; optimistic updates rollback",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P2-04",
+      "title": "[P2-04] Role/permission editor + policy preview",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#29; role editor /members, member:read/write chỉ org_admin (REQUIRES_OWNER_APPROVAL)",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-03",
+        "output": "RBAC UI",
+        "acceptance": "Deny escalations; audit all updates",
+        "responsible": "Fullstack Dev"
+      },
+      "coverage": "partial",
+      "remaining": "policy preview"
+    },
+    {
+      "id": "P2-05",
+      "title": "[P2-05] Agent definitions & instances CRUD",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#16",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-03",
+        "output": "Agent registry",
+        "acceptance": "Role, capabilities, versions distinct from credentials",
+        "responsible": "Fullstack Dev"
+      },
+      "coverage": "partial",
+      "remaining": "capabilities/versions tách khỏi credential — ánh xạ chưa xác minh"
+    },
+    {
+      "id": "P2-06",
+      "title": "[P2-06] Visual org chart and role assignment",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#30; /agents/chart: cây báo cáo, kéo thả + select bàn phím",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-04,P2-05",
+        "output": "Org chart",
+        "acceptance": "Hierarchy change saved, validated, audit logged",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P2-07",
+      "title": "[P2-07] Provider account registry secret refs",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#13",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-07,P2-05",
+        "output": "Provider account screen",
+        "acceptance": "No plaintext tokens; licensing state visible",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P2-08",
+      "title": "[P2-08] Worker pool inventory + health placeholders",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#14",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-05",
+        "output": "Workers screen",
+        "acceptance": "Real heartbeat/unknown state; no pretend online",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P2-09",
+      "title": "[P2-09] Bind agent-account-worker-project rules",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-07,P2-08",
+        "output": "Binding API/UI",
+        "acceptance": "Reject unlicensed/unhealthy/incompatible bindings",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P2-10",
+      "title": "[P2-10] Project CRUD, environments, repository mapping",
+      "labels": [
+        "release-0.1",
+        "phase:2"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#12",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-03",
+        "output": "Project registry",
+        "acceptance": "Repo validation; org isolation; audit",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P2-11",
+      "title": "[P2-11] Settings, profile, locale, accessibility",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-01",
+        "output": "Settings pages",
+        "acceptance": "Keyboard navigation, a11y checks",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P2-12",
+      "title": "[P2-12] Org/agent/project authorization E2E tests",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-03,P2-09,P2-10",
+        "output": "Test evidence",
+        "acceptance": "Cross-tenant deny and assigned-project access verified",
+        "responsible": "QA Agent"
+      }
+    },
+    {
+      "id": "P3-01",
+      "title": "[P3-01] Epics/milestones/sprints schema/API",
+      "labels": [
+        "post-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-10",
+        "output": "Planning API",
+        "acceptance": "Project-scoped; pagination, audit",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P3-02",
+      "title": "[P3-02] Task schema, CRUD and status transitions",
+      "labels": [
+        "release-0.1",
+        "phase:3"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#17",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-01",
+        "output": "Task API",
+        "acceptance": "Illegal transitions rejected; idempotency keys",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P3-03",
+      "title": "[P3-03] Task dependency DAG validation",
+      "labels": [
+        "post-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-02",
+        "output": "Dependency engine",
+        "acceptance": "Cycle detection; blocked tasks cannot dispatch",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P3-04",
+      "title": "[P3-04] Kanban with filters, drag/drop, task drawer",
+      "labels": [
+        "release-0.1",
+        "phase:3"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#17",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-02",
+        "output": "Project board",
+        "acceptance": "Server-enforced transitions, preserve scroll/filter state",
+        "responsible": "Frontend Dev"
+      },
+      "coverage": "partial",
+      "remaining": "filters, task drawer, giữ scroll/filter"
+    },
+    {
+      "id": "P3-05",
+      "title": "[P3-05] Agent assignment & capacity policy",
+      "labels": [
+        "post-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-02,P2-09",
+        "output": "Task assignment UI/API",
+        "acceptance": "No assignment if role/capability/project mismatch",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P3-06",
+      "title": "[P3-06] Task contract JSON schema and prompts",
+      "labels": [
+        "post-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-02",
+        "output": "task.schema.json/prompts",
+        "acceptance": "Schema validated; forbidden paths & criteria included",
+        "responsible": "Claude Manager"
+      }
+    },
+    {
+      "id": "P3-07",
+      "title": "[P3-07] Task activity timeline/comments/attachments",
+      "labels": [
+        "post-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-02,P1-08",
+        "output": "Timeline",
+        "acceptance": "Events immutable order, sanitized attachments",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P3-08",
+      "title": "[P3-08] Global task search/filter + project stats",
+      "labels": [
+        "post-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-04",
+        "output": "Task search",
+        "acceptance": "Filters org/project/assignee/state; RBAC respected",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P3-09",
+      "title": "[P3-09] Manual dispatch, pause, cancel requests UI",
+      "labels": [
+        "post-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-05",
+        "output": "Dispatch controls",
+        "acceptance": "Confirm critical actions, only authorized operator",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P3-10",
+      "title": "[P3-10] Task E2E acceptance flows",
+      "labels": [
+        "post-0.1",
+        "phase:3"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-04,P3-07",
+        "output": "QA evidence",
+        "acceptance": "Create→assign→block→ready, no access bypass",
+        "responsible": "QA Agent"
+      }
+    },
+    {
+      "id": "P4-01",
+      "title": "[P4-01] Design provider adapter interface",
+      "labels": [
+        "release-0.1",
+        "phase:4"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-04,P3-06",
+        "output": "IWorkerAdapter SDK",
+        "acceptance": "Capabilities/auth/license metadata; mock fallback",
+        "responsible": "Architect"
+      },
+      "coverage": "partial",
+      "remaining": "provider adapter interface đầy đủ (capabilities/auth/license metadata) — 0.1 chỉ có dispatch mock"
+    },
+    {
+      "id": "P4-02",
+      "title": "[P4-02] Durable queue state machine and scheduler",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-01,P1-04",
+        "output": "Queue engine",
+        "acceptance": "Restart recovery, at-least-once delivery with dedupe",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P4-03",
+      "title": "[P4-03] Mock coding worker for integration tests",
+      "labels": [
+        "release-0.1",
+        "phase:4"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-01",
+        "output": "Mock adapter",
+        "acceptance": "Deterministic outputs, failures, cancellations",
+        "responsible": "Backend Dev"
+      },
+      "coverage": "partial",
+      "remaining": "ánh xạ chưa xác minh: 0.1 làm agent run lifecycle rút gọn với mock worker"
+    },
+    {
+      "id": "P4-04",
+      "title": "[P4-04] Worker leases, heartbeat, concurrency limits",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-02",
+        "output": "Worker registry",
+        "acceptance": "Lease expiry handling and orphaned job recovery",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P4-05",
+      "title": "[P4-05] Git worktree manager / locks / cleanup",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-04",
+        "output": "Worktree service",
+        "acceptance": "No shared worktree; no main branch modification",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P4-06",
+      "title": "[P4-06] Isolated runner images, UID, filesystem/network policy",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-04",
+        "output": "Runner templates",
+        "acceptance": "No docker.sock/secrets; egress and ACL tests",
+        "responsible": "Security/DevOps"
+      }
+    },
+    {
+      "id": "P4-07",
+      "title": "[P4-07] Run logs, artifacts, stream, cancellation",
+      "labels": [
+        "release-0.1",
+        "phase:4"
+      ],
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-02",
+        "output": "Run detail UI",
+        "acceptance": "Redacted real-time logs; cancel kills subprocess tree",
+        "responsible": "Fullstack Dev"
+      },
+      "coverage": "partial",
+      "remaining": "stream real-time, artifacts, kill cả process tree (0.1 rút gọn)"
+    },
+    {
+      "id": "P4-08",
+      "title": "[P4-08] Retry/backoff, timeout, circuit breaker, DLQ",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-02",
+        "output": "Run policies",
+        "acceptance": "Failure paths deterministic; no infinite retry",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P4-09",
+      "title": "[P4-09] Integrate Claude Manager via approved API/SDK",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-01,P0-04",
+        "output": "Manager adapter",
+        "acceptance": "Authenticates, schema-valid result, no deployment privileges",
+        "responsible": "Agent Integrator"
+      }
+    },
+    {
+      "id": "P4-10",
+      "title": "[P4-10] Integrate a permitted coding API/SDK adapter",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-01,P0-04",
+        "output": "Coding adapter",
+        "acceptance": "License check, min perms, explicit account binding",
+        "responsible": "Agent Integrator"
+      }
+    },
+    {
+      "id": "P4-11",
+      "title": "[P4-11] AGY CLI experimental compatibility test (gated)",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-01,P0-04",
+        "output": "AGY_COMPAT_TEST.md",
+        "acceptance": "Only if provider terms allow; verify flags/JSON/login/exit codes",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P4-12",
+      "title": "[P4-12] Wrap existing router v0.1 as legacy adapter (optional)",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "OPTIONAL",
+      "notes": "Chỉ sau khi O-06 giải quyết",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-11",
+        "output": "Adapter bridge",
+        "acceptance": "Only after legal/security clearance, not required for MVP",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P4-13",
+      "title": "[P4-13] Multi-worker contention/load/failure testing",
+      "labels": [
+        "post-0.1",
+        "phase:4"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-04,P4-07",
+        "output": "Load report",
+        "acceptance": "No duplicate writes, stable worktree locks",
+        "responsible": "QA/DevOps"
+      }
+    },
+    {
+      "id": "P5-01",
+      "title": "[P5-01] Register GitHub App + permission matrix",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P0-04,P1-07",
+        "output": "GitHub App config",
+        "acceptance": "Least privilege, installation verified by Owner",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P5-02",
+      "title": "[P5-02] Webhook receiver signature/replay/dedupe",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P5-01",
+        "output": "Webhook API",
+        "acceptance": "Tampered & replayed events rejected",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P5-03",
+      "title": "[P5-03] Sync repos/issues/PR/checks/status",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P5-02",
+        "output": "GitHub sync jobs",
+        "acceptance": "Consistent eventual sync and retry",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P5-04",
+      "title": "[P5-04] Generate issue from approved task contract",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-06,P5-03",
+        "output": "Issue template",
+        "acceptance": "Task ID, criteria, security boundaries present",
+        "responsible": "Claude Manager"
+      }
+    },
+    {
+      "id": "P5-05",
+      "title": "[P5-05] Create feature branch/worktree & PR linkage",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-05,P5-03",
+        "output": "PR lifecycle",
+        "acceptance": "PR carries task ID and base/head SHA",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P5-06",
+      "title": "[P5-06] Claude code-review adapter and structured verdict",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-09,P5-05",
+        "output": "Review reports",
+        "acceptance": "Clear PASS/CHANGES_REQUIRED/INCONCLUSIVE evidence",
+        "responsible": "Agent Integrator"
+      }
+    },
+    {
+      "id": "P5-07",
+      "title": "[P5-07] Trusted claude-review status check publishing",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P5-06",
+        "output": "Check workflow",
+        "acceptance": "Source app pinning, cannot spoof PASS",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P5-08",
+      "title": "[P5-08] Auto fix-review loop capped retries",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P5-06,P4-08",
+        "output": "QA loop",
+        "acceptance": "Retry ceiling; BLOCKED with feedback and human escalation",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P5-09",
+      "title": "[P5-09] CI + staging deploy + smoke/E2E",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P5-07",
+        "output": "Staging pipeline",
+        "acceptance": "Preview URL & artifacts accessible only authorized",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P5-10",
+      "title": "[P5-10] Security scans/branch rulesets validation",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P5-09",
+        "output": "Ruleset evidence",
+        "acceptance": "Bot approval cannot substitute required human gate",
+        "responsible": "Security/QA"
+      }
+    },
+    {
+      "id": "P5-11",
+      "title": "[P5-11] Project GitHub/PR/checks UI",
+      "labels": [
+        "post-0.1",
+        "phase:5"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P5-03",
+        "output": "PR dashboard",
+        "acceptance": "Display actual checks, SHA, failures",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P6-01",
+      "title": "[P6-01] Import policy v1.0.1 & versioned evaluator",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-06,P5-09",
+        "output": "Policy engine",
+        "acceptance": "Fail closed on missing/unrecognized policy",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P6-02",
+      "title": "[P6-02] Release manifest builder + SHA/digest",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-01,P5-03",
+        "output": "Immutable manifest",
+        "acceptance": "Stable digest with deterministic canonicalization",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P6-03",
+      "title": "[P6-03] Daily train aggregator per project",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-02",
+        "output": "Train scheduler",
+        "acceptance": "No >1 train/day/project; no runtime until time configured",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P6-04",
+      "title": "[P6-04] Hotfix workflow incident/branch/targeted QA",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-01,P5-09",
+        "output": "Hotfix workflow",
+        "acceptance": "hotfix/<incident_id>; separate approval",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P6-05",
+      "title": "[P6-05] Approval request/decision API and receipts",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-02,P1-08",
+        "output": "Approval service",
+        "acceptance": "Trusted Owner identity, immutable receipt",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P6-06",
+      "title": "[P6-06] Approval Center UX and pending queues",
+      "labels": [
+        "release-0.1",
+        "phase:6"
+      ],
+      "status": "MERGED",
+      "notes": "O-07; residoken-wq/aidevteam#23; E2E approvals.e2e.cjs xanh trong CI",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-05",
+        "output": "Approval screens",
+        "acceptance": "Diff, SHA, digest, pipeline run, rollback visible",
+        "responsible": "Frontend Dev"
+      },
+      "coverage": "partial",
+      "remaining": "pending queues; 0.1 chỉ đọc (O-07)"
+    },
+    {
+      "id": "P6-07",
+      "title": "[P6-07] GitHub protected production environment",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "NOT AVAILABLE ON PLAN",
+      "notes": "O-01",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-05",
+        "output": "Environment settings",
+        "acceptance": "Reviewer residoken-wq, self-review policy checked",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P6-08",
+      "title": "[P6-08] CI deploy gate bound to SHA+digest+run",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-02,P6-07",
+        "output": "Deploy protection",
+        "acceptance": "Mismatch approval rejects at runtime",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P6-09",
+      "title": "[P6-09] Approval invalidation & expiration path",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-05",
+        "output": "Invalidation events",
+        "acceptance": "SHA/manifest/run change instantly revokes eligibility",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P6-10",
+      "title": "[P6-10] Emergency escalation notification only",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-04",
+        "output": "Notification adapters",
+        "acceptance": "Teams never records approval; owner absent -> pause",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P6-11",
+      "title": "[P6-11] Post-deploy healthcheck/rollback/postmortem",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-08",
+        "output": "Runbooks",
+        "acceptance": "Failure rollback and incident evidence preserved",
+        "responsible": "DevOps"
+      }
+    },
+    {
+      "id": "P6-12",
+      "title": "[P6-12] Acceptance tests for 8 policy gates",
+      "labels": [
+        "post-0.1",
+        "phase:6"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-08,P6-09",
+        "output": "POLICY_TEST_EVIDENCE.md",
+        "acceptance": "All 8 tests from §6.3 pass; Owner signoff",
+        "responsible": "QA/Security"
+      }
+    },
+    {
+      "id": "P7-01",
+      "title": "[P7-01] Agent live status & heartbeat view",
+      "labels": [
+        "post-0.1",
+        "phase:7"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-04,P4-07",
+        "output": "Agent monitor",
+        "acceptance": "Shows unknown/offline/queued/running precisely",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P7-02",
+      "title": "[P7-02] Task execution metrics/SLIs and alerts",
+      "labels": [
+        "post-0.1",
+        "phase:7"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-07",
+        "output": "Dashboards",
+        "acceptance": "Latency, failure, stuck tasks, backlog measured",
+        "responsible": "SRE"
+      }
+    },
+    {
+      "id": "P7-03",
+      "title": "[P7-03] Usage/token/cost estimation pipeline",
+      "labels": [
+        "post-0.1",
+        "phase:7"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-01",
+        "output": "Usage analytics",
+        "acceptance": "Separate estimates from provider invoices",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P7-04",
+      "title": "[P7-04] Executive project/portfolio dashboard",
+      "labels": [
+        "post-0.1",
+        "phase:7"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P3-08,P7-02",
+        "output": "Portfolio view",
+        "acceptance": "Filters project/org/time; drilldown to evidence",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P7-05",
+      "title": "[P7-05] Approval/release calendar + audit explorer",
+      "labels": [
+        "post-0.1",
+        "phase:7"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-06,P1-08",
+        "output": "Release/audit UI",
+        "acceptance": "Owner can export immutable receipts",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P7-06",
+      "title": "[P7-06] Notification rules & digest (Teams optional)",
+      "labels": [
+        "post-0.1",
+        "phase:7"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P7-02",
+        "output": "Notification service",
+        "acceptance": "Dedup, no sensitive leak, never as approval source",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P7-07",
+      "title": "[P7-07] Operational runbook, DR/restore test",
+      "labels": [
+        "post-0.1",
+        "phase:7"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P1-10,P7-02",
+        "output": "OPS_RUNBOOK.md",
+        "acceptance": "Recovery simulated, alert escalation tested",
+        "responsible": "SRE"
+      }
+    },
+    {
+      "id": "P7-08",
+      "title": "[P7-08] Load test & performance budgets",
+      "labels": [
+        "post-0.1",
+        "phase:7"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P7-04",
+        "output": "Performance report",
+        "acceptance": "Document throughput limits without invented SLA",
+        "responsible": "QA/SRE"
+      }
+    },
+    {
+      "id": "P8-01",
+      "title": "[P8-01] Product registry / widget SDK specification",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P2-10",
+        "output": "Support SDK spec",
+        "acceptance": "Tenant/project/version mapping; safe identity",
+        "responsible": "Product/Backend"
+      }
+    },
+    {
+      "id": "P8-02",
+      "title": "[P8-02] Embedded chat UI and channel gateway",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-01",
+        "output": "Support widget",
+        "acceptance": "Secure embed; conversation continuity",
+        "responsible": "Frontend Dev"
+      }
+    },
+    {
+      "id": "P8-03",
+      "title": "[P8-03] Product/version-scoped knowledge base RAG",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-01",
+        "output": "KB service",
+        "acceptance": "Cite approved docs; no cross-tenant retrieval",
+        "responsible": "AI Integrator"
+      }
+    },
+    {
+      "id": "P8-04",
+      "title": "[P8-04] Bug intake evidence and PII masking",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-02",
+        "output": "Ticket API/schema",
+        "acceptance": "Consent/retention; no secrets/PII in tickets by default",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P8-05",
+      "title": "[P8-05] CSKH triage FAQ/user-error/bug/feature/security",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-03,P8-04",
+        "output": "Triage policy",
+        "acceptance": "Confidence/uncertainty and escalation handled",
+        "responsible": "AI Integrator"
+      }
+    },
+    {
+      "id": "P8-06",
+      "title": "[P8-06] Sentry/PostHog optional evidence connectors",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-04",
+        "output": "Evidence connectors",
+        "acceptance": "Private replay access, masking, license check",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P8-07",
+      "title": "[P8-07] Duplicate detection and ticket grouping",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-05",
+        "output": "Ticket dedupe",
+        "acceptance": "Original tickets preserved & linked",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P8-08",
+      "title": "[P8-08] Authorized ticket → engineering task bridge",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-05,P3-02",
+        "output": "Task bridge",
+        "acceptance": "No direct repo writes from untrusted ticket content",
+        "responsible": "Backend Dev"
+      }
+    },
+    {
+      "id": "P8-09",
+      "title": "[P8-09] Incident severity routing, SLA and human override",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-08",
+        "output": "Escalation rules",
+        "acceptance": "SEV1/2 follow hotfix approval, not auto deploy",
+        "responsible": "CSKH Lead"
+      }
+    },
+    {
+      "id": "P8-10",
+      "title": "[P8-10] Status feedback to end user and closure",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-08,P6-11",
+        "output": "Notification workflow",
+        "acceptance": "No false “fixed” until deployed & verified",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P8-11",
+      "title": "[P8-11] Pilot HULA ERP end-to-end bug journey",
+      "labels": [
+        "post-0.1",
+        "phase:8"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-10",
+        "output": "Pilot report",
+        "acceptance": "User report→triage→task→QA→approved release→closure",
+        "responsible": "QA/Product"
+      }
+    },
+    {
+      "id": "P9-01",
+      "title": "[P9-01] Codex docs adapter via permitted SDK/API",
+      "labels": [
+        "post-0.1",
+        "phase:9"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P4-01,P0-04",
+        "output": "Docs adapter",
+        "acceptance": "Approved execution mode; no untrusted prod access",
+        "responsible": "Agent Integrator"
+      }
+    },
+    {
+      "id": "P9-02",
+      "title": "[P9-02] Release-linked docs/FAQ/change log templates",
+      "labels": [
+        "post-0.1",
+        "phase:9"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P9-01,P6-02",
+        "output": "Docs templates",
+        "acceptance": "References exact deployed version/SHA",
+        "responsible": "Tech Writer"
+      }
+    },
+    {
+      "id": "P9-03",
+      "title": "[P9-03] Playwright guided screenshot/video capture",
+      "labels": [
+        "post-0.1",
+        "phase:9"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P5-09,P9-02",
+        "output": "Capture worker",
+        "acceptance": "Mask sensitive data; stable demo dataset",
+        "responsible": "QA/Automation"
+      }
+    },
+    {
+      "id": "P9-04",
+      "title": "[P9-04] FFmpeg processing/subtitle/TTS integration",
+      "labels": [
+        "post-0.1",
+        "phase:9"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P9-03",
+        "output": "Video pipeline",
+        "acceptance": "Audio rights/consent, captions, deterministic assets",
+        "responsible": "Media Dev"
+      }
+    },
+    {
+      "id": "P9-05",
+      "title": "[P9-05] Documentation review/approval & publishing",
+      "labels": [
+        "post-0.1",
+        "phase:9"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P9-02",
+        "output": "Docs Studio",
+        "acceptance": "Review required; approved artifacts immutable/versioned",
+        "responsible": "Fullstack Dev"
+      }
+    },
+    {
+      "id": "P9-06",
+      "title": "[P9-06] Feedback from CSKH to knowledge base",
+      "labels": [
+        "post-0.1",
+        "phase:9"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-05,P9-05",
+        "output": "KB refresh workflow",
+        "acceptance": "Curated edits; evaluation prevents hallucinated instructions",
+        "responsible": "AI Integrator"
+      }
+    },
+    {
+      "id": "P9-07",
+      "title": "[P9-07] Docs/video pilot for product release",
+      "labels": [
+        "post-0.1",
+        "phase:9"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P9-05,P9-04",
+        "output": "Docs pilot report",
+        "acceptance": "User can follow guide; all screenshots match release",
+        "responsible": "QA"
+      }
+    },
+    {
+      "id": "P10-01",
+      "title": "[P10-01] Security penetration/abuse tests",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P6-12,P8-11",
+        "output": "Security report",
+        "acceptance": "Fix critical/high before go-live",
+        "responsible": "Security"
+      }
+    },
+    {
+      "id": "P10-02",
+      "title": "[P10-02] Cross-tenant and data isolation regression",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P8-11,P9-07",
+        "output": "Isolation report",
+        "acceptance": "No data leaks; project scoping exhaustive",
+        "responsible": "QA"
+      }
+    },
+    {
+      "id": "P10-03",
+      "title": "[P10-03] Production-like chaos/restart/retry tests",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P7-07",
+        "output": "Resilience report",
+        "acceptance": "No duplicate run/release; crash recovery",
+        "responsible": "SRE"
+      }
+    },
+    {
+      "id": "P10-04",
+      "title": "[P10-04] Owner acceptance/UAT demo and signoff",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P10-01,P10-02,P10-03",
+        "output": "UAT receipt",
+        "acceptance": "All core use cases and policy evidence accepted",
+        "responsible": "Owner"
+      }
+    },
+    {
+      "id": "P10-05",
+      "title": "[P10-05] Release manifest / rollback / go-no-go",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P10-04",
+        "output": "Release dossier",
+        "acceptance": "SHA+digest+run bound; exceptions documented",
+        "responsible": "Claude Manager"
+      }
+    },
+    {
+      "id": "P10-06",
+      "title": "[P10-06] Production environment gate verification",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "NOT AVAILABLE ON PLAN",
+      "notes": "O-01; thay bằng phương án B",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P10-05",
+        "output": "Gate evidence",
+        "acceptance": "residoken-wq reviewer; no bypass; approve real run",
+        "responsible": "DevOps + Owner"
+      }
+    },
+    {
+      "id": "P10-07",
+      "title": "[P10-07] Pilot initial release candidate evaluation",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P10-06",
+        "output": "GO_NO_GO.md",
+        "acceptance": "Release only if date/time/approval ready; otherwise defer",
+        "responsible": "Owner"
+      }
+    },
+    {
+      "id": "P10-08",
+      "title": "[P10-08] Post-release monitoring and lessons learned",
+      "labels": [
+        "post-0.1",
+        "phase:10"
+      ],
+      "status": "TODO",
+      "notes": "",
+      "source": "Master Plan v1.0.0",
+      "master_plan": {
+        "depends_on": "P10-07",
+        "output": "POST_RELEASE_REPORT.md",
+        "acceptance": "Health/incident/known issues tracked",
+        "responsible": "SRE/PM"
+      }
     }
   ]
 }
