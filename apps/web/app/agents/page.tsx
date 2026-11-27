@@ -16,7 +16,7 @@ export default async function AgentsPage({ searchParams }: { searchParams: Promi
   return (
     <main>
       <p>
-        <Link href="/">← Trang chủ</Link>
+        <Link href="/">← Trang chủ</Link> · <Link href="/agents/chart">Sơ đồ tổ chức</Link>
       </p>
       <h1>Agent {me?.activeOrg ? `— ${me.activeOrg.slug}` : ""}</h1>
       {data === null ? (
