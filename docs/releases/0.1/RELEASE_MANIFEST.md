@@ -17,7 +17,7 @@
 | Image web | `ghcr.io/residoken-wq/aidevteam-web@sha256:09325bfd8d7e346c9a98e92eb92564205560850cdb877ad33324d6f1a61a9e65` | build-image run 45991558374 (push `main`) |
 | `pipeline_run_id` | `45991558378` (ci) / `45991558374` (build-image) | ứng viên |
 | `release_manifest_digest` | Chưa tính — xem §8 | **CHƯA CÓ** |
-| Policy áp dụng | Release Policy v1.0.1 (đang hiệu lực) — **file `SOURCE_MISSING` trong repo** | **BLOCKER B-01** |
+| Policy áp dụng | Release Policy v1.0.1 (đang hiệu lực) — `docs/operations/RELEASE_POLICY.md` + `policies/approval-policy.yaml` (có trong repo từ 27/11). v1.0.1 đòi protected environment (không có trên gói, O-01) → production fail closed cho tới khi có v1.0.2 hoặc ngoại lệ (B-06) | B-01 **ĐÃ GIẢM**, còn B-06 |
 
 ## 2. Phạm vi (CLAUDE.md §5.2)
 
@@ -139,7 +139,7 @@ printf 'sha256:%s\n' "$(git show <manifest_pr_head_sha>:docs/releases/0.1/RELEAS
 
 | ID | Blocker | Ai xử lý |
 |---|---|---|
-| B-01 | Release Policy v1.0.1/v1.0.2 và `approval-policy.yaml` **`SOURCE_MISSING`** trong repo → không đối chiếu được 9 trường approval record và quy tắc digest | Owner đưa file vào repo |
+| B-01 | ~~Release Policy v1.0.1 và `approval-policy.yaml` `SOURCE_MISSING`~~ → **v1.0.1 đã vào repo 27/11** (SOURCE_INVENTORY); 9 trường approval record đã đối chiếu (`APPROVAL_RECORD.md` §1). **Còn:** file v1.0.2 vẫn `SOURCE_MISSING` (gộp vào B-06) | Owner (v1.0.2) |
 | B-02 | Staging + domain production/staging `CHƯA CẤU HÌNH` | Owner |
 | B-03 | OAuth App chưa đăng ký | Owner |
 | B-04 | `ttl_minutes = null` chặn deploy | Owner (D-OWN-10) |
