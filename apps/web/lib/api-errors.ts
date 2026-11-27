@@ -26,6 +26,14 @@ const CONFLICTS: Record<string, string> = {
   worker_not_dispatchable: "Worker không khả dụng hoặc không phải worker mock đang bật.",
   task_not_dispatchable: "Chỉ có thể chạy task ở trạng thái Cần làm hoặc Đang làm.",
   run_not_cancellable: "Chỉ có thể hủy lượt chạy đang ở hàng đợi hoặc đang chạy.",
+  cannot_change_own_roles: "Không thể tự thay đổi vai trò của chính mình.",
+  last_org_admin: "Không thể gỡ vai trò quản trị viên (org_admin) cuối cùng của tổ chức.",
+};
+
+const SPECIFIC_422: Record<string, string> = {
+  user_not_allowlisted: "Người dùng chưa có trong danh sách được phép (allowlist).",
+  user_disabled: "Tài khoản người dùng đã bị vô hiệu hóa.",
+  role_not_found: "Vai trò không tồn tại trong tổ chức.",
 };
 
 export function apiErrorMessage(status: number, body: unknown): string {
@@ -33,7 +41,12 @@ export function apiErrorMessage(status: number, body: unknown): string {
   if (status === 422 && Array.isArray(b.issues) && b.issues.some((i) => i?.problem === "secret_like")) {
     return "Giá trị vừa nhập trông giống một secret thật. Không dán secret vào đây — đặt secret trên máy worker rồi nhập tham chiếu (env:AIDEV_SECRET_… hoặc file:/run/secrets/…).";
   }
+  if (status === 422 && typeof b.message === "string" && Object.prototype.hasOwnProperty.call(SPECIFIC_422, b.message)) {
+    return SPECIFIC_422[b.message]!;
+  }
   if (status === 422 && Array.isArray(b.issues)) {
+    const specific = b.issues.find((i) => typeof i?.message === "string" && Object.prototype.hasOwnProperty.call(SPECIFIC_422, i.message));
+    if (specific && typeof specific.message === "string") return SPECIFIC_422[specific.message]!;
     return b.issues.map((i) => `${String(i.path ?? "")}: ${String(i.message ?? "")}`).join("; ");
   }
   if ((status === 409 || status === 429) && typeof b.message === "string" && Object.prototype.hasOwnProperty.call(CONFLICTS, b.message)) return CONFLICTS[b.message]!;
@@ -45,7 +58,7 @@ export function apiErrorMessage(status: number, body: unknown): string {
 }
 
 export async function sendJson<T = unknown>(
-  method: "POST" | "PATCH",
+  method: "POST" | "PATCH" | "DELETE",
   url: string,
   body?: unknown,
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
