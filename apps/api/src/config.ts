@@ -38,6 +38,14 @@ const EnvSchema = z.object({
     .optional()
     .transform((v) => (v ? v.split(",").map((s) => s.trim()).filter(Boolean) : []))
     .refine((ips) => ips.every((ip) => /^[0-9a-fA-F.:/]+$/.test(ip)), "TRUSTED_PROXY_IPS must be a comma-separated list of IPs/CIDRs"),
+  APPROVAL_REPO: z
+    .string()
+    .optional()
+    .transform((v) => {
+      if (!v) return null;
+      const trimmed = v.trim();
+      return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(trimmed) ? trimmed : null;
+    }),
 });
 
 export interface AppConfig {
@@ -56,6 +64,8 @@ export interface AppConfig {
   sessionTtlMinutes: number;
   /** Express "trust proxy" list. Only these hops may set X-Forwarded-* (e.g. NPM 192.168.250.10). */
   trustedProxies: string[];
+  /** Optional GitHub repo (owner/repo) for deep-linking PR comment approvals (P6-06). */
+  approvalRepo: string | null;
 }
 
 /**
@@ -82,5 +92,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
     },
     sessionTtlMinutes: e.SESSION_TTL_MINUTES,
     trustedProxies: e.TRUSTED_PROXY_IPS,
+    approvalRepo: e.APPROVAL_REPO ?? null,
   };
 }

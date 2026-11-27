@@ -19,6 +19,7 @@ import { RunWorker } from "./runs/run-worker.service";
 import { defaultMockRunner, type MockRunner } from "./runs/mock-runner";
 import { PlatformOrgsController } from "./platform/platform-orgs.controller";
 import { DashboardController } from "./dashboard/dashboard.controller";
+import { ApprovalsController } from "./approvals/approvals.controller";
 import { RateLimitService } from "./rate-limit";
 import { RbacGuard } from "./rbac/rbac.guard";
 import { RbacService } from "./rbac/rbac.service";
@@ -48,7 +49,7 @@ export class AppModule {
     const ownsPool = !options.pool;
     return {
       module: AppModule,
-      controllers: [HealthController, AuthController, OrgController, AuditController, ProjectsController, ProviderAccountsController, WorkersController, AgentsController, TasksController, RunsController, PlatformOrgsController, DashboardController, ...(options.extraControllers ?? [])],
+      controllers: [HealthController, AuthController, OrgController, AuditController, ProjectsController, ProviderAccountsController, WorkersController, AgentsController, TasksController, RunsController, PlatformOrgsController, DashboardController, ApprovalsController, ...(options.extraControllers ?? [])],
       providers: [
         { provide: APP_CONFIG, useValue: options.config },
         { provide: DB_POOL, useValue: options.pool ?? createPool(options.config.databaseUrl) },

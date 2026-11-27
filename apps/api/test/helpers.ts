@@ -14,6 +14,7 @@ export function testConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     sessionTtlMinutes: 60,
     mockWorkerEnabled: false,
     trustedProxies: [],
+    approvalRepo: null,
     ...overrides,
   };
 }
