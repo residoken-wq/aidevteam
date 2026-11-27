@@ -14,11 +14,14 @@ import { ProviderAccountsController } from "./provider-accounts/provider-account
 import { WorkersController } from "./workers/workers.controller";
 import { AgentsController } from "./agents/agents.controller";
 import { TasksController } from "./tasks/tasks.controller";
+import { RunsController } from "./runs/runs.controller";
+import { RunWorker } from "./runs/run-worker.service";
+import { defaultMockRunner, type MockRunner } from "./runs/mock-runner";
 import { PlatformOrgsController } from "./platform/platform-orgs.controller";
 import { RateLimitService } from "./rate-limit";
 import { RbacGuard } from "./rbac/rbac.guard";
 import { RbacService } from "./rbac/rbac.service";
-import { APP_CONFIG, DB_POOL, GITHUB_CLIENT } from "./tokens";
+import { APP_CONFIG, DB_POOL, GITHUB_CLIENT, MOCK_RUNNER } from "./tokens";
 
 export interface AppOptions {
   config: AppConfig;
@@ -28,6 +31,7 @@ export interface AppOptions {
   pool?: Pool;
   /** Test-only: extra controllers (e.g. a route without an access rule, to prove default deny). */
   extraControllers?: Type[];
+  mockRunner?: MockRunner;
 }
 
 class PoolCloser implements OnApplicationShutdown {
@@ -43,7 +47,7 @@ export class AppModule {
     const ownsPool = !options.pool;
     return {
       module: AppModule,
-      controllers: [HealthController, AuthController, OrgController, AuditController, ProjectsController, ProviderAccountsController, WorkersController, AgentsController, TasksController, PlatformOrgsController, ...(options.extraControllers ?? [])],
+      controllers: [HealthController, AuthController, OrgController, AuditController, ProjectsController, ProviderAccountsController, WorkersController, AgentsController, TasksController, RunsController, PlatformOrgsController, ...(options.extraControllers ?? [])],
       providers: [
         { provide: APP_CONFIG, useValue: options.config },
         { provide: DB_POOL, useValue: options.pool ?? createPool(options.config.databaseUrl) },
@@ -51,10 +55,15 @@ export class AppModule {
           provide: GITHUB_CLIENT,
           useValue: options.githubClient ?? new HttpGithubOAuthClient(options.config.github.clientId, options.config.github.clientSecret),
         },
+        {
+          provide: MOCK_RUNNER,
+          useValue: options.mockRunner ?? defaultMockRunner,
+        },
         AuthService,
         HealthService,
         RbacService,
         RateLimitService,
+        RunWorker,
         // Global default-deny guard: every route must declare @Public, @Authenticated or @RequirePermission.
         { provide: APP_GUARD, useClass: RbacGuard },
         ...(ownsPool ? [PoolCloser] : []),

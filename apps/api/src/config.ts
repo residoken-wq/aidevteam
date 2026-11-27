@@ -19,6 +19,10 @@ const httpsOrigin = z
 
 const EnvSchema = z.object({
   PORT: z.string().optional(),
+  MOCK_WORKER_ENABLED: z
+    .string()
+    .optional()
+    .transform((v) => v === "true"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   PUBLIC_BASE_URL: httpsOrigin,
   GITHUB_OAUTH_CLIENT_ID: z.string().regex(/^[A-Za-z0-9._-]{8,64}$/, "GITHUB_OAUTH_CLIENT_ID looks invalid"),
@@ -38,6 +42,8 @@ const EnvSchema = z.object({
 
 export interface AppConfig {
   port: number;
+  mockWorkerEnabled: boolean;
+  runnerTimeoutMs?: number;
   databaseUrl: string;
   /** Public origin users see (behind the NPM proxy), e.g. https://cc.example.com */
   publicBaseUrl: string;
@@ -66,6 +72,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
   const origin = new URL(e.PUBLIC_BASE_URL).origin;
   return {
     port: parsePort(e.PORT),
+    mockWorkerEnabled: e.MOCK_WORKER_ENABLED ?? false,
     databaseUrl: e.DATABASE_URL,
     publicBaseUrl: origin,
     github: {

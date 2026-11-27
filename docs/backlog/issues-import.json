@@ -328,8 +328,8 @@
         "release-0.1",
         "phase:4"
       ],
-      "status": "TODO",
-      "notes": "Cần duyệt ADR-003",
+      "status": "PR_OPEN",
+      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -339,8 +339,8 @@
         "release-0.1",
         "phase:4"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "PR_OPEN",
+      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -350,8 +350,8 @@
         "release-0.1",
         "phase:4"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "PR_OPEN",
+      "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {

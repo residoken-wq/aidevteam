@@ -251,3 +251,91 @@ describe("tasks (P3-02, DB backstop for STATE_MACHINES §1)", () => {
     await expect(pool.query("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 9999, 'X')", [orgB, projectA])).rejects.toThrow(/tasks_project_same_org_fk/);
   });
 });
+
+describe("agent_runs (P4-01, DB backstop for STATE_MACHINES §2)", () => {
+  let projectA: string;
+  let projectB: string;
+  let taskA: string;
+  let taskB: string;
+  let workerA: string;
+  let workerB: string;
+
+  beforeAll(async () => {
+    projectA = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'proj-runs-a', 'Runs A') RETURNING id", [orgA])).rows[0]!.id;
+    projectB = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'proj-runs-b', 'Runs B') RETURNING id", [orgB])).rows[0]!.id;
+    taskA = (await pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 1, 'Task A') RETURNING id", [orgA, projectA])).rows[0]!.id;
+    taskB = (await pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 1, 'Task B') RETURNING id", [orgB, projectB])).rows[0]!.id;
+    workerA = (await pool.query<{ id: string }>(
+      "INSERT INTO workers (org_id, slug, name, type, workspace_path) VALUES ($1, 'worker-a', 'Worker A', 'mock', '/tmp/worker-a') RETURNING id",
+      [orgA],
+    )).rows[0]!.id;
+    workerB = (await pool.query<{ id: string }>(
+      "INSERT INTO workers (org_id, slug, name, type, workspace_path) VALUES ($1, 'worker-b', 'Worker B', 'mock', '/tmp/worker-b') RETURNING id",
+      [orgB],
+    )).rows[0]!.id;
+  });
+
+  const insert = (status = "QUEUED", extra: { org?: string; task?: string; worker?: string } = {}) =>
+    pool.query<{ id: string }>(
+      "INSERT INTO agent_runs (org_id, task_id, worker_id, status) VALUES ($1, $2, $3, $4) RETURNING id",
+      [extra.org ?? orgA, extra.task ?? taskA, extra.worker ?? workerA, status],
+    );
+
+  const move = (id: string, status: string) =>
+    pool.query("UPDATE agent_runs SET status = $2 WHERE id = $1", [id, status]);
+
+  it("must start in QUEUED", async () => {
+    await expect(insert("RUNNING")).rejects.toThrow(/start in QUEUED/);
+    await expect(insert("SUCCEEDED")).rejects.toThrow(/start in QUEUED/);
+  });
+
+  it("walks QUEUED -> RUNNING -> SUCCEEDED", async () => {
+    const id = (await insert()).rows[0]!.id;
+    expect((await move(id, "RUNNING")).rowCount).toBe(1);
+    expect((await move(id, "SUCCEEDED")).rowCount).toBe(1);
+  });
+
+  it("walks QUEUED -> CANCELLED", async () => {
+    const id = (await insert()).rows[0]!.id;
+    expect((await move(id, "CANCELLED")).rowCount).toBe(1);
+  });
+
+  it("walks QUEUED -> RUNNING -> FAILED / CANCELLED / INTERRUPTED", async () => {
+    for (const term of ["FAILED", "CANCELLED", "INTERRUPTED"]) {
+      const id = (await insert()).rows[0]!.id;
+      expect((await move(id, "RUNNING")).rowCount).toBe(1);
+      expect((await move(id, term)).rowCount).toBe(1);
+    }
+  });
+
+  it.each([
+    ["QUEUED", "SUCCEEDED"],
+    ["QUEUED", "FAILED"],
+    ["QUEUED", "INTERRUPTED"],
+    ["SUCCEEDED", "RUNNING"],
+    ["FAILED", "RUNNING"],
+    ["CANCELLED", "RUNNING"],
+    ["INTERRUPTED", "RUNNING"],
+  ])("refuses %s -> %s", async (from, to) => {
+    const id = (await insert()).rows[0]!.id;
+    if (from === "RUNNING") {
+      await move(id, "RUNNING");
+    } else if (from !== "QUEUED") {
+      await move(id, "RUNNING");
+      await move(id, from);
+    }
+    await expect(move(id, to)).rejects.toThrow(/not allowed/);
+  });
+
+  it("org/task/worker are immutable", async () => {
+    const id = (await insert()).rows[0]!.id;
+    await expect(pool.query("UPDATE agent_runs SET org_id = $2 WHERE id = $1", [id, orgB])).rejects.toThrow(/immutable/);
+    await expect(pool.query("UPDATE agent_runs SET task_id = $2 WHERE id = $1", [id, taskB])).rejects.toThrow(/immutable/);
+    await expect(pool.query("UPDATE agent_runs SET worker_id = $2 WHERE id = $1", [id, workerB])).rejects.toThrow(/immutable/);
+  });
+
+  it("rejects cross-org task or worker FK", async () => {
+    await expect(insert("QUEUED", { task: taskB })).rejects.toThrow(/agent_runs_task_same_org_fk/);
+    await expect(insert("QUEUED", { worker: workerB })).rejects.toThrow(/agent_runs_worker_same_org_fk/);
+  });
+});

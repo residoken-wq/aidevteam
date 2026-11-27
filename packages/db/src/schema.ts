@@ -262,27 +262,59 @@ export const tasks = pgTable(
   },
   (t) => [
     unique("tasks_project_number_unique").on(t.projectId, t.number),
+    unique("tasks_id_org_unique").on(t.id, t.orgId),
     foreignKey({ name: "tasks_project_same_org_fk", columns: [t.projectId, t.orgId], foreignColumns: [projects.id, projects.orgId] }),
     foreignKey({ name: "tasks_agent_same_org_fk", columns: [t.agentId, t.orgId], foreignColumns: [agents.id, agents.orgId] }),
     index("tasks_org_project_status_idx").on(t.orgId, t.projectId, t.status),
   ],
 );
 
+export const agentRuns = pgTable(
+  "agent_runs",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    taskId: uuid("task_id").notNull(),
+    workerId: uuid("worker_id").notNull(),
+    status: text("status", { enum: ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED", "INTERRUPTED"] })
+      .notNull()
+      .default("QUEUED"),
+    attempt: integer("attempt").notNull().default(1),
+    queuedAt: ts("queued_at").notNull().defaultNow(),
+    startedAt: ts("started_at"),
+    finishedAt: ts("finished_at"),
+    outputSummary: text("output_summary"),
+    log: text("log"),
+    errorCode: text("error_code"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+  },
+  (t) => [
+    foreignKey({ name: "agent_runs_task_same_org_fk", columns: [t.taskId, t.orgId], foreignColumns: [tasks.id, tasks.orgId] }),
+    foreignKey({ name: "agent_runs_worker_same_org_fk", columns: [t.workerId, t.orgId], foreignColumns: [workers.id, workers.orgId] }),
+    index("agent_runs_status_queued_at_idx").on(t.status, t.queuedAt),
+    index("agent_runs_org_task_idx").on(t.orgId, t.taskId, t.queuedAt),
+    index("agent_runs_worker_active_idx").on(t.orgId, t.workerId, t.status),
+  ],
+);
+
 export const allTables = {
-  orgs,
-  users,
-  user_allowlist: userAllowlist,
-  roles,
-  role_bindings: roleBindings,
-  sessions,
+  agent_runs: agentRuns,
+  agents,
   audit_events: auditEvents,
-  release_approvals: releaseApprovals,
   oauth_login_states: oauthLoginStates,
-  rate_limit_hits: rateLimitHits,
+  orgs,
+  platform_admins: platformAdmins,
   projects,
   provider_accounts: providerAccounts,
-  workers,
-  platform_admins: platformAdmins,
-  agents,
+  rate_limit_hits: rateLimitHits,
+  release_approvals: releaseApprovals,
+  role_bindings: roleBindings,
+  roles,
+  sessions,
   tasks,
+  user_allowlist: userAllowlist,
+  users,
+  workers,
 } as const;

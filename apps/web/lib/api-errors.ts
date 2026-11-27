@@ -21,6 +21,11 @@ const CONFLICTS: Record<string, string> = {
   org_archived: "Tổ chức đã lưu trữ, không sửa được.",
   org_already_archived: "Tổ chức đã được lưu trữ trước đó.",
   org_not_archived: "Tổ chức đang hoạt động, không cần khôi phục.",
+  worker_busy: "Worker đang bận thực hiện lượt chạy khác.",
+  queue_full: "Hàng đợi đã đầy (tối đa 20 lượt chạy chờ). Vui lòng thử lại sau.",
+  worker_not_dispatchable: "Worker không khả dụng hoặc không phải worker mock đang bật.",
+  task_not_dispatchable: "Chỉ có thể chạy task ở trạng thái Cần làm hoặc Đang làm.",
+  run_not_cancellable: "Chỉ có thể hủy lượt chạy đang ở hàng đợi hoặc đang chạy.",
 };
 
 export function apiErrorMessage(status: number, body: unknown): string {
@@ -31,20 +36,28 @@ export function apiErrorMessage(status: number, body: unknown): string {
   if (status === 422 && Array.isArray(b.issues)) {
     return b.issues.map((i) => `${String(i.path ?? "")}: ${String(i.message ?? "")}`).join("; ");
   }
-  if (status === 409 && typeof b.message === "string" && Object.prototype.hasOwnProperty.call(CONFLICTS, b.message)) return CONFLICTS[b.message]!;
+  if ((status === 409 || status === 429) && typeof b.message === "string" && Object.prototype.hasOwnProperty.call(CONFLICTS, b.message)) return CONFLICTS[b.message]!;
+  if (status === 429) return "Hàng đợi đã đầy hoặc có quá nhiều yêu cầu. Vui lòng thử lại sau.";
   if (status === 403) return "Bạn không có quyền thực hiện thao tác này.";
   if (status === 401) return "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
   if (status === 404) return "Không tìm thấy.";
   return "Có lỗi xảy ra. Vui lòng thử lại.";
 }
 
-export async function sendJson(method: "POST" | "PATCH", url: string, body?: unknown): Promise<{ ok: true } | { ok: false; error: string }> {
+export async function sendJson<T = unknown>(
+  method: "POST" | "PATCH",
+  url: string,
+  body?: unknown,
+): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   const res = await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
     credentials: "same-origin",
   });
-  if (res.ok) return { ok: true };
+  if (res.ok) {
+    const data = (await res.json().catch(() => null)) as T;
+    return { ok: true, data };
+  }
   return { ok: false, error: apiErrorMessage(res.status, await res.json().catch(() => null)) };
 }

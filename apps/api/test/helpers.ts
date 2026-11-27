@@ -12,6 +12,7 @@ export function testConfig(overrides: Partial<AppConfig> = {}): AppConfig {
       callbackUrl: "https://cc.example.com/auth/github/callback",
     },
     sessionTtlMinutes: 60,
+    mockWorkerEnabled: false,
     trustedProxies: [],
     ...overrides,
   };
