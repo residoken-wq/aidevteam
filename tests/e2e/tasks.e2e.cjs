@@ -18,12 +18,17 @@ async function contextFor(browser, token) {
 (async () => {
   const browser = await chromium.launch();
   const results = [];
+  // On failure, report the alert texts on the main page and the dialogs seen (no screenshots: they could carry session data).
+  let diagPage = null;
+  const dialogs = [];
   const step = async (name, fn) => {
     try {
       await fn();
       results.push(`PASS  ${name}`);
     } catch (e) {
-      results.push(`FAIL  ${name}: ${e.message.split("\n").filter(Boolean).slice(0, 4).join(" | ")}`);
+      const alerts = diagPage ? await diagPage.getByRole("alert").allTextContents().catch(() => []) : [];
+      const diag = `${alerts.length ? ` | alerts: ${alerts.join(" / ")}` : ""}${dialogs.length ? ` | dialogs: ${dialogs.join(" / ")}` : ""}`;
+      results.push(`FAIL  ${name}: ${e.message.split("\n").filter(Boolean).slice(0, 4).join(" | ")}${diag}`);
     }
   };
   const inCol = (page, status, n) => page.getByTestId(`col-${status}`).getByTestId(`task-${n}`);
@@ -43,7 +48,11 @@ async function contextFor(browser, token) {
   try {
     const ctx = await contextFor(browser, process.env.MAINT_TOKEN);
     const page = await ctx.newPage();
-    page.on("dialog", (d) => (d.type() === "prompt" ? d.accept("trùng với task khác") : d.accept()));
+    diagPage = page;
+    page.on("dialog", (d) => {
+      dialogs.push(d.type());
+      return d.type() === "prompt" ? d.accept("trùng với task khác") : d.accept();
+    });
     const BOARD = `${BASE}/projects/kanban-e2e/tasks`;
 
     await step("create a project, open its board, create tasks; HTML in text is shown as text", async () => {
