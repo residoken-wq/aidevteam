@@ -22,7 +22,7 @@ P2-02,[P2-02] Dashboard tổng quan,release-0.1;phase:2,MERGED,residoken-wq/aide
 P2-03,[P2-03] CRUD org (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#15 · platform admin REQUIRES_OWNER_APPROVAL (D-2026-11-26-13)
 P2-04,[P2-04] Role editor nâng cao,post-0.1;phase:2,MERGED,"residoken-wq/aidevteam#29; role editor /members, member:read/write chỉ org_admin (REQUIRES_OWNER_APPROVAL)"
 P2-05,[P2-05] CRUD agent (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#16
-P2-06,[P2-06] Org chart kéo thả,post-0.1;phase:2,PR_OPEN,"PR mở (/agents/chart: cây báo cáo, kéo thả + select bàn phím; dùng PATCH /agents/:slug có sẵn)"
+P2-06,[P2-06] Org chart kéo thả,post-0.1;phase:2,MERGED,"residoken-wq/aidevteam#30; /agents/chart: cây báo cáo, kéo thả + select bàn phím"
 P2-07,[P2-07] CRUD provider account (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#13
 P2-08,[P2-08] CRUD worker (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#14
 P2-10,[P2-10] CRUD project (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#12

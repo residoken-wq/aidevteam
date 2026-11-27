@@ -262,8 +262,8 @@
         "post-0.1",
         "phase:2"
       ],
-      "status": "PR_OPEN",
-      "notes": "PR mở (/agents/chart: cây báo cáo, kéo thả + select bàn phím; dùng PATCH /agents/:slug có sẵn)",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#30; /agents/chart: cây báo cáo, kéo thả + select bàn phím",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {

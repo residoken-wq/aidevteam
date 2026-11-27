@@ -1,0 +1,103 @@
+# Approved governance configuration, NOT enforced on GitHub/n8n.
+# 2026-12-05 is first planned release DATE, not daily execution TIME.
+policy_id: ai-dev-team-release-governance
+policy_version: 1.0.1
+effective_date: '2026-11-25'
+timezone: Asia/Ho_Chi_Minh
+owner_decision:
+  confirmed: true
+  confirmed_on: '2026-11-25'
+  release_train_frequency: daily
+  sev1_sev2_requires_separate_owner_approval: true
+  github_owner_username: residoken-wq
+defaults:
+  fail_closed: true
+  production_deploy_by_agents: false
+  bypass_branch_protection: false
+  approval_is_bound_to_exact_artifact: true
+release_train:
+  enabled: true
+  frequency: daily
+  execution_time_local: null
+  applicable_severities:
+  - SEV3
+  - SEV4
+  batch_strategy: one_manifest_per_project_per_day
+  require_owner_approval_before_production: true
+  allow_unapproved_items: false
+  carry_over_unapproved_items: true
+  required_gates:
+  - pull_request_checks_passed
+  - claude_review_status_passed
+  - staging_verified
+  - uat_signed_off
+  - release_manifest_generated
+  - rollback_plan_ready
+  - owner_approval_valid
+  first_planned_release_date: '2026-12-05'
+emergency_hotfix:
+  enabled: true
+  applicable_severities:
+  - SEV1
+  - SEV2
+  release_train_exempt: true
+  require_separate_owner_approval_before_production: true
+  auto_approve: false
+  approval_reuse_from_release_train: false
+  required_gates:
+  - incident_id_recorded
+  - severity_justified
+  - targeted_fix_reviewed
+  - minimum_safety_tests_passed
+  - rollback_plan_ready
+  - owner_approval_valid
+  post_release:
+  - production_healthcheck
+  - incident_report
+  - regression_tests_and_followup_review
+high_risk_changes:
+  require_separate_owner_approval: true
+  triggers:
+  - auth_or_authorization
+  - credentials_or_secrets
+  - destructive_or_incompatible_database_migration
+  - sensitive_or_production_data
+  - critical_infrastructure
+  - security_or_privacy_impact
+approval_record:
+  required_fields:
+  - approval_id
+  - approver_id
+  - decision
+  - timestamp
+  - project_id
+  - environment
+  - release_manifest_digest
+  - target_sha
+  - pipeline_run_id
+  valid_decisions:
+  - APPROVE
+  - REJECT
+  - REQUEST_CHANGES
+  reject_on_manifest_change: true
+  reject_on_target_sha_change: true
+  reject_on_expiry: true
+  ttl_minutes: null
+github_controls:
+  required_status_checks:
+  - claude-review
+  require_code_ci_checks: true
+  require_protected_production_environment: true
+  required_production_reviewer: project_owner
+  do_not_treat_bot_review_as_human_approval: true
+  no_self_approval_by_ai: true
+  required_production_reviewer_username: residoken-wq
+audit:
+  append_only: true
+  record_decisions_and_pipeline_evidence: true
+  notification_channels: []
+implementation:
+  policy_document_approved: true
+  automation_enforced: false
+  notes: Owner username and first planned release date recorded; daily execution time
+    unset. Not enforced until GitHub/n8n configuration and acceptance tests.

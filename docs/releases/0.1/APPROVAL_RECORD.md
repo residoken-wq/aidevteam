@@ -4,21 +4,23 @@
 > Người vận hành (con người) điền file này **sau khi** đối chiếu comment `/approve-uat <digest>` / `/approve-production <digest>` của Owner trên PR manifest (CLAUDE.md §5.5). Claude **không** điền, không giả lập approval (§2 quy tắc 2, 6).
 > Teams/chat không phải nguồn approval (§2 quy tắc 7). Nguồn duy nhất: comment trên PR manifest.
 
-## 1. Các trường (đề xuất — cần đối chiếu Release Policy)
+## 1. Các trường (theo `policies/approval-policy.yaml` v1.0.1)
 
-"Approval record (9 trường)" theo §5.5. Release Policy v1.0.1/v1.0.2 đang **`SOURCE_MISSING`** trong repo (SOURCE_INVENTORY), nên tên trường dưới đây lấy theo cột bảng `release_approvals` (migration 0001, cũng 9 trường dữ liệu) — **UNVERIFIED**, đối chiếu lại khi có file policy.
+"Approval record (9 trường)" theo §5.5 = `approval_record.required_fields` của policy v1.0.1 (đưa vào repo 27/11/2026). Cột "DB" là cột tương ứng của bảng `release_approvals` (migration 0001).
 
-| # | Trường | Ràng buộc (theo DB) |
-|---|---|---|
-| 1 | `environment` | `uat` hoặc `production` |
-| 2 | `decision` | `approved` hoặc `rejected` |
-| 3 | `target_sha` | 40 ký tự hex, khớp manifest |
-| 4 | `release_manifest_digest` | `sha256:<64 hex>`, khớp digest trong comment |
-| 5 | `pipeline_run_id` | 1–64 ký tự (run CI của `target_sha`) |
-| 6 | `approver_github_user_id` | GitHub user ID **số** của người duyệt (không dùng username) |
-| 7 | `source_comment_url` | `https://github.com/<owner>/<repo>/pull/<n>#issuecomment-<n>` |
-| 8 | `decided_at` | Thời điểm comment (ISO 8601, ghi rõ múi giờ) |
-| 9 | `recorded_at` | Thời điểm người vận hành ghi bản ghi |
+| # | Trường (policy) | Giá trị hợp lệ | Cột DB | Khớp? |
+|---|---|---|---|---|
+| 1 | `approval_id` | ID duy nhất của bản ghi | `id` (uuid) | Có |
+| 2 | `approver_id` | GitHub user ID **số** của người duyệt (không dùng username, CLAUDE.md §9) | `approver_github_user_id` | Có |
+| 3 | `decision` | `APPROVE` / `REJECT` / `REQUEST_CHANGES` | `decision` (`approved` / `rejected`) | **Thiếu `REQUEST_CHANGES`** |
+| 4 | `timestamp` | Thời điểm comment (ISO 8601, ghi rõ múi giờ) | `decided_at` | Có |
+| 5 | `project_id` | Project của release | — | **Không có cột** |
+| 6 | `environment` | `uat` / `production` (O-05) | `environment` | Có |
+| 7 | `release_manifest_digest` | `sha256:<64 hex>`, khớp digest trong comment | `release_manifest_digest` | Có |
+| 8 | `target_sha` | 40 ký tự hex, khớp manifest | `target_sha` | Có |
+| 9 | `pipeline_run_id` | Run CI xanh của `target_sha` | `pipeline_run_id` | Có |
+
+Thêm ngoài 9 trường (bằng chứng): `source_comment_url` (`https://github.com/<owner>/<repo>/pull/<n>#issuecomment-<n>`), `recorded_at`, người vận hành ghi. Hai chỗ lệch (`REQUEST_CHANGES`, `project_id`) sửa trong P6-05 bằng migration; với Release 0.1, `project_id` ghi tay là project Control Center.
 
 ## 2. Đối chiếu trước khi ghi (người vận hành)
 
@@ -33,14 +35,16 @@
 
 | Trường | UAT | Production |
 |---|---|---|
-| `environment` | `uat` | `production` |
+| `approval_id` | | |
+| `approver_id` (GitHub user ID số) | | |
 | `decision` | | |
-| `target_sha` | | |
+| `timestamp` | | |
+| `project_id` | | |
+| `environment` | `uat` | `production` |
 | `release_manifest_digest` | | |
+| `target_sha` | | |
 | `pipeline_run_id` | | |
-| `approver_github_user_id` | | |
 | `source_comment_url` | | |
-| `decided_at` | | |
 | `recorded_at` | | |
 | Người vận hành ghi (GitHub user ID số) | | |
 

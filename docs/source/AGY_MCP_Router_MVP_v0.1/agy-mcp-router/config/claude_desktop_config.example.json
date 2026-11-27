@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "agy-router": {
+      "command": "C:\\AGY\\router\\.venv\\Scripts\\python.exe",
+      "args": ["C:\\AGY\\router\\router.py"],
+      "env": {
+        "AGY_ROUTER_CONFIG": "C:\\AGY\\router\\config\\workers.json",
+        "AGY_ROUTER_STATE": "C:\\AGY\\router\\.state"
+      }
+    }
+  }
+}

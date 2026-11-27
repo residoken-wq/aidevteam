@@ -1,0 +1,18 @@
+{
+  "workers": [
+    {
+      "id": "frontend",
+      "executable": "agy",
+      "home": "C:/AGY/profiles/frontend",
+      "workspace": "C:/Projects/worktrees/hula-frontend-feature",
+      "timeout_sec": 900
+    },
+    {
+      "id": "backend",
+      "executable": "agy",
+      "home": "C:/AGY/profiles/backend",
+      "workspace": "C:/Projects/worktrees/hula-backend-feature",
+      "timeout_sec": 1200
+    }
+  ]
+}
