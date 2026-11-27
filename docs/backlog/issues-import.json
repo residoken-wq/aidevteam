@@ -219,7 +219,7 @@
         "phase:2"
       ],
       "status": "PR_OPEN",
-      "notes": "",
+      "notes": "residoken-wq/aidevteam#20; E2E dashboard.e2e.cjs chưa chạy (Windows) — QA-01",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
