@@ -8,13 +8,13 @@
 |---|---|---|---|---|
 | S-01 | Đăng nhập | `/login` | Công khai | **Đã có** (P1-05G) |
 | S-02 | Trang chủ / chọn tổ chức | `/` | Đã đăng nhập | **Đã có** (P1-06) |
-| S-03 | Dashboard tổng quan | `/dashboard` | `dashboard:read` | **Đã có** (P2-02; E2E chưa chạy trên CI — QA-01) |
+| S-03 | Dashboard tổng quan | `/dashboard` | `dashboard:read` | **Đã có** (P2-02; E2E xanh trong CI) |
 | S-04 | Project: danh sách, tạo/sửa | `/projects` | `project:read` / `project:write` | **Đã có** (P2-10) |
 | S-05 | Agent | `/agents` | `agent:read` / `agent:write` | **Đã có** (P2-05; mô hình dữ liệu đề xuất, chờ xác nhận) |
 | S-06 | Provider account (chỉ `secret_ref`) | `/provider-accounts` | `provider_account:*` | **Đã có** (P2-07) |
 | S-07 | Worker (chỉ loại mock) | `/workers` | `worker:*` | **Đã có** (P2-08) |
 | S-08 | Task: Kanban + chi tiết | `/projects/:slug/tasks` | `task:*` | **Đã có** (P3-02/P3-04) |
-| S-09 | Dispatch + danh sách run + log | trong S-08, `/runs/:id` | `dispatch:execute`, `run:read` | **Đã có** (P4-01/03/07; E2E chưa chạy trên CI — QA-01) |
+| S-09 | Dispatch + danh sách run + log | trong S-08, `/runs/:id` | `dispatch:execute`, `run:read` | **Đã có** (P4-01/03/07; E2E xanh trong CI) |
 | S-10 | Approval Center (chỉ đọc) | `/approvals` | `approval:read` | **Đã có** (P6-06; link comment chỉ hiện khi cấu hình `APPROVAL_REPO` — CHƯA CẤU HÌNH) |
 | S-11 | Audit log | `/audit` | `audit:read` | Có API (P1-06), UI chưa có |
 | S-12 | Quản trị tổ chức (platform admin) | `/platform/orgs` | `platform:org:*` | **Đã có** (P2-03) — chờ Owner duyệt (D-2026-11-26-13) |

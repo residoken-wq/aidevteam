@@ -15,7 +15,7 @@
 | R-17 | Giới hạn đăng nhập theo IP sai nếu NPM không đặt `X-Forwarded-For` → mọi người dùng chung bộ đếm | TB | TB | TB | Kiểm tra trên staging (`AUTH_SETUP.md` §4 bước 5) | Mở |
 | R-18 | Cổng `3301` mở cho cả LAN nếu chưa có rule `DOCKER-USER` → giả `X-Forwarded-For`, bỏ qua TLS | TB | Cao | TB | Chạy rule (CICD.md §3.4) trước UAT | Mở |
 | R-19 | Chưa có branch protection (gói Free) → có thể merge khi CI đỏ hoặc push thẳng `main` | TB | Cao | TB | Nâng Pro + bật protection trước 04/12 (O-02); hiện dựa vào quy trình hỏi-đồng ý (D-2026-11-25-03) | Mở |
-| R-20 | Thiếu SCA / secret scan trong CI | TB | TB | TB | Hoàn thành P1-09 trước feature freeze | Mở |
+| R-20 | Thiếu SCA / secret scan trong CI | TB | TB | TB | Hoàn thành P1-09 trước feature freeze | **Đã giảm** (27/11: gitleaks + `pnpm audit --audit-level high` trong job `ci`, residoken-wq/aidevteam#24; còn phụ thuộc R-19 để thành gate bắt buộc) |
 | R-21 | Một người (người dùng phiên) vừa review vừa đồng ý merge mọi PR; review của Claude không được tính (§2.6) | TB | TB | TB | Owner hoặc người thứ hai review các PR bảo mật (P1-05G, P1-06) | Mở |
 | R-23 | Platform admin (P2-03) quản lý mọi org; tài khoản bị chiếm (chưa bật 2FA, R-11) → tạo/lưu trữ org trái phép, làm gián đoạn mọi tenant | TB | Cao | Cao | Chỉ cấp bằng CLI có audit; không cấp quyền xem dữ liệu trong org; lưu trữ khôi phục được, không xóa; giữ số platform admin tối thiểu; bật 2FA trước khi cấp | Mở |
 | R-24 | Token `gh` của Owner nằm trên máy điều phối (ngoại lệ D-2026-11-27-03) khi Owner chưa bật 2FA (R-11): máy hoặc phiên bị chiếm → push/merge trái phép | TB | Cao | Cao | Chỉ Claude dùng, guard chặn agent push/`gh`; merge chỉ khi người đồng ý từng PR; hết hạn 15/01/2027; bật 2FA sớm | Mở |
