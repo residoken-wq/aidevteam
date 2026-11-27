@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { apiInternalUrl, SESSION_COOKIE } from "../lib/api";
 import { roleLabel } from "../lib/roles";
+import { can } from "../lib/server-api";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +64,11 @@ export default async function HomePage() {
 
       {me.activeOrg ? (
         <nav>
+          {can(me, "dashboard:read") ? (
+            <>
+              <a href="/dashboard">Tổng quan</a> ·{" "}
+            </>
+          ) : null}
           <a href="/projects">Dự án</a> · <a href="/agents">Agent</a> · <a href="/provider-accounts">Tài khoản provider</a> · <a href="/workers">Worker</a>
         </nav>
       ) : null}
