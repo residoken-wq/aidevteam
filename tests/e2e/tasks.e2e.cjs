@@ -34,10 +34,14 @@ async function contextFor(browser, token) {
   const inCol = (page, status, n) => page.getByTestId(`col-${status}`).getByTestId(`task-${n}`);
   // Grab the card by its title line: since P4-07 the card centre can hold the "Chạy mock" form controls, which do not start a drag.
   const GRAB = { sourcePosition: { x: 8, y: 6 } };
+  // The board moves the card optimistically, so the target column shows before the server commits. Wait for the
+  // transition response, otherwise the next move can be sent with an expectedFrom the server does not have yet (409).
   const moveVia = async (page, n, label) => {
     const card = page.getByTestId(`task-${n}`);
     await card.getByLabel("Chuyển sang").selectOption({ label });
+    const done = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes(`/tasks/${n}/transitions`));
     await card.getByRole("button", { name: "Chuyển" }).click();
+    await done;
   };
   const createTask = async (page, title, description) => {
     const f = page.getByRole("form", { name: "Tạo task" });

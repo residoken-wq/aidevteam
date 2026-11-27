@@ -33,7 +33,10 @@ async function contextFor(browser, token) {
   const moveVia = async (page, n, label) => {
     const card = page.getByTestId(`task-${n}`);
     await card.getByLabel("Chuyển sang").selectOption({ label });
+    // Optimistic board: wait for the server to commit before dispatching (else task_not_dispatchable can race).
+    const done = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes(`/tasks/${n}/transitions`));
     await card.getByRole("button", { name: "Chuyển" }).click();
+    await done;
   };
   const createTask = async (page, title, description) => {
     const f = page.getByRole("form", { name: "Tạo task" });
