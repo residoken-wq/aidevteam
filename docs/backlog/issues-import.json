@@ -185,7 +185,7 @@
         "release-0.1",
         "phase:1"
       ],
-      "status": "PR_OPEN",
+      "status": "MERGED",
       "notes": "residoken-wq/aidevteam#24; branch protection DEFINED – NOT ENFORCED (plan: free); Đã có: CI ci (lint/typecheck/test/integration/backup) + build image (residoken-wq/aidevteam#2, #3). Còn: SCA, secret scan, BRANCH_PROTECTION.md",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
