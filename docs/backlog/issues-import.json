@@ -185,8 +185,8 @@
         "release-0.1",
         "phase:1"
       ],
-      "status": "TODO",
-      "notes": "Đã có: CI ci (lint/typecheck/test/integration/backup) + build image (residoken-wq/aidevteam#2, #3). Còn: SCA, secret scan, BRANCH_PROTECTION.md",
+      "status": "PR_OPEN",
+      "notes": "residoken-wq/aidevteam#24; branch protection DEFINED – NOT ENFORCED (plan: free); Đã có: CI ci (lint/typecheck/test/integration/backup) + build image (residoken-wq/aidevteam#2, #3). Còn: SCA, secret scan, BRANCH_PROTECTION.md",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -383,8 +383,8 @@
         "release-0.1",
         "phase:6"
       ],
-      "status": "PR_OPEN",
-      "notes": "O-07; residoken-wq/aidevteam#23; E2E approvals.e2e.cjs chạy ở job e2e của CI",
+      "status": "MERGED",
+      "notes": "O-07; residoken-wq/aidevteam#23; E2E approvals.e2e.cjs xanh trong CI",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
