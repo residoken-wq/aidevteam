@@ -55,6 +55,7 @@ async function contextFor(browser, token) {
       ]) {
         const res = await mctx.request.post(`${BASE}/api/agents`, {
           data: { slug, name, title },
+          headers: { Origin: BASE }, // API requires Origin === PUBLIC_BASE_URL (CSRF guard)
         });
         assert.ok(res.ok() || res.status() === 409, `API create agent ${slug} failed: ${await res.text()}`);
       }
