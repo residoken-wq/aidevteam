@@ -49,7 +49,6 @@ function findCycleNodes(agents: OrgAgent[]): Set<string> {
 }
 
 export function buildOrgTree(agents: OrgAgent[]): OrgTreeNode[] {
-  const map = new Map(agents.map((a) => [a.slug, a]));
   const cycleNodes = findCycleNodes(agents);
 
   const nodeMap = new Map<string, OrgTreeNode>();
