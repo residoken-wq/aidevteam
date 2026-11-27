@@ -236,8 +236,10 @@ GITHUB_OAUTH_CLIENT_SECRET=some-production-secret-value
   });
 
   it("rejects real token patterns like GitHub PAT", () => {
+    // Built at runtime so the literal never sits in the repo (secret scanners would flag it). FAKE value.
+    const fakePat = "ghp_" + "FAKE0".repeat(7) + "0";
     const badEnv = `
-GITHUB_TOKEN=ghp_123456789012345678901234567890123456
+GITHUB_TOKEN=${fakePat}
 `;
     assert.throws(
       () => validateDevEnv(badEnv, null),
