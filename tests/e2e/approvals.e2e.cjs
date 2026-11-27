@@ -94,7 +94,7 @@ async function contextFor(browser, token) {
         "Nguồn",
       ];
       for (const h of headers) {
-        await page.getByRole("columnheader", { name: h }).waitFor();
+        await page.getByRole("columnheader", { name: h, exact: true }).waitFor();
       }
 
       // Check row values
