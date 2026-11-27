@@ -128,8 +128,9 @@ export class RunWorker implements OnApplicationBootstrap, OnApplicationShutdown 
         log = "Execution exceeded configured timeout";
       } else {
         errorCode = "runner_error";
+        // Message only: stack traces expose internal paths and are readable by viewers (run:read).
         summary = err instanceof Error ? err.message : String(err);
-        log = err instanceof Error && err.stack ? err.stack : summary;
+        log = summary;
       }
     } finally {
       if (timeoutTimer) clearTimeout(timeoutTimer);

@@ -5,7 +5,8 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["**/node_modules/**", "**/dist/**", "**/.next/**", "**/coverage/**", "**/next-env.d.ts"],
+    // .agent/ and .agents/ hold the local agy dispatch kit (not in git); the agent must never edit them to satisfy lint.
+    ignores: ["**/node_modules/**", "**/dist/**", "**/.next/**", "**/coverage/**", "**/next-env.d.ts", ".agent/**", ".agents/**"],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
