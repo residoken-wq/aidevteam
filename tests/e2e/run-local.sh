@@ -31,13 +31,19 @@ node "$ROOT/packages/db/dist/allowlist-cli.js" add 900000005 e2e-platform >/dev/
 node "$ROOT/packages/db/dist/admin-cli.js" platform grant 900000005 e2e >/dev/null 2>&1
 
 session() { # create a fake session row for a seeded fake user, print the raw token
-  local t h
+  local t h n
   t="$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")"
-  h="$(node -e "console.log(require('crypto').createHash('sha256').update(process.argv[1]).digest('hex'))" "$t")"
-  psql -w -X -q -d "$DB" -c "INSERT INTO sessions (user_id, token_hash, expires_at) SELECT id, decode('$h','hex'), now() + interval '1 hour' FROM users WHERE github_user_id = $1" >/dev/null
+  # Pass the token through the environment, not argv: a base64url token can start with "-", which node would
+  # parse as an option ("bad option"), leaving an empty hash and a session that never works (~1 in 64 per token).
+  h="$(T="$t" node -e "console.log(require('crypto').createHash('sha256').update(process.env.T).digest('hex'))")"
+  [[ "$h" =~ ^[0-9a-f]{64}$ ]] || { echo "session: could not hash token for $1" >&2; return 1; }
+  n="$(psql -w -X -q -t -A -d "$DB" -c "WITH s AS (INSERT INTO sessions (user_id, token_hash, expires_at) SELECT id, decode('$h','hex'), now() + interval '1 hour' FROM users WHERE github_user_id = $1 RETURNING 1) SELECT count(*) FROM s")"
+  [ "$n" = "1" ] || { echo "session: no session created for $1" >&2; return 1; }
   echo "$t"
 }
-export MAINT_TOKEN="$(session 900000003)" VIEWER_TOKEN="$(session 900000002)" PLATFORM_TOKEN="$(session 900000005)"
+# Assign separately: `export X="$(…)"` would hide a failing session() from set -e.
+MAINT_TOKEN="$(session 900000003)"; VIEWER_TOKEN="$(session 900000002)"; PLATFORM_TOKEN="$(session 900000005)"
+export MAINT_TOKEN VIEWER_TOKEN PLATFORM_TOKEN
 
 (cd "$ROOT/apps/api" && PORT=$API_PORT PUBLIC_BASE_URL="$BASE_URL" GITHUB_OAUTH_CLIENT_ID=Iv1.e2efakeclient GITHUB_OAUTH_CLIENT_SECRET=fake-secret-e2e-only-0000000 TRUSTED_PROXY_IPS=127.0.0.1 node dist/main.js >/tmp/e2e-api.log 2>&1) & pids+=($!)
 (cd "$ROOT/apps/web/.next/standalone" && PORT=$WEB_PORT HOSTNAME=127.0.0.1 API_INTERNAL_URL="http://127.0.0.1:$API_PORT" node apps/web/server.js >/tmp/e2e-web.log 2>&1) & pids+=($!)

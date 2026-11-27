@@ -38,7 +38,6 @@ export function Board({
   const router = useRouter();
   const [tasks, setTasks] = useState(initial);
   const [error, setError] = useState<string | null>(null);
-  const [dragging, setDragging] = useState<number | null>(null);
   useEffect(() => setTasks(initial), [initial]);
 
   async function move(task: Task, to: TaskStatus) {
@@ -71,7 +70,6 @@ export function Board({
     e.preventDefault();
     const n = Number(e.dataTransfer.getData("text/plain"));
     const task = tasks.find((t) => t.number === n);
-    setDragging(null);
     if (task) void move(task, to);
   }
 
@@ -82,7 +80,9 @@ export function Board({
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${TASK_STATUSES.length}, minmax(10rem, 1fr))`, gap: "0.5rem", overflowX: "auto" }}>
         {TASK_STATUSES.map((status) => {
           const items = tasks.filter((t) => t.status === status);
-          const droppable = dragging !== null && canWrite;
+          // Always accept drops when the user may write: gating on a "dragging" state attached the handlers only after
+          // a re-render, so a fast drag-and-drop was silently ignored. Unknown payloads match no task and do nothing.
+          const droppable = canWrite;
           return (
             <section
               key={status}
@@ -100,11 +100,7 @@ export function Board({
                   key={t.number}
                   data-testid={`task-${t.number}`}
                   draggable={canWrite && TASK_TRANSITIONS[t.status].length > 0}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData("text/plain", String(t.number));
-                    setDragging(t.number);
-                  }}
-                  onDragEnd={() => setDragging(null)}
+                  onDragStart={(e) => e.dataTransfer.setData("text/plain", String(t.number))}
                   style={{ border: "1px solid #999", padding: "0.25rem", marginBottom: "0.5rem", background: "#fff" }}
                 >
                   <strong>

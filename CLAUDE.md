@@ -298,7 +298,7 @@ Không viết code ứng dụng trước khi Owner ký baseline.
 | Backup DB (operator; mật khẩu chỉ qua `.pgpass`) | `PGHOST=… PGUSER=… PGDATABASE=… BACKUP_DIR=… deploy/backup.sh` |
 | Restore vào DB rỗng | `PGHOST=… PGUSER=… deploy/restore.sh --file <…dump> --target-db <db_rỗng> --yes` |
 | Test backup/restore (cần PostgreSQL + `pnpm build:packages`) | `PGHOST=… PGPORT=… PGUSER=… bash tests/backup/test_backup_restore.sh` |
-| E2E trình duyệt (Playwright; cần PostgreSQL + gói `playwright`; `E2E_ONLY="projects workers"` để chạy riêng) | `PGHOST=… PGPORT=… PGUSER=… NODE_PATH="$(npm root -g)" bash tests/e2e/run-local.sh` |
+| E2E trình duyệt (Playwright; cần PostgreSQL + gói `playwright`; `E2E_ONLY="projects workers"` để chạy riêng; CI chạy ở job `e2e`, QA-01) | `PGHOST=… PGPORT=… PGUSER=… NODE_PATH="$(npm root -g)" bash tests/e2e/run-local.sh` |
 | Test script deploy | `bash tests/deploy/test_deploy.sh` |
 | Báo cáo tiến độ (Phase/task xong, từ `docs/backlog/issues-import.json`) | `pnpm progress` (= `node scripts/progress.mjs`) · test: `pnpm test:scripts` |
 | Build image (cần Docker) | `docker build -f apps/api/Dockerfile .` / `docker build -f apps/web/Dockerfile .` — **chưa chạy cục bộ**, CI chạy trên PR |
