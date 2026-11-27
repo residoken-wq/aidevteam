@@ -69,7 +69,7 @@ async function contextFor(browser, token) {
       // Member row should appear in the table
       const row = page.getByTestId(`member-${fakeId}`);
       await row.waitFor();
-      await row.getByText("Chỉ xem").waitFor();
+      await row.getByRole("cell", { name: "Chỉ xem", exact: true }).waitFor();
     });
 
     await step("revoke role viewer in UI and row disappears", async () => {
