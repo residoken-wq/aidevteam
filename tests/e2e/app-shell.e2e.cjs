@@ -94,7 +94,7 @@ async function contextFor(browser, token) {
       await maintPage.goto(`${BASE}/`);
 
       const noHorizontalScroll = await maintPage.evaluate(() => {
-        return document.documentElement.scrollWidth <= window.innerWidth;
+        return globalThis.document.documentElement.scrollWidth <= globalThis.window.innerWidth;
       });
       assert.ok(noHorizontalScroll, "page must not scroll horizontally on 375px viewport");
 
