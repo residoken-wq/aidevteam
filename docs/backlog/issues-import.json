@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-26",
-  "note": "Không tạo issue trên GitHub (CLAUDE.md §7 P0-08). Danh sách chưa đầy đủ: chỉ Task ID được nhắc trong CLAUDE.md.",
+  "generated": "2026-11-27",
+  "note": "Không tạo issue trên GitHub (CLAUDE.md §7 P0-08). Danh sách chưa đầy đủ: chỉ Task ID được nhắc trong CLAUDE.md. Trạng thái: TODO / IN_PROGRESS / PR_OPEN / MERGED (đã người review + merge) / DONE (tài liệu đã ký). Đếm tiến độ: node scripts/progress.mjs.",
   "items": [
     {
       "id": "P0-01",
@@ -9,8 +9,8 @@
         "release-0.1",
         "phase:0"
       ],
-      "status": "DONE_PENDING_REVIEW",
-      "notes": "docs/reports/SOURCE_INVENTORY.md — 8 nguồn SOURCE_MISSING",
+      "status": "DONE",
+      "notes": "docs/reports/SOURCE_INVENTORY.md — 8 nguồn SOURCE_MISSING · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -20,8 +20,8 @@
         "release-0.1",
         "phase:0"
       ],
-      "status": "DONE_PENDING_REVIEW",
-      "notes": "docs/reports/ENVIRONMENT_INVENTORY.md",
+      "status": "DONE",
+      "notes": "docs/reports/ENVIRONMENT_INVENTORY.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -31,8 +31,8 @@
         "release-0.1",
         "phase:0"
       ],
-      "status": "DONE_PENDING_REVIEW",
-      "notes": "docs/operations/THREAT_MODEL.md",
+      "status": "DONE",
+      "notes": "docs/operations/THREAT_MODEL.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -42,8 +42,8 @@
         "release-0.1",
         "phase:0"
       ],
-      "status": "DONE_PENDING_REVIEW",
-      "notes": "docs/operations/PROVIDER_COMPLIANCE.md",
+      "status": "DONE",
+      "notes": "docs/operations/PROVIDER_COMPLIANCE.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -53,8 +53,8 @@
         "release-0.1",
         "phase:0"
       ],
-      "status": "DONE_PENDING_REVIEW",
-      "notes": "ADR-001/002/004 ACCEPTED (người dùng phiên), ADR-003 PROPOSED, ADR-005 ACCEPTED (Owner)",
+      "status": "DONE",
+      "notes": "ADR-001/002/004 ACCEPTED (người dùng phiên), ADR-003 PROPOSED, ADR-005 ACCEPTED (Owner) · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -64,8 +64,8 @@
         "release-0.1",
         "phase:0"
       ],
-      "status": "DONE_PENDING_OWNER",
-      "notes": "docs/governance/RBAC_MATRIX.md — cần Owner duyệt",
+      "status": "DONE",
+      "notes": "docs/governance/RBAC_MATRIX.md — cần Owner duyệt · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -75,8 +75,8 @@
         "release-0.1",
         "phase:0"
       ],
-      "status": "DONE_PENDING_REVIEW",
-      "notes": "docs/ux/UX_FLOWS.md",
+      "status": "DONE",
+      "notes": "docs/ux/UX_FLOWS.md · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -86,8 +86,8 @@
         "release-0.1",
         "phase:0"
       ],
-      "status": "DONE_PENDING_REVIEW",
-      "notes": "File này; chỉ gồm Task ID có trong CLAUDE.md (Master Plan SOURCE_MISSING)",
+      "status": "DONE",
+      "notes": "File này; chỉ gồm Task ID có trong CLAUDE.md (Master Plan SOURCE_MISSING) · Owner ký baseline 26/11 (residoken-wq/aidevteam#9)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -185,8 +185,8 @@
         "release-0.1",
         "phase:1"
       ],
-      "status": "PARTIAL",
-      "notes": "CI/CD có (#2); chưa có SCA, secret scan; branch protection DEFINED – NOT ENFORCED",
+      "status": "TODO",
+      "notes": "Đã có: CI ci (lint/typecheck/test/integration/backup) + build image (residoken-wq/aidevteam#2, #3). Còn: SCA, secret scan, BRANCH_PROTECTION.md",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -196,8 +196,8 @@
         "release-0.1",
         "phase:1"
       ],
-      "status": "TODO",
-      "notes": "/health có, chưa kiểm tra DB",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#10",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -207,8 +207,8 @@
         "release-0.1",
         "phase:1"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#11",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -229,8 +229,8 @@
         "release-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "Hiện tạo org bằng CLI",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#15 · platform admin REQUIRES_OWNER_APPROVAL (D-2026-11-26-13)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -251,8 +251,8 @@
         "release-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#16",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -273,8 +273,8 @@
         "release-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "Dùng SecretRefSchema",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#13",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -284,8 +284,8 @@
         "release-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "Chỉ mock",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#14",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -295,8 +295,8 @@
         "release-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#12",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -306,8 +306,8 @@
         "release-0.1",
         "phase:3"
       ],
-      "status": "TODO",
-      "notes": "Cần duyệt STATE_MACHINES §1",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#17",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -317,8 +317,8 @@
         "release-0.1",
         "phase:3"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#17",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -419,6 +419,17 @@
       "status": "NOT AVAILABLE ON PLAN",
       "notes": "O-01; thay bằng phương án B",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
+    },
+    {
+      "id": "QA-01",
+      "title": "[QA-01] E2E trình duyệt (Playwright) chạy trong CI",
+      "labels": [
+        "release-0.1",
+        "phase:1"
+      ],
+      "status": "TODO",
+      "notes": "D-2026-11-26-08 — trước UAT 03/12. Không phải Task ID của Master Plan",
+      "source": "DECISION_LOG D-2026-11-26-08"
     }
   ]
 }
