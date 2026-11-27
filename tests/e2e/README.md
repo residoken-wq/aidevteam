@@ -21,5 +21,5 @@ PGHOST=127.0.0.1 PGPORT=5432 PGUSER=postgres NODE_PATH="$(npm root -g)" bash tes
 
 Runner build api + web, migrate + seed dữ liệu giả, tạo session giả cho user seed, chạy api (`:3911`) và web standalone (`:3910`), chạy mọi `*.e2e.cjs`, rồi dừng server.
 
-## Chưa có trong CI
-E2E chưa chạy trong GitHub Actions (cần thêm `@playwright/test` + trình duyệt vào CI). Đề xuất bổ sung trước UAT 03/12 cho các màn hình 0.1.
+## Trong CI
+Job `e2e` trong `.github/workflows/ci.yml` (QA-01) chạy runner này trên mọi PR: cài `playwright@1.63.0` global + Chromium, `NODE_PATH="$(npm root -g)"`, PostgreSQL service ghim digest. Khi fail chỉ upload log api/web, không upload trace/screenshot.
