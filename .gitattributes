@@ -1,0 +1,2 @@
+# Shell scripts must keep LF so they run in WSL/Linux even when checked out on Windows (core.autocrlf=true).
+*.sh text eol=lf
