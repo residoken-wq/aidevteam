@@ -88,6 +88,10 @@ jobs:
         if: steps.detect.outputs.node == 'true'
         run: pnpm test
 
+      - name: Script tests (progress report)
+        if: steps.detect.outputs.node == 'true'
+        run: pnpm test:scripts
+
       - name: Integration tests (PostgreSQL)
         if: steps.detect.outputs.node == 'true'
         env:

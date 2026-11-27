@@ -1,5 +1,8 @@
 # Bộ prompt instruction cho Antigravity (AGY) — Release 0.1
 
+> **Từ 27/11/2026 dùng [`AGY_RUNBOOK.md`](AGY_RUNBOOK.md) + [`tasks-v2/`](tasks-v2/)** (D-2026-11-27-01): QA đơn giản, tiết kiệm token, báo cáo tiến độ sau mỗi task bằng `node scripts/progress.mjs`.
+> Các file `00_…06_*.md` và `tasks/` bên dưới là bản 25/11, **chỉ để tham khảo** — cổng G1/G2 đã đạt (Owner ký 26/11), nhiều task đã merge.
+
 > **Phiên bản:** 0.1-draft · **Ngày:** 25/11/2026 · **Trạng thái:** `DRAFT – CHỜ OWNER DUYỆT`
 > **Người soạn:** Claude (vai trò BA Manager + Planning Manager + QA) · **Nguồn:** `CLAUDE.md` v1.2
 > Timezone: `Asia/Ho_Chi_Minh`

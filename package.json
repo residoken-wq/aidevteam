@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "typecheck": "pnpm build:packages && pnpm -r typecheck",
     "test": "pnpm build:packages && pnpm -r test",
-    "test:integration": "pnpm build:packages && pnpm -r --workspace-concurrency=1 --if-present test:integration"
+    "test:integration": "pnpm build:packages && pnpm -r --workspace-concurrency=1 --if-present test:integration",
+    "test:scripts": "node --test scripts/progress.test.mjs",
+    "progress": "node scripts/progress.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
