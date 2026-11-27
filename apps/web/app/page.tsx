@@ -1,31 +1,8 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { apiInternalUrl, SESSION_COOKIE } from "../lib/api";
 import { roleLabel } from "../lib/roles";
-import { can } from "../lib/server-api";
+import { currentUser } from "../lib/server-api";
 
 export const dynamic = "force-dynamic";
-
-interface Me {
-  githubUserId: number;
-  githubLogin: string | null;
-  orgs: Array<{ slug: string; roles: string[] }>;
-  activeOrg: { slug: string; roles: string[]; permissions: string[] } | null;
-  /** P2-03: non-empty only for operator-granted platform admins. */
-  platformPermissions: string[];
-}
-
-async function currentUser(): Promise<Me | null> {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  if (!token) return null;
-  const res = await fetch(`${apiInternalUrl()}/auth/me`, {
-    headers: { cookie: `${SESSION_COOKIE}=${encodeURIComponent(token)}` },
-    cache: "no-store",
-  });
-  if (res.status === 401) return null;
-  if (!res.ok) throw new Error("failed to load session");
-  return (await res.json()) as Me;
-}
 
 export default async function HomePage() {
   const me = await currentUser();
@@ -61,37 +38,6 @@ export default async function HomePage() {
           ))}
         </ul>
       ) : null}
-
-      {me.activeOrg ? (
-        <nav>
-          {can(me, "dashboard:read") ? (
-            <>
-              <a href="/dashboard">Tổng quan</a> ·{" "}
-            </>
-          ) : null}
-          <a href="/projects">Dự án</a> · <a href="/agents">Agent</a> · <a href="/provider-accounts">Tài khoản provider</a> · <a href="/workers">Worker</a>
-          {can(me, "approval:read") ? (
-            <>
-              {" "}· <a href="/approvals">Duyệt release</a>
-            </>
-          ) : null}
-          {can(me, "member:read") ? (
-            <>
-              {" "}· <a href="/members">Thành viên</a>
-            </>
-          ) : null}
-        </nav>
-      ) : null}
-
-      {me.platformPermissions?.includes("platform:org:read") ? (
-        <nav aria-label="Quản trị nền tảng">
-          <a href="/platform/orgs">Quản trị tổ chức</a>
-        </nav>
-      ) : null}
-
-      <form method="post" action="/auth/logout">
-        <button type="submit">Đăng xuất</button>
-      </form>
     </main>
   );
 }

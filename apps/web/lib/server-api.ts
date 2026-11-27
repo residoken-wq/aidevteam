@@ -35,3 +35,16 @@ export function can(me: Me | null, permission: string): boolean {
 export function canPlatform(me: Me | null, permission: string): boolean {
   return Boolean(me?.platformPermissions?.includes(permission));
 }
+
+export async function currentUser(): Promise<Me | null> {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+  const res = await fetch(`${apiInternalUrl()}/auth/me`, {
+    headers: { cookie: `${SESSION_COOKIE}=${encodeURIComponent(token)}` },
+    cache: "no-store",
+  });
+  if (res.status === 401) return null;
+  if (!res.ok) throw new Error("failed to load session");
+  return (await res.json()) as Me;
+}
+
