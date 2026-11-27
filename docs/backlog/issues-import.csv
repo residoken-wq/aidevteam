@@ -18,7 +18,7 @@ P1-08,[P1-08] Audit append-only,release-0.1;phase:1,MERGED,residoken-wq/aidevtea
 P1-09,[P1-09] CI SCA + required checks,release-0.1;phase:1,TODO,"Đã có: CI ci (lint/typecheck/test/integration/backup) + build image (residoken-wq/aidevteam#2, #3). Còn: SCA, secret scan, BRANCH_PROTECTION.md"
 P1-10,[P1-10] Health probe (DB readiness),release-0.1;phase:1,MERGED,residoken-wq/aidevteam#10
 P1-11,[P1-11] Backup/restore cơ bản,release-0.1;phase:1,MERGED,residoken-wq/aidevteam#11
-P2-02,[P2-02] Dashboard tổng quan,release-0.1;phase:2,TODO,
+P2-02,[P2-02] Dashboard tổng quan,release-0.1;phase:2,PR_OPEN,PR mở; E2E dashboard.e2e.cjs chưa chạy (Windows) — QA-01
 P2-03,[P2-03] CRUD org (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#15 · platform admin REQUIRES_OWNER_APPROVAL (D-2026-11-26-13)
 P2-04,[P2-04] Role editor nâng cao,post-0.1;phase:2,TODO,0.1 dùng CLI
 P2-05,[P2-05] CRUD agent (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#16
@@ -28,9 +28,9 @@ P2-08,[P2-08] CRUD worker (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED
 P2-10,[P2-10] CRUD project (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#12
 P3-02,[P3-02] Task CRUD + trạng thái,release-0.1;phase:3,MERGED,residoken-wq/aidevteam#17
 P3-04,[P3-04] Kanban cơ bản,release-0.1;phase:3,MERGED,residoken-wq/aidevteam#17
-P4-01,[P4-01] Dispatch tới mock worker,release-0.1;phase:4,PR_OPEN,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
-P4-03,[P4-03] Agent run lifecycle (rút gọn),release-0.1;phase:4,PR_OPEN,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
-P4-07,[P4-07] Xem log/run (rút gọn),release-0.1;phase:4,PR_OPEN,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
+P4-01,[P4-01] Dispatch tới mock worker,release-0.1;phase:4,MERGED,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
+P4-03,[P4-03] Agent run lifecycle (rút gọn),release-0.1;phase:4,MERGED,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
+P4-07,[P4-07] Xem log/run (rút gọn),release-0.1;phase:4,MERGED,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
 P4-12,[P4-12] Legacy adapter router v0.1,post-0.1;phase:4,OPTIONAL,Chỉ sau khi O-06 giải quyết
 P6-05,[P6-05] Approval service xác minh comment,post-0.1;phase:6,TODO,
 P6-06,[P6-06] Approval Center chỉ đọc (rút gọn),release-0.1;phase:6,TODO,O-07
