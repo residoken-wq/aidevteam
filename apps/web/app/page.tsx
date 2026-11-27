@@ -70,6 +70,11 @@ export default async function HomePage() {
             </>
           ) : null}
           <a href="/projects">Dự án</a> · <a href="/agents">Agent</a> · <a href="/provider-accounts">Tài khoản provider</a> · <a href="/workers">Worker</a>
+          {can(me, "approval:read") ? (
+            <>
+              {" "}· <a href="/approvals">Duyệt release</a>
+            </>
+          ) : null}
         </nav>
       ) : null}
 

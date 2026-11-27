@@ -29,6 +29,16 @@ describe("loadConfig", () => {
     expect(c.github.callbackUrl).toBe("https://cc.example.com/auth/github/callback");
     expect(c.sessionTtlMinutes).toBe(480);
     expect(c.trustedProxies).toEqual([]);
+    expect(c.approvalRepo).toBeNull();
+  });
+
+  it("parses valid APPROVAL_REPO and defaults invalid/missing to null", () => {
+    expect(loadConfig({ ...validEnv, APPROVAL_REPO: "owner/repo" }).approvalRepo).toBe("owner/repo");
+    expect(loadConfig({ ...validEnv, APPROVAL_REPO: "org-name/repo.js" }).approvalRepo).toBe("org-name/repo.js");
+    expect(loadConfig({ ...validEnv, APPROVAL_REPO: "" }).approvalRepo).toBeNull();
+    expect(loadConfig({ ...validEnv, APPROVAL_REPO: "invalid-repo" }).approvalRepo).toBeNull();
+    expect(loadConfig({ ...validEnv, APPROVAL_REPO: "too/many/slashes" }).approvalRepo).toBeNull();
+    expect(loadConfig({ ...validEnv, APPROVAL_REPO: "owner/with spaces" }).approvalRepo).toBeNull();
   });
 
   it("parses trusted proxies (NPM server)", () => {
