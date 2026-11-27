@@ -218,8 +218,8 @@
         "release-0.1",
         "phase:2"
       ],
-      "status": "PR_OPEN",
-      "notes": "residoken-wq/aidevteam#20; E2E dashboard.e2e.cjs chưa chạy (Windows) — QA-01",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#20; E2E dashboard.e2e.cjs xanh trong CI (QA-01, #21)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -427,8 +427,8 @@
         "release-0.1",
         "phase:1"
       ],
-      "status": "TODO",
-      "notes": "D-2026-11-26-08 — trước UAT 03/12. Không phải Task ID của Master Plan",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#21 (job e2e; AC-2 run 45986565988); D-2026-11-26-08 — trước UAT 03/12. Không phải Task ID của Master Plan",
       "source": "DECISION_LOG D-2026-11-26-08"
     }
   ]
