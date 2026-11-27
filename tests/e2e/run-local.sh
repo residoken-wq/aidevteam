@@ -25,6 +25,7 @@ cp -r "$ROOT/apps/web/public" "$ROOT/apps/web/.next/standalone/apps/web/public"
 node "$ROOT/packages/db/dist/cli.js" up >/dev/null 2>&1
 node "$ROOT/packages/db/dist/seed-cli.js" >/dev/null 2>&1
 node "$ROOT/packages/db/dist/allowlist-cli.js" add 900000003 e2e >/dev/null 2>&1
+node "$ROOT/packages/db/dist/admin-cli.js" role grant 900000001 org-test-a org_admin >/dev/null 2>&1
 node "$ROOT/packages/db/dist/admin-cli.js" role grant 900000003 org-test-a maintainer >/dev/null 2>&1
 node "$ROOT/packages/db/dist/admin-cli.js" role grant 900000002 org-test-a viewer >/dev/null 2>&1
 node "$ROOT/packages/db/dist/allowlist-cli.js" add 900000005 e2e-platform >/dev/null 2>&1
@@ -42,8 +43,8 @@ session() { # create a fake session row for a seeded fake user, print the raw to
   echo "$t"
 }
 # Assign separately: `export X="$(…)"` would hide a failing session() from set -e.
-MAINT_TOKEN="$(session 900000003)"; VIEWER_TOKEN="$(session 900000002)"; PLATFORM_TOKEN="$(session 900000005)"
-export MAINT_TOKEN VIEWER_TOKEN PLATFORM_TOKEN
+ADMIN_TOKEN="$(session 900000001)"; MAINT_TOKEN="$(session 900000003)"; VIEWER_TOKEN="$(session 900000002)"; PLATFORM_TOKEN="$(session 900000005)"
+export ADMIN_TOKEN MAINT_TOKEN VIEWER_TOKEN PLATFORM_TOKEN
 
 (cd "$ROOT/apps/api" && PORT=$API_PORT PUBLIC_BASE_URL="$BASE_URL" GITHUB_OAUTH_CLIENT_ID=Iv1.e2efakeclient GITHUB_OAUTH_CLIENT_SECRET=fake-secret-e2e-only-0000000 TRUSTED_PROXY_IPS=127.0.0.1 node dist/main.js >/tmp/e2e-api.log 2>&1) & pids+=($!)
 (cd "$ROOT/apps/web/.next/standalone" && PORT=$WEB_PORT HOSTNAME=127.0.0.1 API_INTERNAL_URL="http://127.0.0.1:$API_PORT" node apps/web/server.js >/tmp/e2e-web.log 2>&1) & pids+=($!)
