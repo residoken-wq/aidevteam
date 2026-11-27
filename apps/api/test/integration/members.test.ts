@@ -257,7 +257,7 @@ describe("AC-4 Audit logging", () => {
       .expect(200);
     expect(r1.body).toEqual({ changed: true });
 
-    const auditAfter1 = await pool.query<{ action: string; actor_github_user_id: string; target_id: string; metadata: any }>(
+    const auditAfter1 = await pool.query<{ action: string; actor_github_user_id: string; target_id: string; metadata: unknown }>(
       "SELECT action, actor_github_user_id, target_id, metadata FROM audit_events ORDER BY id DESC LIMIT 1",
     );
     expect(auditAfter1.rows[0]?.action).toBe("org.role_granted");
@@ -282,7 +282,7 @@ describe("AC-4 Audit logging", () => {
       .expect(200);
     expect(r3.body).toEqual({ changed: true });
 
-    const auditAfter3 = await pool.query<{ action: string; target_id: string; metadata: any }>(
+    const auditAfter3 = await pool.query<{ action: string; target_id: string; metadata: unknown }>(
       "SELECT action, target_id, metadata FROM audit_events ORDER BY id DESC LIMIT 1",
     );
     expect(auditAfter3.rows[0]?.action).toBe("org.role_revoked");
