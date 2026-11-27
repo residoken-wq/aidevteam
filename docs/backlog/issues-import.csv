@@ -33,7 +33,7 @@ P4-03,[P4-03] Agent run lifecycle (rút gọn),release-0.1;phase:4,MERGED,resido
 P4-07,[P4-07] Xem log/run (rút gọn),release-0.1;phase:4,MERGED,residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01
 P4-12,[P4-12] Legacy adapter router v0.1,post-0.1;phase:4,OPTIONAL,Chỉ sau khi O-06 giải quyết
 P6-05,[P6-05] Approval service xác minh comment,post-0.1;phase:6,TODO,
-P6-06,[P6-06] Approval Center chỉ đọc (rút gọn),release-0.1;phase:6,TODO,O-07
+P6-06,[P6-06] Approval Center chỉ đọc (rút gọn),release-0.1;phase:6,PR_OPEN,O-07; residoken-wq/aidevteam#23; E2E approvals.e2e.cjs chạy ở job e2e của CI
 P6-07,[P6-07] Protected environment reviewer,post-0.1;phase:6,NOT AVAILABLE ON PLAN,O-01
 P6-08,[P6-08] Approval verification (deploy-time),post-0.1;phase:6,TODO,
 P10-06,[P10-06] Production gate (Master Plan),post-0.1;phase:10,NOT AVAILABLE ON PLAN,O-01; thay bằng phương án B

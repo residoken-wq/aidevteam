@@ -383,8 +383,8 @@
         "release-0.1",
         "phase:6"
       ],
-      "status": "TODO",
-      "notes": "O-07",
+      "status": "PR_OPEN",
+      "notes": "O-07; residoken-wq/aidevteam#23; E2E approvals.e2e.cjs chạy ở job e2e của CI",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
