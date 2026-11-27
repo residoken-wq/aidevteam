@@ -218,8 +218,8 @@
         "release-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "PR_OPEN",
+      "notes": "residoken-wq/aidevteam#20; E2E dashboard.e2e.cjs chưa chạy (Windows) — QA-01",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
@@ -328,7 +328,7 @@
         "release-0.1",
         "phase:4"
       ],
-      "status": "PR_OPEN",
+      "status": "MERGED",
       "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
@@ -339,7 +339,7 @@
         "release-0.1",
         "phase:4"
       ],
-      "status": "PR_OPEN",
+      "status": "MERGED",
       "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
@@ -350,7 +350,7 @@
         "release-0.1",
         "phase:4"
       ],
-      "status": "PR_OPEN",
+      "status": "MERGED",
       "notes": "residoken-wq/aidevteam#19 (backend P4a + UI P4b); E2E runs.e2e.cjs chưa chạy (Windows) — QA-01",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },

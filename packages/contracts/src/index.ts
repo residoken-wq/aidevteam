@@ -10,3 +10,4 @@ export * from "./org";
 export * from "./agent";
 export * from "./task";
 export * from "./run";
+export * from "./dashboard";
