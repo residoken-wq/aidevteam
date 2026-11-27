@@ -121,3 +121,69 @@ jobs:
           export PATH="$bindir:$PATH" TMPDIR=/tmp
           pg_dump --version
           bash tests/backup/test_backup_restore.sh
+
+  # Browser E2E (QA-01, D-2026-11-26-08): builds api + web, runs every tests/e2e/*.e2e.cjs against a throwaway
+  # *_test database with fake data. OAuth values inside run-local.sh are fake; no secrets are used.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-bookworm@sha256:cd0e9518bda5f2ea667ff84d22795d089720c883f288e215d97ce57437e8ef37 # resolved 25/11/2026
+        env:
+          POSTGRES_DB: aidevteam_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4 (reads packageManager from package.json)
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright + Chromium
+        # Not a repo dependency yet (tests/e2e/README.md): exact version installed globally, resolved via NODE_PATH.
+        run: |
+          set -euo pipefail
+          npm install -g playwright@1.63.0
+          playwright --version
+          playwright install --with-deps chromium
+
+      - name: Browser E2E
+        env:
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+        run: |
+          set -euo pipefail
+          export NODE_PATH="$(npm root -g)"
+          bash tests/e2e/run-local.sh
+
+      - name: Upload api/web logs (failure only)
+        # Server logs only — no Playwright traces or screenshots (they could hold session cookies).
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: e2e-server-logs
+          path: |
+            /tmp/e2e-api.log
+            /tmp/e2e-web.log
+          retention-days: 7
+          if-no-files-found: ignore
