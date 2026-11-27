@@ -243,6 +243,7 @@ export class RunsController {
   }
 
   @RequirePermission("dispatch:execute")
+  @HttpCode(200)
   @Post("runs/:id/cancel")
   async cancel(@Req() req: Request, @Param("id") id: string): Promise<Run> {
     if (!UUID_RE.test(id)) throw new NotFoundException({ statusCode: 404, message: "run_not_found" });
