@@ -301,6 +301,8 @@ Không viết code ứng dụng trước khi Owner ký baseline.
 | E2E trình duyệt (Playwright; cần PostgreSQL + gói `playwright`; `E2E_ONLY="projects workers"` để chạy riêng; CI chạy ở job `e2e`, QA-01) | `PGHOST=… PGPORT=… PGUSER=… NODE_PATH="$(npm root -g)" bash tests/e2e/run-local.sh` |
 | Test script deploy | `bash tests/deploy/test_deploy.sh` |
 | Báo cáo tiến độ (Phase/task xong, từ `docs/backlog/issues-import.json`) | `pnpm progress` (= `node scripts/progress.mjs`) · test: `pnpm test:scripts` |
+| Kiểm tra lỗ hổng dependency (SCA, như CI) | `pnpm audit --audit-level high` |
+| Quét secret (như CI; gitleaks 8.30.1, bỏ qua fixture giả trong `.gitleaksignore`) | `gitleaks git --no-banner --redact .` |
 | Build image (cần Docker) | `docker build -f apps/api/Dockerfile .` / `docker build -f apps/web/Dockerfile .` — **chưa chạy cục bộ**, CI chạy trên PR |
 
 ---
