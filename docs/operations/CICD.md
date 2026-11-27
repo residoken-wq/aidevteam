@@ -29,6 +29,7 @@ Không dùng cơ chế tự động pull image mới (kiểu Watchtower): như v
 | File | Vai trò |
 |---|---|
 | `.github/workflows/ci.yml` | Job `ci` (tên trùng required check ở O-02). Kiểm tra không commit file `.env`/key; chạy test deploy script; lint/typecheck/test khi đã có `package.json` + `pnpm-lock.yaml` + `.nvmrc` (sau P1-01) |
+| `.github/workflows/ci.yml` job `e2e` | QA-01: Playwright 1.63.0 + Chromium, PostgreSQL ghim digest, chạy `bash tests/e2e/run-local.sh` (mọi `tests/e2e/*.e2e.cjs`). Khi fail chỉ upload log api/web (`/tmp/e2e-*.log`, giữ 7 ngày), không upload trace/screenshot. Giá trị OAuth trong job là giả |
 | `.github/workflows/build-image.yml` | Tìm `apps/*/Dockerfile`; chưa có thì bỏ qua. PR: build không push. `main`: build + push `ghcr.io/<owner>/aidevteam-<app>` bằng `GITHUB_TOKEN` |
 | `deploy/compose.yaml` | Stack chạy trên VPS: `api`, `web` (theo stack đề xuất). Image chỉ nhận dạng digest. Container read-only, drop mọi capability, `no-new-privileges`. `web` publish ra `WEB_PUBLISH_ADDR:WEB_PUBLISH_PORT`; `api` chỉ bind `127.0.0.1` |
 | `deploy/host.env.example` | Cấu hình mạng của VPS (không có secret): `192.168.250.30:3301` |
@@ -146,6 +147,7 @@ sudo /opt/aidevteam/deploy.sh --rollback --health-url http://127.0.0.1:3001/heal
 | Hạng mục | Trạng thái |
 |---|---|
 | Workflow `ci`, `build-image` | `IMPLEMENTATION_PENDING` — chưa có run trên GitHub |
+| Job `e2e` (QA-01) | Xem PR residoken-wq/aidevteam#21 (link run xanh + run cố ý FAIL ở AC-2). Chưa là required check (branch protection chưa bật) |
 | Build image thật | `apps/api/Dockerfile`, `apps/web/Dockerfile` thêm ở P1-01. Các bước build đã mô phỏng cục bộ không cần Docker; build Docker thật do CI chạy trên PR P1-01 |
 | Test `deploy.sh` (dry-run, validate) | 17/17 pass cục bộ 25/11/2026 (bash 5.2). **Chưa** chạy với Docker daemon thật |
 | `docker compose config` | Hợp lệ cục bộ (Compose v5.7.1) với dữ liệu giả |

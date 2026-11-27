@@ -33,7 +33,10 @@ async function contextFor(browser, token) {
   const moveVia = async (page, n, label) => {
     const card = page.getByTestId(`task-${n}`);
     await card.getByLabel("Chuyển sang").selectOption({ label });
+    // Optimistic board: wait for the server to commit before dispatching (else task_not_dispatchable can race).
+    const done = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes(`/tasks/${n}/transitions`));
     await card.getByRole("button", { name: "Chuyển" }).click();
+    await done;
   };
   const createTask = async (page, title, description) => {
     const f = page.getByRole("form", { name: "Tạo task" });
@@ -97,7 +100,9 @@ async function contextFor(browser, token) {
       assert.equal(await mpage.getByRole("button", { name: "Hủy" }).count(), 1, "Maintainer should see Hủy button for QUEUED run");
 
       // AC-9b: ensure no active script or img tags rendered from task
-      assert.equal(await mpage.locator("script, img").count(), 0, "HTML from task was executed/rendered as tags");
+      // Next.js injects its own <script> tags, so look only for the injected payload, not every script/img on the page.
+      assert.equal(await mpage.locator('img[src="x"]').count(), 0, "HTML from task was rendered as an img tag");
+      assert.equal(await mpage.evaluate(() => [...globalThis.document.scripts].some((s) => (s.textContent || "").includes("__xss"))), false, "HTML from task was rendered as a script tag");
       assert.equal(await mpage.evaluate(() => globalThis.__xss), undefined, "script from task ran");
     });
 

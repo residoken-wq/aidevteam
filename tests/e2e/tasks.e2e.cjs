@@ -18,19 +18,30 @@ async function contextFor(browser, token) {
 (async () => {
   const browser = await chromium.launch();
   const results = [];
+  // On failure, report the alert texts on the main page and the dialogs seen (no screenshots: they could carry session data).
+  let diagPage = null;
+  const dialogs = [];
   const step = async (name, fn) => {
     try {
       await fn();
       results.push(`PASS  ${name}`);
     } catch (e) {
-      results.push(`FAIL  ${name}: ${e.message.split("\n").filter(Boolean).slice(0, 4).join(" | ")}`);
+      const alerts = diagPage ? await diagPage.getByRole("alert").allTextContents().catch(() => []) : [];
+      const diag = `${alerts.length ? ` | alerts: ${alerts.join(" / ")}` : ""}${dialogs.length ? ` | dialogs: ${dialogs.join(" / ")}` : ""}`;
+      results.push(`FAIL  ${name}: ${e.message.split("\n").filter(Boolean).slice(0, 4).join(" | ")}${diag}`);
     }
   };
   const inCol = (page, status, n) => page.getByTestId(`col-${status}`).getByTestId(`task-${n}`);
+  // Grab the card by its title line: since P4-07 the card centre can hold the "Chạy mock" form controls, which do not start a drag.
+  const GRAB = { sourcePosition: { x: 8, y: 6 } };
+  // The board moves the card optimistically, so the target column shows before the server commits. Wait for the
+  // transition response, otherwise the next move can be sent with an expectedFrom the server does not have yet (409).
   const moveVia = async (page, n, label) => {
     const card = page.getByTestId(`task-${n}`);
     await card.getByLabel("Chuyển sang").selectOption({ label });
+    const done = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes(`/tasks/${n}/transitions`));
     await card.getByRole("button", { name: "Chuyển" }).click();
+    await done;
   };
   const createTask = async (page, title, description) => {
     const f = page.getByRole("form", { name: "Tạo task" });
@@ -41,7 +52,11 @@ async function contextFor(browser, token) {
   try {
     const ctx = await contextFor(browser, process.env.MAINT_TOKEN);
     const page = await ctx.newPage();
-    page.on("dialog", (d) => (d.type() === "prompt" ? d.accept("trùng với task khác") : d.accept()));
+    diagPage = page;
+    page.on("dialog", (d) => {
+      dialogs.push(d.type());
+      return d.type() === "prompt" ? d.accept("trùng với task khác") : d.accept();
+    });
     const BOARD = `${BASE}/projects/kanban-e2e/tasks`;
 
     await step("create a project, open its board, create tasks; HTML in text is shown as text", async () => {
@@ -66,14 +81,16 @@ async function contextFor(browser, token) {
     });
 
     await step("drag a card BACKLOG → Cần làm", async () => {
-      await page.getByTestId("task-1").dragTo(page.getByTestId("col-TODO"));
+      const committed = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes("/tasks/1/transitions"));
+      await page.getByTestId("task-1").dragTo(page.getByTestId("col-TODO"), GRAB);
+      await committed;
       await inCol(page, "TODO", 1).waitFor();
       await page.reload();
       await inCol(page, "TODO", 1).waitFor();
     });
 
     await step("an illegal drag (Cần làm → Hoàn thành) is refused and the card stays", async () => {
-      await page.getByTestId("task-1").dragTo(page.getByTestId("col-DONE"));
+      await page.getByTestId("task-1").dragTo(page.getByTestId("col-DONE"), GRAB);
       await page.getByRole("alert").filter({ hasText: "Không thể chuyển" }).waitFor();
       await inCol(page, "TODO", 1).waitFor();
     });
