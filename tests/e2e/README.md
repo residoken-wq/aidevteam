@@ -9,6 +9,7 @@
 | `platform-orgs.e2e.cjs` | P2-03: platform admin tạo org → trùng mã báo lỗi → đổi tên → lưu trữ → khôi phục; maintainer không thấy link và bị từ chối |
 | `projects.e2e.cjs` | P2-10 AC-8: tạo → đổi tên → lưu trữ dự án qua UI; lỗi trùng slug; tên chứa HTML hiển thị dạng chữ; viewer không thấy nút ghi và gọi API trực tiếp bị 403 |
 | `runs.e2e.cjs` | P4-07: Dispatch mock từ Kanban → trang run hiện QUEUED; viewer không thấy nút Hủy và form Chạy mock; id sai → 404 |
+| `org-chart.e2e.cjs` | P2-06: Sơ đồ tổ chức agent — kéo thả đổi quản lý, phát hiện và chặn vòng lặp, select bàn phím đưa về gốc; viewer chỉ xem |
 | `dashboard.e2e.cjs` | P2-02: org mới → dashboard hiện 0 và "Chưa có dữ liệu"; tạo 1 project + 1 task → số project đang dùng và số task BACKLOG tăng đúng 1 |
 | `approvals.e2e.cjs` | P6-06: Approval Center chỉ đọc — banner + "Chưa có bản ghi duyệt" khi rỗng; chèn bản ghi giả qua psql → hiện đủ cột, đúng environment, không có button/form, không có link github khi chưa cấu hình APPROVAL_REPO; viewer xem được |
 | `members.e2e.cjs` | P2-04: org_admin gán role viewer cho user allowlist → thấy trong bảng → gỡ → biến mất; maintainer không có quyền xem |
