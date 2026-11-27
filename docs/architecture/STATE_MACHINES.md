@@ -6,6 +6,8 @@
 
 ## 1. Task (P3-02/P3-04 — Release 0.1)
 
+> Đã triển khai: `packages/contracts/src/task.ts` (test `task.test.ts` đọc bảng dưới đây và fail nếu code lệch), API `POST /projects/:slug/tasks/:number/transitions` (cập nhật có điều kiện), trigger DB `tasks_enforce_transition` (migration 0009). DONE yêu cầu người dùng xác nhận rõ (`confirmReviewed: true`, ghi audit); CANCELLED yêu cầu lý do.
+
 ```text
 BACKLOG ─▶ TODO ─▶ IN_PROGRESS ─▶ IN_REVIEW ─▶ DONE
    │         │          │   ▲          │
