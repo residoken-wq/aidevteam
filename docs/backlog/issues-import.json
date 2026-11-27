@@ -240,8 +240,8 @@
         "post-0.1",
         "phase:2"
       ],
-      "status": "PR_OPEN",
-      "notes": "PR mở (role editor /members, member:read/write chỉ org_admin — REQUIRES_OWNER_APPROVAL); 0.1 dùng CLI",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#29; role editor /members, member:read/write chỉ org_admin (REQUIRES_OWNER_APPROVAL)",
       "source": "CLAUDE.md v1.2 (Master Plan SOURCE_MISSING)"
     },
     {
