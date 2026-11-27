@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { AppShell } from "./app-shell";
+import "./globals.css";
 
 export const metadata = {
   title: "AI Dev Team Control Center",
@@ -8,7 +10,9 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="vi">
-      <body>{children}</body>
+      <body>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }
