@@ -8,6 +8,7 @@
 | `tasks.e2e.cjs` | P3-02/P3-04: Kanban — HTML trong task hiển thị dạng text → kéo thả BACKLOG→TODO → kéo sai bị từ chối → đi tới DONE có xác nhận → hủy có lý do → bảng cũ nhận 409 và tải lại; viewer chỉ đọc |
 | `platform-orgs.e2e.cjs` | P2-03: platform admin tạo org → trùng mã báo lỗi → đổi tên → lưu trữ → khôi phục; maintainer không thấy link và bị từ chối |
 | `projects.e2e.cjs` | P2-10 AC-8: tạo → đổi tên → lưu trữ dự án qua UI; lỗi trùng slug; tên chứa HTML hiển thị dạng chữ; viewer không thấy nút ghi và gọi API trực tiếp bị 403 |
+| `runs.e2e.cjs` | P4-07: Dispatch mock từ Kanban → trang run hiện QUEUED; viewer không thấy nút Hủy và form Chạy mock; id sai → 404 |
 
 ## Chạy cục bộ
 

@@ -23,7 +23,7 @@ export async function apiGet<T>(path: string): Promise<T | null> {
     cache: "no-store",
   });
   if (res.status === 401) redirect("/login");
-  if (res.status === 403) return null;
+  if (res.status === 403 || res.status === 404) return null;
   if (!res.ok) throw new Error(`api ${res.status}`);
   return (await res.json()) as T;
 }

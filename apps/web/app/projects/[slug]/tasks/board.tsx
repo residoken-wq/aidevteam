@@ -1,6 +1,7 @@
 "use client";
 
 import { isAllowedTransition, TASK_STATUSES, TASK_TRANSITIONS, type Task, type TaskStatus } from "@aidevteam/contracts";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type DragEvent, type FormEvent } from "react";
 import { sendJson } from "../../../../lib/api-errors";
@@ -19,7 +20,21 @@ const PRIORITY: Record<Task["priority"], string> = { low: "Thấp", medium: "Tru
  * Kanban for one project (P3-04). Every move calls POST …/transitions with expectedFrom = the card's status as shown;
  * a refused move is rolled back on screen with a message. Task text is rendered as plain text only (no HTML).
  */
-export function Board({ projectSlug, initial, canWrite, agents }: { projectSlug: string; initial: Task[]; canWrite: boolean; agents: string[] }) {
+export function Board({
+  projectSlug,
+  initial,
+  canWrite,
+  canDispatch = false,
+  agents,
+  workers = [],
+}: {
+  projectSlug: string;
+  initial: Task[];
+  canWrite: boolean;
+  canDispatch?: boolean;
+  agents: string[];
+  workers?: Array<{ slug: string; name: string }>;
+}) {
   const router = useRouter();
   const [tasks, setTasks] = useState(initial);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +127,15 @@ export function Board({ projectSlug, initial, canWrite, agents }: { projectSlug:
                       <small>Lý do hủy: {t.cancelReason}</small>
                     </div>
                   ) : null}
+                  <div>
+                    <small>
+                      <Link href={`/projects/${encodeURIComponent(projectSlug)}/tasks/${t.number}/runs`}>Lịch sử chạy</Link>
+                    </small>
+                  </div>
                   {canWrite && TASK_TRANSITIONS[t.status].length > 0 ? <MoveControl task={t} onMove={move} /> : null}
+                  {canDispatch && (t.status === "TODO" || t.status === "IN_PROGRESS") ? (
+                    <DispatchMockForm projectSlug={projectSlug} taskNumber={t.number} workers={workers} />
+                  ) : null}
                 </article>
               ))}
             </section>
@@ -201,6 +224,69 @@ function CreateTaskForm({ projectSlug, agents }: { projectSlug: string; agents: 
       </label>{" "}
       <button type="submit">Tạo task</button>
       {error ? <p role="alert">{error}</p> : null}
+    </form>
+  );
+}
+
+function DispatchMockForm({
+  projectSlug,
+  taskNumber,
+  workers,
+}: {
+  projectSlug: string;
+  taskNumber: number;
+  workers: Array<{ slug: string; name: string }>;
+}) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const d = new FormData(e.currentTarget);
+    const workerSlug = String(d.get("workerSlug") ?? "");
+    if (!workerSlug) {
+      setError("Vui lòng chọn worker mock.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    const r = await sendJson<{ id: string }>(
+      "POST",
+      `/api/projects/${encodeURIComponent(projectSlug)}/tasks/${taskNumber}/dispatch`,
+      { workerSlug },
+    );
+    if (!r.ok) {
+      setError(r.error);
+      setLoading(false);
+      return;
+    }
+    router.push(`/runs/${r.data.id}`);
+  }
+
+  return (
+    <form onSubmit={onSubmit} aria-label={`Chạy mock task #${taskNumber}`} style={{ marginTop: "0.25rem" }}>
+      <select name="workerSlug" defaultValue={workers[0]?.slug ?? ""} aria-label="Worker" required>
+        {workers.length === 0 ? (
+          <option value="" disabled>
+            (không có worker mock)
+          </option>
+        ) : (
+          workers.map((w) => (
+            <option key={w.slug} value={w.slug}>
+              {w.name}
+            </option>
+          ))
+        )}
+      </select>{" "}
+      <button type="submit" disabled={loading || workers.length === 0}>
+        Chạy mock
+      </button>
+      {error ? (
+        <p role="alert" style={{ color: "#c00", margin: "0.25rem 0" }}>
+          {error}
+        </p>
+      ) : null}
     </form>
   );
 }

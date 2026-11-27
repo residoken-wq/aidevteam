@@ -8,6 +8,12 @@ describe("apiErrorMessage", () => {
 
   it("maps known conflicts and hides unknown ones", () => {
     expect(apiErrorMessage(409, { message: "project_slug_or_name_taken" })).toMatch(/đã tồn tại/);
+    expect(apiErrorMessage(409, { message: "worker_busy" })).toMatch(/Worker đang bận/);
+    expect(apiErrorMessage(429, { message: "queue_full" })).toMatch(/Hàng đợi đã đầy/);
+    expect(apiErrorMessage(409, { message: "worker_not_dispatchable" })).toMatch(/Worker không khả dụng/);
+    expect(apiErrorMessage(409, { message: "task_not_dispatchable" })).toMatch(/Chỉ có thể chạy task/);
+    expect(apiErrorMessage(409, { message: "run_not_cancellable" })).toMatch(/Chỉ có thể hủy lượt chạy/);
+    expect(apiErrorMessage(429, {})).toMatch(/Hàng đợi đã đầy/);
     expect(apiErrorMessage(409, { message: "__proto__" })).toMatch(/Có lỗi/);
   });
 
