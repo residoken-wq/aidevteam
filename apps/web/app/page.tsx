@@ -75,6 +75,11 @@ export default async function HomePage() {
               {" "}· <a href="/approvals">Duyệt release</a>
             </>
           ) : null}
+          {can(me, "member:read") ? (
+            <>
+              {" "}· <a href="/members">Thành viên</a>
+            </>
+          ) : null}
         </nav>
       ) : null}
 
