@@ -30,6 +30,8 @@
 | `run:read` | ✅ | ✅ | ✅ | Log đã redact |
 | `approval:read` | ✅ | ✅ | ✅ | Approval Center chỉ đọc (O-07); **không có permission ghi approval** |
 | `audit:read` | ✅ | ❌ | ❌ | Audit log của org |
+| `member:read` | ✅ | ❌ | ❌ | P2-04 (REQUIRES_OWNER_APPROVAL) |
+| `member:write` | ✅ | ❌ | ❌ | P2-04 (REQUIRES_OWNER_APPROVAL) |
 
 ## Quản trị nền tảng (platform admin) — P2-03
 

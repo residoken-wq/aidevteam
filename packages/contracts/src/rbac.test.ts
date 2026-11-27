@@ -14,10 +14,14 @@ describe("permissionsFor", () => {
     expect([...p].some((x) => x.endsWith(":write"))).toBe(false);
     expect(p.has("dispatch:execute")).toBe(false);
     expect(p.has("audit:read")).toBe(false);
+    expect(p.has("member:read")).toBe(false);
+    expect(p.has("member:write")).toBe(false);
   });
 
-  it("only org_admin can read audit", () => {
+  it("only org_admin can read audit or manage members", () => {
     expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("audit:read"))).toEqual(["org_admin"]);
+    expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("member:read"))).toEqual(["org_admin"]);
+    expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("member:write"))).toEqual(["org_admin"]);
   });
 
   it("roles are nested viewer ⊂ maintainer ⊂ org_admin", () => {
