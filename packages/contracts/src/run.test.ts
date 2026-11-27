@@ -8,7 +8,6 @@ import {
   RUN_STATUSES,
   RUN_TRANSITIONS,
   RunSchema,
-  type RunStatus,
 } from "./run";
 
 describe("STATE_MACHINES.md §2 mirrors RUN_TRANSITIONS", () => {

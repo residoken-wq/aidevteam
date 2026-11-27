@@ -70,7 +70,7 @@ export class RunWorker implements OnApplicationBootstrap, OnApplicationShutdown 
 
   async tick(): Promise<{ processed: boolean; runId?: string; status?: RunStatus }> {
     const client = await this.pool.connect();
-    let job: { id: string; org_id: string; task_id: string; attempt: number; task_number: number } | null = null;
+    let job: { id: string; org_id: string; task_id: string; attempt: number; task_number: number };
     try {
       await client.query("BEGIN");
       // Documentation: PostgreSQL 16 "The Locking Clause"
