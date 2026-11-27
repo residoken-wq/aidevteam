@@ -93,9 +93,11 @@ async function contextFor(browser, token) {
         (r) => r.request().method() === "PATCH" && r.url().includes("/agents/e2e-dev-a"),
       );
       await devA.getByRole("button", { name: "Lưu" }).click();
-      await patchDone;
+      const res = await patchDone;
+      assert.ok(res.ok(), `PATCH to root failed: ${res.status()}`);
 
-      // e2e-dev-a should not be under e2e-lead anymore
+      // router.refresh() is async: reload so the assertion reads the server state, not a mid-refresh DOM.
+      await mpage.reload();
       await mpage.getByTestId("agent-node-e2e-dev-a").waitFor();
       assert.equal(
         await mpage.getByTestId("agent-node-e2e-lead").getByTestId("agent-node-e2e-dev-a").count(),
