@@ -38,6 +38,20 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          fetch-depth: 0 # full history for the secret scan
+
+      - name: Secret scan (gitleaks, full git history)
+        # P1-09. gitleaks binary (MIT) pinned by version + SHA-256 from the release checksums file (checked 27/11/2026,
+        # https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1). The binary is used instead of gitleaks-action.
+        # Findings are redacted in the log. Known fake test fixtures are ignored by fingerprint in .gitleaksignore.
+        run: |
+          set -euo pipefail
+          v=8.30.1
+          sum=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+          curl -fsSL -o "$RUNNER_TEMP/gitleaks.tgz" "https://github.com/gitleaks/gitleaks/releases/download/v${v}/gitleaks_${v}_linux_x64.tar.gz"
+          echo "${sum}  $RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" git --no-banner --redact -v .
 
       - name: Repo hygiene (no committed env/key files)
         run: |
@@ -75,6 +89,13 @@ jobs:
       - name: Install
         if: steps.detect.outputs.node == 'true'
         run: pnpm install --frozen-lockfile
+
+      - name: Dependency audit (SCA, high and above)
+        # P1-09. https://pnpm.io/cli/audit (checked 27/11/2026): exits 1 when an advisory >= --audit-level remains.
+        # Exceptions: none. A known, not-yet-fixable advisory is ignored only by GHSA ID with a reason and an expiry date
+        # recorded in docs/operations/CICD.md — never by disabling this step.
+        if: steps.detect.outputs.node == 'true'
+        run: pnpm audit --audit-level high
 
       - name: Lint
         if: steps.detect.outputs.node == 'true'
