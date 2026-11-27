@@ -27,6 +27,8 @@ async function contextFor(browser, token) {
     }
   };
   const inCol = (page, status, n) => page.getByTestId(`col-${status}`).getByTestId(`task-${n}`);
+  // Grab the card by its title line: since P4-07 the card centre can hold the "Chạy mock" form controls, which do not start a drag.
+  const GRAB = { sourcePosition: { x: 8, y: 6 } };
   const moveVia = async (page, n, label) => {
     const card = page.getByTestId(`task-${n}`);
     await card.getByLabel("Chuyển sang").selectOption({ label });
@@ -66,14 +68,14 @@ async function contextFor(browser, token) {
     });
 
     await step("drag a card BACKLOG → Cần làm", async () => {
-      await page.getByTestId("task-1").dragTo(page.getByTestId("col-TODO"));
+      await page.getByTestId("task-1").dragTo(page.getByTestId("col-TODO"), GRAB);
       await inCol(page, "TODO", 1).waitFor();
       await page.reload();
       await inCol(page, "TODO", 1).waitFor();
     });
 
     await step("an illegal drag (Cần làm → Hoàn thành) is refused and the card stays", async () => {
-      await page.getByTestId("task-1").dragTo(page.getByTestId("col-DONE"));
+      await page.getByTestId("task-1").dragTo(page.getByTestId("col-DONE"), GRAB);
       await page.getByRole("alert").filter({ hasText: "Không thể chuyển" }).waitFor();
       await inCol(page, "TODO", 1).waitFor();
     });
