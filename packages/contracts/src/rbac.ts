@@ -20,6 +20,8 @@ export const PERMISSIONS = [
   "run:read",
   "approval:read",
   "audit:read",
+  "member:read",
+  "member:write",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -50,7 +52,7 @@ const MAINTAINER: Permission[] = [
 ];
 
 export const ROLE_PERMISSIONS: Readonly<Record<RoleKey, ReadonlySet<Permission>>> = {
-  org_admin: new Set<Permission>([...MAINTAINER, "audit:read"]),
+  org_admin: new Set<Permission>([...MAINTAINER, "audit:read", "member:read", "member:write"]),
   maintainer: new Set<Permission>(MAINTAINER),
   viewer: new Set<Permission>(READ_ONLY),
 };
