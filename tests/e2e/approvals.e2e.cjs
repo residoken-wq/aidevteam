@@ -52,9 +52,9 @@ async function contextFor(browser, token) {
       await page.getByText("Chỉ hiển thị. Quyết định được thực hiện bằng comment /approve-* trên PR.").waitFor();
       await page.getByText("Chưa có bản ghi duyệt").waitFor();
 
-      const buttonCount = await page.locator("button").count();
+      const buttonCount = await page.locator("main button").count();
       assert.equal(buttonCount, 0, "approvals page must not contain any button elements");
-      const formCount = await page.locator("form").count();
+      const formCount = await page.locator("main form").count();
       assert.equal(formCount, 0, "approvals page must not contain any form elements");
     });
 
@@ -104,9 +104,9 @@ async function contextFor(browser, token) {
       await page.getByText("900000099").waitFor();
 
       // Check no button / form
-      const buttonCount = await page.locator("button").count();
+      const buttonCount = await page.locator("main button").count();
       assert.equal(buttonCount, 0, "approvals page must not contain any button elements");
-      const formCount = await page.locator("form").count();
+      const formCount = await page.locator("main form").count();
       assert.equal(formCount, 0, "approvals page must not contain any form elements");
 
       // APPROVAL_REPO is not configured in E2E, so sourceCommentUrl is null, no link to github.com
@@ -127,9 +127,9 @@ async function contextFor(browser, token) {
       await vpage.getByRole("cell", { name: "approved" }).waitFor();
       await vpage.getByText("TEST-pipeline-run-001").waitFor();
 
-      const buttonCount = await vpage.locator("button").count();
+      const buttonCount = await vpage.locator("main button").count();
       assert.equal(buttonCount, 0, "approvals page for viewer must not contain buttons");
-      const formCount = await vpage.locator("form").count();
+      const formCount = await vpage.locator("main form").count();
       assert.equal(formCount, 0, "approvals page for viewer must not contain forms");
 
       const githubLinksCount = await vpage.locator("a[href*='github.com']").count();

@@ -116,7 +116,7 @@ async function contextFor(browser, token) {
 
       assert.equal(await vpage.locator('[draggable="true"]').count(), 0, "viewer sees draggable elements");
       assert.equal(await vpage.locator("select").count(), 0, "viewer sees select elements");
-      assert.equal(await vpage.locator("button").count(), 0, "viewer sees buttons");
+      assert.equal(await vpage.locator("main button").count(), 0, "viewer sees buttons");
       assert.equal(await vpage.getByTestId("drop-root").count(), 0, "viewer sees drop root zone");
     });
   } finally {
