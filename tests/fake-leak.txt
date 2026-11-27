@@ -1,0 +1,2 @@
+# DELIBERATE FAKE secret for P1-09 AC-2 (never a real token). Do not merge.
+GITHUB_TOKEN=ghp_DKRYfmt07ELSZgnu18FMTahov29GNUbipw3A
