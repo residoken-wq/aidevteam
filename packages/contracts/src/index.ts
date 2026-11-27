@@ -11,3 +11,4 @@ export * from "./agent";
 export * from "./task";
 export * from "./run";
 export * from "./dashboard";
+export * from "./approval";
