@@ -81,7 +81,9 @@ async function contextFor(browser, token) {
     });
 
     await step("drag a card BACKLOG → Cần làm", async () => {
+      const committed = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes("/tasks/1/transitions"));
       await page.getByTestId("task-1").dragTo(page.getByTestId("col-TODO"), GRAB);
+      await committed;
       await inCol(page, "TODO", 1).waitFor();
       await page.reload();
       await inCol(page, "TODO", 1).waitFor();
