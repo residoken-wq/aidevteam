@@ -28,9 +28,9 @@ P2-08,[P2-08] CRUD worker (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED
 P2-10,[P2-10] CRUD project (ánh xạ chưa xác minh),release-0.1;phase:2,MERGED,residoken-wq/aidevteam#12
 P3-02,[P3-02] Task CRUD + trạng thái,release-0.1;phase:3,MERGED,residoken-wq/aidevteam#17
 P3-04,[P3-04] Kanban cơ bản,release-0.1;phase:3,MERGED,residoken-wq/aidevteam#17
-P4-01,[P4-01] Dispatch tới mock worker,release-0.1;phase:4,TODO,Cần duyệt ADR-003
-P4-03,[P4-03] Agent run lifecycle (rút gọn),release-0.1;phase:4,TODO,
-P4-07,[P4-07] Xem log/run (rút gọn),release-0.1;phase:4,TODO,
+P4-01,[P4-01] Dispatch tới mock worker,release-0.1;phase:4,IN_PROGRESS,Backend (P4a) xong trên ai/P4-01-mock-dispatch; UI + E2E (P4b) còn lại
+P4-03,[P4-03] Agent run lifecycle (rút gọn),release-0.1;phase:4,IN_PROGRESS,Backend (P4a) xong trên ai/P4-01-mock-dispatch; UI + E2E (P4b) còn lại
+P4-07,[P4-07] Xem log/run (rút gọn),release-0.1;phase:4,IN_PROGRESS,Backend (P4a) xong trên ai/P4-01-mock-dispatch; UI + E2E (P4b) còn lại
 P4-12,[P4-12] Legacy adapter router v0.1,post-0.1;phase:4,OPTIONAL,Chỉ sau khi O-06 giải quyết
 P6-05,[P6-05] Approval service xác minh comment,post-0.1;phase:6,TODO,
 P6-06,[P6-06] Approval Center chỉ đọc (rút gọn),release-0.1;phase:6,TODO,O-07

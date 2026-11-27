@@ -40,6 +40,7 @@ Nếu một nguồn được nhắc đến mà không có trong repo, ghi `SOURC
 2. Không tự duyệt, không giả lập approval, không ghi `PASS`/`VERIFIED` khi chưa có bằng chứng test thật. Giá trị chưa biết ghi `CHƯA CẤU HÌNH` hoặc `UNVERIFIED`.
 3. Không commit secrets, token, connection string hay dữ liệu khách hàng thật. Chỉ dùng `.env.example` và seed dữ liệu giả.
 4. Không dùng token cá nhân của tài khoản Owner (`residoken-wq`) trong automation, script hay CI.
+   - *Ngoại lệ tạm thời đến 15/01/2027 (D-2026-11-27-03):* Claude được dùng `gh`/credential git của Owner trên máy điều phối **chỉ** để push branch `ai/*`, mở PR, đọc CI và merge khi người dùng đồng ý từng PR. Agent `agy`, CI và script chạy nền vẫn **không** dùng token này.
 5. Không push lên `main`. Mọi thay đổi đi qua feature branch/worktree và PR. **Mọi code từ Phase 1 trở đi phải được người review trước khi merge vào `main`** (Owner xác nhận 25/11/2026).
 6. Không coi review của Claude hay bot là approval của con người. `claude-review` chỉ là quality check.
 7. Không dùng Teams/chat làm nguồn approval. Notification chỉ để thông báo.
