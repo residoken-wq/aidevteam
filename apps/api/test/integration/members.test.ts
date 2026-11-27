@@ -148,6 +148,12 @@ describe("AC-2 Cross-org isolation", () => {
       "SELECT count(*) FROM role_bindings rb JOIN orgs o ON o.id = rb.org_id WHERE o.slug = 'org-test-b'",
     );
 
+    // Attempting to revoke Org B's member from Org A must not touch Org B bindings
+    const attemptRevokeB = await write("delete", "/org/members/roles", "admin1")
+      .send({ githubUserId: 900000011, role: "viewer" })
+      .expect(200);
+    expect(attemptRevokeB.body).toEqual({ changed: false });
+
     await write("post", "/org/members/roles", "admin1").send({ githubUserId: 900000005, role: "viewer" }).expect(200);
     await write("delete", "/org/members/roles", "admin1").send({ githubUserId: 900000005, role: "viewer" }).expect(200);
 
