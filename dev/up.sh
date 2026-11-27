@@ -34,6 +34,9 @@ TEST_DATABASE_URL="postgres://postgres@127.0.0.1:${DEV_PG_PORT}/aidevteam_test"
 echo "==> Starting dev PostgreSQL container on loopback port ${DEV_PG_PORT}..."
 docker compose -f dev/compose.yaml up -d --wait postgres
 
+echo "==> Building workspace packages (migrate/seed run from dist)..."
+pnpm build:packages
+
 echo "==> Running migrations on aidevteam_dev..."
 DATABASE_URL="$DEV_DATABASE_URL" pnpm --filter @aidevteam/db migrate up
 
@@ -61,7 +64,7 @@ if [ "$WITH_APP" = true ]; then
   echo "   Web: http://127.0.0.1:${DEV_WEB_PORT:-3000}"
 else
   echo " To run API and Web locally:"
-  echo "   API:  pnpm --filter @aidevteam/api dev   # or PORT=3001 node apps/api/dist/main.js"
-  echo "   Web:  pnpm --filter @aidevteam/web dev   # or cd apps/web/.next/standalone && node apps/web/server.js"
+  echo "   API:  pnpm build && PORT=3001 DATABASE_URL=$DEV_DATABASE_URL node apps/api/dist/main.js"
+  echo "   Web:  API_INTERNAL_URL=http://127.0.0.1:3001 pnpm --filter @aidevteam/web dev"
 fi
 echo "================================================================================"
