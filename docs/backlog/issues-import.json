@@ -179,8 +179,8 @@
         "post-0.1",
         "phase:1"
       ],
-      "status": "TODO",
-      "notes": "ID cũ P1-02 trong backlog = \"CI lint/typecheck/test\" (đã merge, nay thuộc P1-09). Master Plan P1-02 = Docker Compose dev: chưa làm (dev hiện dùng PostgreSQL trong WSL; deploy/compose.yaml là bản deploy).",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#34; dev/compose.yaml (PostgreSQL 55433, profile app), dev/up.sh, docs/operations/DEV_ENVIRONMENT.md",
       "source": "Master Plan v1.0.0",
       "master_plan": {
         "depends_on": "P1-01",
@@ -379,8 +379,8 @@
         "post-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#33; app shell: header + sidebar lọc theo quyền; AC \"OIDC\" thay bằng GitHub OAuth (O-12)",
       "source": "Master Plan v1.0.0",
       "master_plan": {
         "depends_on": "P1-05",
