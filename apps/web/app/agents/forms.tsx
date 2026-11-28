@@ -32,6 +32,14 @@ export function CreateAgentForm({ accounts, managers }: { accounts: string[]; ma
       const v = String(d.get(k) ?? "").trim();
       return v ? { [k]: v } : {};
     };
+    const capsRaw = String(d.get("capabilities") ?? "");
+    const capabilities = capsRaw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const maxActiveTasksRaw = d.get("maxActiveTasks");
+    const maxActiveTasks = maxActiveTasksRaw ? Number(maxActiveTasksRaw) : undefined;
+
     const r = await sendJson("POST", "/api/agents", {
       slug: String(d.get("slug") ?? ""),
       name: String(d.get("name") ?? ""),
@@ -40,6 +48,8 @@ export function CreateAgentForm({ accounts, managers }: { accounts: string[]; ma
       ...opt("providerAccountSlug"),
       ...opt("reportsToSlug"),
       ...opt("description"),
+      ...(capabilities.length > 0 ? { capabilities } : {}),
+      ...(maxActiveTasks !== undefined && !Number.isNaN(maxActiveTasks) ? { maxActiveTasks } : {}),
     });
     if (!r.ok) return setError(r.error);
     setError(null);
@@ -63,6 +73,12 @@ export function CreateAgentForm({ accounts, managers }: { accounts: string[]; ma
       </label>{" "}
       <Select name="providerAccountSlug" label="Tài khoản provider" options={accounts} empty="(chưa gắn)" />{" "}
       <Select name="reportsToSlug" label="Báo cáo cho" options={managers} empty="(không có)" />{" "}
+      <label>
+        Năng lực (cách nhau bởi dấu phẩy) <input name="capabilities" placeholder="backend, nodejs" />
+      </label>{" "}
+      <label>
+        Số việc tối đa <input name="maxActiveTasks" type="number" min={1} max={50} defaultValue={3} />
+      </label>{" "}
       <label>
         Mô tả <input name="description" maxLength={2000} />
       </label>{" "}
