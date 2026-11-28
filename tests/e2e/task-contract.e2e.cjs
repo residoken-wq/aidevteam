@@ -56,8 +56,22 @@ async function contextFor(browser, token) {
       notes: "E2E test note",
     };
 
+    // Own fixture: e2e files run in alphabetical order, so this test cannot rely on data from tasks.e2e.cjs.
+    await step("maintainer creates the fixture project and task via API", async () => {
+      const p = await maint.request.post(`${BASE}/api/projects`, {
+        data: { slug: "contract-e2e", name: "Contract E2E" },
+        headers: { Origin: BASE }, // API requires Origin === PUBLIC_BASE_URL (CSRF guard)
+      });
+      assert.ok(p.ok() || p.status() === 409, `create project: ${p.status()} ${await p.text()}`);
+      const t = await maint.request.post(`${BASE}/api/projects/contract-e2e/tasks`, {
+        data: { title: "Contract E2E task" },
+        headers: { Origin: BASE },
+      });
+      assert.ok(t.ok(), `create task: ${t.status()} ${await t.text()}`);
+    });
+
     await step("maintainer opens task contract page", async () => {
-      await maintPage.goto(`${BASE}/projects/kanban-e2e/tasks/1/contract`);
+      await maintPage.goto(`${BASE}/projects/contract-e2e/tasks/1/contract`);
       await maintPage.getByRole("heading", { name: /Hợp đồng task #1/ }).waitFor();
     });
 
@@ -81,7 +95,7 @@ async function contextFor(browser, token) {
     const viewerPage = await viewer.newPage();
 
     await step("viewer opens task contract page and sees contract details", async () => {
-      await viewerPage.goto(`${BASE}/projects/kanban-e2e/tasks/1/contract`);
+      await viewerPage.goto(`${BASE}/projects/contract-e2e/tasks/1/contract`);
       await viewerPage.getByRole("heading", { name: /Hợp đồng task #1/ }).waitFor();
       await viewerPage.getByTestId("ac-AC-1").waitFor();
       const promptPreview = viewerPage.getByTestId("prompt-preview");
