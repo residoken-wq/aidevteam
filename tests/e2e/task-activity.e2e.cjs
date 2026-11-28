@@ -61,9 +61,9 @@ async function contextFor(browser, token) {
       await form.getByLabel("Tiêu đề").fill("Activity E2E Task");
       await form.getByRole("button", { name: "Tạo task" }).click();
 
-      const taskLink = maintPage.getByRole("link", { name: /#1/ });
-      await taskLink.waitFor();
-      taskUrl = await taskLink.getAttribute("href");
+      // The board has no link to the detail page: wait for the card, then open the detail URL directly.
+      await maintPage.getByTestId("task-1").waitFor();
+      taskUrl = "/projects/act-e2e-proj/tasks/1";
     });
 
     await step("timeline displays task creation event", async () => {

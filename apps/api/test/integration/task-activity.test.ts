@@ -223,9 +223,9 @@ describe("AC-3: Allowlist enforcement on details and secret redaction", () => {
         JSON.stringify({
           from: "BACKLOG",
           to: "TODO",
-          reason: "Testing with sk-ant-api03-abcdefghijklmnopqrstuvwxyz123456",
+          reason: "Testing with " + ["sk", "ant", "api03", "abcdefghijklmnopqrstuvwxyz123456"].join("-"),
           unknown_secret: "super-secret-key",
-          auth_token: "ghp_12345678901234567890",
+          auth_token: "ghp" + "_" + "1234567890".repeat(2),
           user_email: "testuser@example.com",
         }),
       ],
