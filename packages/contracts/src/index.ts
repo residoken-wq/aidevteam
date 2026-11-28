@@ -9,6 +9,8 @@ export * from "./worker";
 export * from "./org";
 export * from "./agent";
 export * from "./task";
+export * from "./task-contract";
+export * from "./task-prompt";
 export * from "./run";
 export * from "./dashboard";
 export * from "./approval";
