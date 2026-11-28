@@ -13,13 +13,25 @@ export default async function TasksPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ epic?: string; sprint?: string }>;
+  searchParams?: Promise<{
+    epic?: string;
+    sprint?: string;
+    priority?: string;
+    agent?: string;
+    q?: string;
+    task?: string;
+  }>;
 }) {
   const { slug } = await params;
   if (!SLUG_RE.test(slug)) notFound();
   const sp = (await searchParams) ?? {};
   const epicFilter = sp.epic?.trim() || undefined;
   const sprintFilter = sp.sprint?.trim() || undefined;
+  const priorityFilter = sp.priority?.trim() || undefined;
+  const agentFilter = sp.agent?.trim() || undefined;
+  const qFilter = sp.q?.trim() || undefined;
+  const taskDrawerParam = sp.task ? parseInt(sp.task.trim(), 10) : undefined;
+  const initialTaskNumber = Number.isInteger(taskDrawerParam) && taskDrawerParam! > 0 ? taskDrawerParam : undefined;
 
   const me = await apiGet<Me>("/auth/me");
   const project = await apiGet<Project>(`/projects/${slug}`);
@@ -39,7 +51,10 @@ export default async function TasksPage({
 
   const canWrite = can(me, "task:write") && project !== null && project.archivedAt === null;
   const canDispatch = can(me, "dispatch:execute") && project !== null && project.archivedAt === null;
-  const agents = canWrite ? ((await apiGet<{ items: Agent[] }>("/agents?limit=100"))?.items ?? []).filter((a) => a.enabled).map((a) => a.slug) : [];
+  const canReadAgents = can(me, "agent:read");
+  const agents = canReadAgents
+    ? ((await apiGet<{ items: Agent[] }>("/agents?limit=100"))?.items ?? []).filter((a) => a.enabled).map((a) => a.slug)
+    : [];
   const workers = canDispatch
     ? ((await apiGet<{ items: Worker[] }>("/workers?limit=100"))?.items ?? [])
         .filter((w) => w.enabled && !w.archivedAt && w.type === "mock")
@@ -90,6 +105,10 @@ export default async function TasksPage({
             sprints={sprints}
             currentEpic={epicFilter}
             currentSprint={sprintFilter}
+            currentPriority={priorityFilter}
+            currentAgent={agentFilter}
+            currentQ={qFilter}
+            initialTaskNumber={initialTaskNumber}
           />
         </>
       )}
