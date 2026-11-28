@@ -15,7 +15,6 @@ import {
 import {
   ListQuerySchema,
   MilestoneCreateSchema,
-  MilestoneSchema,
   MilestoneUpdateSchema,
   SlugSchema,
   type Milestone,

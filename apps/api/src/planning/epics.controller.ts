@@ -15,7 +15,6 @@ import {
 } from "@nestjs/common";
 import {
   EpicCreateSchema,
-  EpicSchema,
   EpicUpdateSchema,
   ListQuerySchema,
   SlugSchema,

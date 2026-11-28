@@ -17,7 +17,6 @@ import {
   ListQuerySchema,
   SlugSchema,
   SprintCreateSchema,
-  SprintSchema,
   SprintTransitionSchema,
   SprintUpdateSchema,
   type Sprint,
