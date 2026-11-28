@@ -128,6 +128,8 @@ async function contextFor(browser, token) {
         (r) => r.request().method() === "POST" && r.url().includes("/tasks/2/dispatch"),
       );
       await dispatchForm.getByRole("button", { name: "Chạy mock" }).click();
+      // P3-09: dispatch now asks for confirmation in a dialog
+      await page.locator("dialog[open]").getByRole("button", { name: "Xác nhận", exact: true }).click();
       const res = await dispatchPost;
       assert.equal(res.status(), 409, "Dispatch should be refused with 409");
 

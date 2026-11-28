@@ -215,7 +215,8 @@ async function contextFor(browser, token) {
       // Click "Không" -> status remains QUEUED
       await dialog.getByRole("button", { name: "Không" }).click();
       assert.equal(await page.locator("dialog[open]").count(), 0);
-      assert.match(await page.getByTestId("run-status").textContent(), /QUEUED/);
+      // The mock worker may already have picked the run up; either way it must not be cancelled.
+      assert.match(await page.getByTestId("run-status").textContent(), /QUEUED|RUNNING/);
 
       // 2. Click Hủy again and confirm
       await cancelBtn.click();
@@ -228,9 +229,8 @@ async function contextFor(browser, token) {
       await postCancel;
 
       // Run status transitions to CANCELLED
-      const statusEl = page.getByTestId("run-status");
-      await statusEl.waitFor();
-      assert.match(await statusEl.textContent(), /CANCELLED/);
+      // The page refreshes after the POST: wait for the new status instead of reading it immediately.
+      await page.getByTestId("run-status").filter({ hasText: "CANCELLED" }).waitFor();
     });
 
     await step("AC-4: 409 Conflict displays clear Vietnamese error message on blocked task dispatch", async () => {
