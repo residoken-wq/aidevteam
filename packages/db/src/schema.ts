@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { bigint, boolean, check, customType, foreignKey, index, integer, jsonb, pgTable, primaryKey, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, check, customType, date, foreignKey, index, integer, jsonb, pgTable, primaryKey, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 
 /**
  * Typed Drizzle view of the schema created by migrations/*.up.sql.
@@ -241,6 +241,86 @@ export const agents = pgTable(
   ],
 );
 
+export const milestones = pgTable(
+  "milestones",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    projectId: uuid("project_id").notNull(),
+    slug: text("slug").notNull(),
+    title: text("title").notNull(),
+    dueDate: date("due_date"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+    archivedAt: ts("archived_at"),
+  },
+  (t) => [
+    unique("milestones_project_slug_unique").on(t.projectId, t.slug),
+    unique("milestones_id_org_unique").on(t.id, t.orgId),
+    unique("milestones_id_project_unique").on(t.id, t.projectId),
+    foreignKey({ name: "milestones_project_same_org_fk", columns: [t.projectId, t.orgId], foreignColumns: [projects.id, projects.orgId] }),
+    index("milestones_org_project_idx").on(t.orgId, t.projectId),
+  ],
+);
+
+export const epics = pgTable(
+  "epics",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    projectId: uuid("project_id").notNull(),
+    slug: text("slug").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    milestoneId: uuid("milestone_id"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+    archivedAt: ts("archived_at"),
+  },
+  (t) => [
+    unique("epics_project_slug_unique").on(t.projectId, t.slug),
+    unique("epics_id_org_unique").on(t.id, t.orgId),
+    unique("epics_id_project_unique").on(t.id, t.projectId),
+    foreignKey({ name: "epics_project_same_org_fk", columns: [t.projectId, t.orgId], foreignColumns: [projects.id, projects.orgId] }),
+    foreignKey({ name: "epics_milestone_same_project_fk", columns: [t.milestoneId, t.projectId], foreignColumns: [milestones.id, milestones.projectId] }),
+    index("epics_org_project_idx").on(t.orgId, t.projectId),
+  ],
+);
+
+export const sprints = pgTable(
+  "sprints",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    projectId: uuid("project_id").notNull(),
+    number: integer("number").notNull(),
+    name: text("name").notNull(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    status: text("status", { enum: ["PLANNED", "ACTIVE", "CLOSED"] })
+      .notNull()
+      .default("PLANNED"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+  },
+  (t) => [
+    unique("sprints_project_number_unique").on(t.projectId, t.number),
+    unique("sprints_id_org_unique").on(t.id, t.orgId),
+    unique("sprints_id_project_unique").on(t.id, t.projectId),
+    foreignKey({ name: "sprints_project_same_org_fk", columns: [t.projectId, t.orgId], foreignColumns: [projects.id, projects.orgId] }),
+    index("sprints_org_project_status_idx").on(t.orgId, t.projectId, t.status),
+  ],
+);
+
 export const tasks = pgTable(
   "tasks",
   {
@@ -264,6 +344,8 @@ export const tasks = pgTable(
     createdByUserId: uuid("created_by_user_id").references(() => users.id),
     createdAt: ts("created_at").notNull().defaultNow(),
     updatedAt: ts("updated_at").notNull().defaultNow(),
+    epicId: uuid("epic_id"),
+    sprintId: uuid("sprint_id"),
   },
   (t) => [
     unique("tasks_project_number_unique").on(t.projectId, t.number),
@@ -271,6 +353,8 @@ export const tasks = pgTable(
     unique("tasks_id_project_org_unique").on(t.id, t.projectId, t.orgId),
     foreignKey({ name: "tasks_project_same_org_fk", columns: [t.projectId, t.orgId], foreignColumns: [projects.id, projects.orgId] }),
     foreignKey({ name: "tasks_agent_same_org_fk", columns: [t.agentId, t.orgId], foreignColumns: [agents.id, agents.orgId] }),
+    foreignKey({ name: "tasks_epic_same_project_fk", columns: [t.epicId, t.projectId], foreignColumns: [epics.id, epics.projectId] }),
+    foreignKey({ name: "tasks_sprint_same_project_fk", columns: [t.sprintId, t.projectId], foreignColumns: [sprints.id, sprints.projectId] }),
     index("tasks_org_project_status_idx").on(t.orgId, t.projectId, t.status),
   ],
 );
@@ -365,6 +449,8 @@ export const allTables = {
   agent_runs: agentRuns,
   agents,
   audit_events: auditEvents,
+  epics,
+  milestones,
   oauth_login_states: oauthLoginStates,
   orgs,
   platform_admins: platformAdmins,
@@ -376,6 +462,7 @@ export const allTables = {
   role_bindings: roleBindings,
   roles,
   sessions,
+  sprints,
   task_dependencies: taskDependencies,
   tasks,
   user_allowlist: userAllowlist,

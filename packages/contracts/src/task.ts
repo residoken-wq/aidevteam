@@ -38,6 +38,8 @@ export const TaskCreateSchema = z
     description: TaskDescriptionSchema.optional(),
     priority: z.enum(TASK_PRIORITIES).optional(),
     agentSlug: SlugSchema.optional(),
+    epicSlug: SlugSchema.optional(),
+    sprintNumber: z.number().int().positive().optional(),
   })
   .strict();
 
@@ -48,6 +50,8 @@ export const TaskUpdateSchema = z
     description: TaskDescriptionSchema.nullable().optional(),
     priority: z.enum(TASK_PRIORITIES).optional(),
     agentSlug: SlugSchema.nullable().optional(),
+    epicSlug: SlugSchema.nullable().optional(),
+    sprintNumber: z.number().int().positive().nullable().optional(),
   })
   .strict()
   .refine((v) => Object.values(v).some((x) => x !== undefined), "nothing to update");
@@ -87,6 +91,8 @@ export const TaskSchema = z
     priority: z.enum(TASK_PRIORITIES),
     agentSlug: z.string().nullable(),
     cancelReason: z.string().nullable(),
+    epicSlug: z.string().nullable(),
+    sprintNumber: z.number().int().positive().nullable(),
     createdAt: z.string(),
     updatedAt: z.string(),
   })
@@ -97,6 +103,8 @@ export const TaskListQuerySchema = z
     limit: z.coerce.number().int().min(1).max(500).default(200),
     offset: z.coerce.number().int().min(0).max(100_000).default(0),
     status: z.enum(TASK_STATUSES).optional(),
+    epic: SlugSchema.optional(),
+    sprint: z.coerce.number().int().positive().optional(),
   })
   .strict();
 

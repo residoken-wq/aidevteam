@@ -1,4 +1,4 @@
--- 0013_task_dependencies (up) — P3-03: Task dependencies (DAG) within the same project.
+-- 0014_task_dependencies (up) — P3-03: Task dependencies (DAG) within the same project.
 ALTER TABLE tasks ADD CONSTRAINT tasks_id_project_org_unique UNIQUE (id, project_id, org_id);
 
 CREATE TABLE task_dependencies (

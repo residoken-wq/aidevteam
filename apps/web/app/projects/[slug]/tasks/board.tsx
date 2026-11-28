@@ -1,6 +1,15 @@
 "use client";
 
-import { isAllowedTransition, TASK_STATUSES, TASK_TRANSITIONS, type Task, type TaskDependencies, type TaskStatus } from "@aidevteam/contracts";
+import {
+  isAllowedTransition,
+  TASK_STATUSES,
+  TASK_TRANSITIONS,
+  type Epic,
+  type Sprint,
+  type Task,
+  type TaskDependencies,
+  type TaskStatus,
+} from "@aidevteam/contracts";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type DragEvent, type FormEvent } from "react";
@@ -28,6 +37,10 @@ export function Board({
   canDispatch = false,
   agents,
   workers = [],
+  epics = [],
+  sprints = [],
+  currentEpic,
+  currentSprint,
 }: {
   projectSlug: string;
   initial: Task[];
@@ -36,6 +49,10 @@ export function Board({
   canDispatch?: boolean;
   agents: string[];
   workers?: Array<{ slug: string; name: string }>;
+  epics?: Epic[];
+  sprints?: Sprint[];
+  currentEpic?: string;
+  currentSprint?: string;
 }) {
   const router = useRouter();
   const [tasks, setTasks] = useState(initial);
@@ -105,7 +122,39 @@ export function Board({
 
   return (
     <>
-      {canWrite ? <CreateTaskForm projectSlug={projectSlug} agents={agents} /> : null}
+      <form
+        method="get"
+        aria-label="Bộ lọc task"
+        style={{ marginBottom: "1rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}
+      >
+        <label>
+          Epic:{" "}
+          <select name="epic" defaultValue={currentEpic ?? ""}>
+            <option value="">Tất cả epic</option>
+            {epics.map((e) => (
+              <option key={e.slug} value={e.slug}>
+                {e.title}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Sprint:{" "}
+          <select name="sprint" defaultValue={currentSprint ?? ""}>
+            <option value="">Tất cả sprint</option>
+            {sprints.map((s) => (
+              <option key={s.number} value={String(s.number)}>
+                Sprint #{s.number} — {s.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="submit">Lọc</button>
+        {currentEpic || currentSprint ? (
+          <Link href={`/projects/${encodeURIComponent(projectSlug)}/tasks`}>Xóa lọc</Link>
+        ) : null}
+      </form>
+      {canWrite ? <CreateTaskForm projectSlug={projectSlug} agents={agents} epics={epics} sprints={sprints} /> : null}
       {error ? <p role="alert">{error}</p> : null}
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${TASK_STATUSES.length}, minmax(10rem, 1fr))`, gap: "0.5rem", overflowX: "auto" }}>
         {TASK_STATUSES.map((status) => {
@@ -155,6 +204,40 @@ export function Board({
                     >
                       Bị chặn
                     </span>
+                  ) : null}
+                  {t.epicSlug || (t.sprintNumber !== null && t.sprintNumber !== undefined) ? (
+                    <div style={{ marginTop: "0.25rem", display: "flex", gap: "0.25rem", flexWrap: "wrap" }}>
+                      {t.epicSlug ? (
+                        <span
+                          data-testid={`badge-epic-${t.number}`}
+                          style={{
+                            fontSize: "0.75rem",
+                            padding: "0.1rem 0.35rem",
+                            borderRadius: "3px",
+                            background: "#e0f2fe",
+                            color: "#0369a1",
+                            border: "1px solid #bae6fd",
+                          }}
+                        >
+                          Epic: {epics.find((e) => e.slug === t.epicSlug)?.title ?? t.epicSlug}
+                        </span>
+                      ) : null}
+                      {t.sprintNumber !== null && t.sprintNumber !== undefined ? (
+                        <span
+                          data-testid={`badge-sprint-${t.number}`}
+                          style={{
+                            fontSize: "0.75rem",
+                            padding: "0.1rem 0.35rem",
+                            borderRadius: "3px",
+                            background: "#fef3c7",
+                            color: "#b45309",
+                            border: "1px solid #fde68a",
+                          }}
+                        >
+                          Sprint #{t.sprintNumber}
+                        </span>
+                      ) : null}
+                    </div>
                   ) : null}
                   <div>
                     <small>
@@ -279,7 +362,17 @@ function MoveControl({ task, onMove }: { task: Task; onMove: (t: Task, to: TaskS
   );
 }
 
-function CreateTaskForm({ projectSlug, agents }: { projectSlug: string; agents: string[] }) {
+function CreateTaskForm({
+  projectSlug,
+  agents,
+  epics = [],
+  sprints = [],
+}: {
+  projectSlug: string;
+  agents: string[];
+  epics?: Epic[];
+  sprints?: Sprint[];
+}) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
@@ -289,11 +382,16 @@ function CreateTaskForm({ projectSlug, agents }: { projectSlug: string; agents: 
     const d = new FormData(form);
     const description = String(d.get("description") ?? "");
     const agentSlug = String(d.get("agentSlug") ?? "");
+    const epicSlug = String(d.get("epicSlug") ?? "");
+    const sprintNumberStr = String(d.get("sprintNumber") ?? "");
+    const sprintNumber = sprintNumberStr ? Number(sprintNumberStr) : undefined;
     const r = await sendJson("POST", `/api/projects/${encodeURIComponent(projectSlug)}/tasks`, {
       title: String(d.get("title") ?? ""),
       priority: String(d.get("priority") ?? "medium"),
       ...(description ? { description } : {}),
       ...(agentSlug ? { agentSlug } : {}),
+      ...(epicSlug ? { epicSlug } : {}),
+      ...(sprintNumber !== undefined ? { sprintNumber } : {}),
     });
     if (!r.ok) return setError(r.error);
     setError(null);
@@ -325,6 +423,32 @@ function CreateTaskForm({ projectSlug, agents }: { projectSlug: string; agents: 
               {a}
             </option>
           ))}
+        </select>
+      </label>{" "}
+      <label>
+        Epic{" "}
+        <select name="epicSlug" defaultValue="">
+          <option value="">(không có)</option>
+          {epics
+            .filter((e) => !e.archivedAt)
+            .map((e) => (
+              <option key={e.slug} value={e.slug}>
+                {e.title}
+              </option>
+            ))}
+        </select>
+      </label>{" "}
+      <label>
+        Sprint{" "}
+        <select name="sprintNumber" defaultValue="">
+          <option value="">(không có)</option>
+          {sprints
+            .filter((s) => s.status !== "CLOSED")
+            .map((s) => (
+              <option key={s.number} value={s.number}>
+                Sprint #{s.number} — {s.name}
+              </option>
+            ))}
         </select>
       </label>
       <br />
