@@ -1,7 +1,18 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { isAllowedTransition, TASK_STATUSES, TASK_TRANSITIONS, TaskCreateSchema, TaskListQuerySchema, TaskTransitionSchema, TaskUpdateSchema, type TaskStatus } from "./task";
+import {
+  isAllowedTransition,
+  TASK_STATUSES,
+  TASK_TRANSITIONS,
+  TaskActivityQuerySchema,
+  TaskCommentCreateSchema,
+  TaskCreateSchema,
+  TaskListQuerySchema,
+  TaskTransitionSchema,
+  TaskUpdateSchema,
+  type TaskStatus,
+} from "./task";
 
 describe("STATE_MACHINES.md §1 mirrors TASK_TRANSITIONS", () => {
   const md = readFileSync(path.join(__dirname, "../../../docs/architecture/STATE_MACHINES.md"), "utf8");
@@ -86,5 +97,21 @@ describe("task contracts", () => {
     expect(TaskTransitionSchema.safeParse({ expectedFrom: "TODO", to: "IN_PROGRESS", reason: "x" }).success).toBe(false);
     expect(TaskTransitionSchema.safeParse({ expectedFrom: "TODO", to: "IN_PROGRESS", confirmReviewed: true }).success).toBe(false);
     expect(TaskTransitionSchema.safeParse({ expectedFrom: "TODO", to: "WONTFIX" }).success).toBe(false);
+  });
+
+  it("TaskCommentCreateSchema validates body length and rejects empty/whitespace-only/unknown fields", () => {
+    expect(TaskCommentCreateSchema.safeParse({ body: "" }).success).toBe(false);
+    expect(TaskCommentCreateSchema.safeParse({ body: "   " }).success).toBe(false);
+    expect(TaskCommentCreateSchema.safeParse({ body: "Valid comment" }).success).toBe(true);
+    expect(TaskCommentCreateSchema.safeParse({ body: "a".repeat(5000) }).success).toBe(true);
+    expect(TaskCommentCreateSchema.safeParse({ body: "a".repeat(5001) }).success).toBe(false);
+    expect(TaskCommentCreateSchema.safeParse({ body: "Valid", extra: true }).success).toBe(false);
+  });
+
+  it("TaskActivityQuerySchema provides defaults and coerces strings", () => {
+    expect(TaskActivityQuerySchema.parse({})).toEqual({ limit: 50, offset: 0 });
+    expect(TaskActivityQuerySchema.parse({ limit: "25", offset: "10" })).toEqual({ limit: 25, offset: 10 });
+    expect(TaskActivityQuerySchema.safeParse({ limit: 0 }).success).toBe(false);
+    expect(TaskActivityQuerySchema.safeParse({ limit: 201 }).success).toBe(false);
   });
 });

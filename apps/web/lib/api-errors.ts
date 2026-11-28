@@ -43,6 +43,7 @@ const CONFLICTS: Record<string, string> = {
   run_not_cancellable: "Chỉ có thể hủy lượt chạy đang ở hàng đợi hoặc đang chạy.",
   cannot_change_own_roles: "Không thể tự thay đổi vai trò của chính mình.",
   last_org_admin: "Không thể gỡ vai trò quản trị viên (org_admin) cuối cùng của tổ chức.",
+  rate_limit_exceeded: "Quá nhiều bình luận trong thời gian ngắn (tối đa 30 bình luận/phút). Vui lòng thử lại sau.",
 };
 
 const SPECIFIC_422: Record<string, string> = {
