@@ -8,18 +8,29 @@ export const dynamic = "force-dynamic";
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,62}$/;
 
+function getSearchParam(val: string | string[] | undefined): string | undefined {
+  if (Array.isArray(val)) return val[0]?.trim() || undefined;
+  return typeof val === "string" ? val.trim() || undefined : undefined;
+}
+
 export default async function TasksPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ epic?: string; sprint?: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
   if (!SLUG_RE.test(slug)) notFound();
   const sp = (await searchParams) ?? {};
-  const epicFilter = sp.epic?.trim() || undefined;
-  const sprintFilter = sp.sprint?.trim() || undefined;
+  const epicFilter = getSearchParam(sp.epic);
+  const sprintFilter = getSearchParam(sp.sprint);
+  const priorityFilter = getSearchParam(sp.priority);
+  const agentFilter = getSearchParam(sp.agent);
+  const qFilter = getSearchParam(sp.q);
+  const rawTask = getSearchParam(sp.task);
+  const taskDrawerParam = rawTask ? parseInt(rawTask, 10) : undefined;
+  const initialTaskNumber = Number.isInteger(taskDrawerParam) && taskDrawerParam! > 0 ? taskDrawerParam : undefined;
 
   const me = await apiGet<Me>("/auth/me");
   const project = await apiGet<Project>(`/projects/${slug}`);
@@ -39,7 +50,10 @@ export default async function TasksPage({
 
   const canWrite = can(me, "task:write") && project !== null && project.archivedAt === null;
   const canDispatch = can(me, "dispatch:execute") && project !== null && project.archivedAt === null;
-  const agents = canWrite ? ((await apiGet<{ items: Agent[] }>("/agents?limit=100"))?.items ?? []).filter((a) => a.enabled).map((a) => a.slug) : [];
+  const canReadAgents = can(me, "agent:read");
+  const agents = canReadAgents
+    ? ((await apiGet<{ items: Agent[] }>("/agents?limit=100"))?.items ?? []).filter((a) => a.enabled).map((a) => a.slug)
+    : [];
   const workers = canDispatch
     ? ((await apiGet<{ items: Worker[] }>("/workers?limit=100"))?.items ?? [])
         .filter((w) => w.enabled && !w.archivedAt && w.type === "mock")
@@ -90,6 +104,10 @@ export default async function TasksPage({
             sprints={sprints}
             currentEpic={epicFilter}
             currentSprint={sprintFilter}
+            currentPriority={priorityFilter}
+            currentAgent={agentFilter}
+            currentQ={qFilter}
+            initialTaskNumber={initialTaskNumber}
           />
         </>
       )}

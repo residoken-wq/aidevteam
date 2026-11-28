@@ -93,7 +93,7 @@ async function contextFor(browser, token) {
       const done = page.waitForResponse(
         (r) => r.request().method() === "POST" && r.url().includes("/tasks/1/transitions"),
       );
-      await card.getByRole("button", { name: "Chuyển" }).click();
+      await card.getByRole("button", { name: "Chuyển", exact: true }).click();
       await done;
 
       // Check agent table shows "Đang làm 1 / 1"

@@ -41,7 +41,7 @@ async function contextFor(browser, token) {
     const card = page.getByTestId(`task-${n}`);
     await card.getByLabel("Chuyển sang").selectOption({ label });
     const done = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes(`/tasks/${n}/transitions`));
-    await card.getByRole("button", { name: "Chuyển" }).click();
+    await card.getByRole("button", { name: "Chuyển", exact: true }).click();
     await done;
   };
   const createTask = async (page, title, description) => {
@@ -104,8 +104,8 @@ async function contextFor(browser, token) {
       await moveVia(page, 1, "Hoàn thành");
       await inCol(page, "DONE", 1).waitFor();
       // The card can reach the DONE column before the re-render drops its controls: wait for the button to go away.
-      await page.getByTestId("task-1").getByRole("button", { name: "Chuyển" }).waitFor({ state: "detached", timeout: 10_000 });
-      assert.equal(await page.getByTestId("task-1").getByRole("button", { name: "Chuyển" }).count(), 0, "a DONE card still offers moves");
+      await page.getByTestId("task-1").getByRole("button", { name: "Chuyển", exact: true }).waitFor({ state: "detached", timeout: 10_000 });
+      assert.equal(await page.getByTestId("task-1").getByRole("button", { name: "Chuyển", exact: true }).count(), 0, "a DONE card still offers moves");
     });
 
     await step("cancel with a reason", async () => {
@@ -130,7 +130,7 @@ async function contextFor(browser, token) {
       await vpage.goto(BOARD);
       await inCol(vpage, "DONE", 1).waitFor();
       assert.equal(await vpage.getByRole("form", { name: "Tạo task" }).count(), 0);
-      assert.equal(await vpage.getByRole("button", { name: "Chuyển" }).count(), 0);
+      assert.equal(await vpage.getByRole("button", { name: "Chuyển", exact: true }).count(), 0);
       assert.equal(await vpage.locator('[draggable="true"]').count(), 0);
     });
   } finally {

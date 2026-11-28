@@ -35,7 +35,7 @@ async function contextFor(browser, token) {
     await card.getByLabel("Chuyển sang").selectOption({ label });
     // Optimistic board: wait for the server to commit before dispatching (else task_not_dispatchable can race).
     const done = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes(`/tasks/${n}/transitions`));
-    await card.getByRole("button", { name: "Chuyển" }).click();
+    await card.getByRole("button", { name: "Chuyển", exact: true }).click();
     await done;
   };
   const createTask = async (page, title, description) => {
@@ -85,7 +85,7 @@ async function contextFor(browser, token) {
 
     await step("maintainer clicks Chạy mock from Kanban card → navigates to run page showing QUEUED (AC-9a, AC-9b)", async () => {
       const card = inCol(mpage, "TODO", 1);
-      const dispatchButton = card.getByRole("button", { name: "Chạy mock" });
+      const dispatchButton = card.getByRole("button", { name: "Chạy mock", exact: true });
       await dispatchButton.waitFor();
       await dispatchButton.click();
 
@@ -128,7 +128,7 @@ async function contextFor(browser, token) {
     await step("viewer opens Kanban board: sees cards but no Chạy mock form/button (AC-9c)", async () => {
       await vpage.goto(`${BASE}/projects/runs-e2e-proj/tasks`);
       await inCol(vpage, "TODO", 1).waitFor();
-      assert.equal(await vpage.getByRole("button", { name: "Chạy mock" }).count(), 0, "Viewer must not see Chạy mock button");
+      assert.equal(await vpage.getByRole("button", { name: "Chạy mock", exact: true }).count(), 0, "Viewer must not see Chạy mock button");
     });
 
     await step("invalid run id returns 404 (AC-9c)", async () => {
