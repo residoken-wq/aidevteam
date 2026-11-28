@@ -348,6 +348,7 @@ export const tasks = pgTable(
       .default("medium"),
     agentId: uuid("agent_id"),
     cancelReason: text("cancel_reason"),
+    contract: jsonb("contract"),
     createdByUserId: uuid("created_by_user_id").references(() => users.id),
     createdAt: ts("created_at").notNull().defaultNow(),
     updatedAt: ts("updated_at").notNull().defaultNow(),

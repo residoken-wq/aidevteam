@@ -1,4 +1,4 @@
--- 0015_agent_assignment (up) — P3-05: Agent capability and capacity limits.
+-- 0016_agent_assignment (up) — P3-05: Agent capability and capacity limits.
 ALTER TABLE agents
   ADD COLUMN capabilities text[] NOT NULL DEFAULT '{}',
   ADD COLUMN max_active_tasks integer NOT NULL DEFAULT 3,

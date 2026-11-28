@@ -52,6 +52,7 @@ const SPECIFIC_422: Record<string, string> = {
   provider_account_not_licensed: "Tài khoản provider chưa được duyệt hoặc đã bị cấm/lưu trữ.",
   agent_not_assignable: "Agent đã bị vô hiệu hóa hoặc đã lưu trữ, không thể nhận việc.",
   agent_capability_mismatch: "Agent không có đủ năng lực (capability) yêu cầu cho task.",
+  path_forbidden: "Đường dẫn không được phép hoặc thuộc danh sách cấm (denylist).",
 };
 
 export function apiErrorMessage(status: number, body: unknown): string {
@@ -83,10 +84,10 @@ export function apiErrorMessage(status: number, body: unknown): string {
 }
 
 export async function sendJson<T = unknown>(
-  method: "POST" | "PATCH" | "DELETE",
+  method: "POST" | "PATCH" | "DELETE" | "PUT",
   url: string,
   body?: unknown,
-): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
+): Promise<{ ok: true; data: T } | { ok: false; error: string; issues?: Array<{ path?: string; message?: string }> }> {
   const res = await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
@@ -97,5 +98,10 @@ export async function sendJson<T = unknown>(
     const data = (await res.json().catch(() => null)) as T;
     return { ok: true, data };
   }
-  return { ok: false, error: apiErrorMessage(res.status, await res.json().catch(() => null)) };
+  const errBody = await res.json().catch(() => null);
+  const issues =
+    errBody && typeof errBody === "object" && Array.isArray((errBody as { issues?: unknown }).issues)
+      ? ((errBody as { issues: Array<{ path?: string; message?: string }> }).issues)
+      : undefined;
+  return { ok: false, error: apiErrorMessage(res.status, errBody), issues };
 }
