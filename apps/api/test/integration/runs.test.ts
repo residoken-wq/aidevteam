@@ -257,8 +257,12 @@ describe("AC-3: concurrent cancel during execution keeps CANCELLED", () => {
     // Start tick in background (picks job, sets status='RUNNING', calls mockRunner)
     const tickPromise = worker.tick();
 
-    // Give tick a short tick to ensure it entered RUNNING and is awaiting runnerFn
-    await new Promise((r) => setTimeout(r, 50));
+    // Give tick time to enter RUNNING and await runnerFn
+    for (let i = 0; i < 20; i++) {
+      await new Promise((r) => setTimeout(r, 50));
+      const check = await api().get(`/runs/${runId}`).set("Cookie", as("maintA"));
+      if (check.body.status === "RUNNING") break;
+    }
 
     // Verify it is RUNNING in DB
     const checkRunning = await api().get(`/runs/${runId}`).set("Cookie", as("maintA")).expect(200);

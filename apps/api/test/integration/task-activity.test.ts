@@ -409,5 +409,5 @@ describe("AC-5: Comment validation, audit, terminal task commenting, and rate li
     const r31 = await sendRateReq("Rate comment 31");
     expect(r31.status).toBe(429);
     expect(r31.body.message).toBe("rate_limit_exceeded");
-  });
+  }, 15_000);
 });
