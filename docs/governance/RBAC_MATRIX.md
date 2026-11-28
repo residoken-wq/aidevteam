@@ -35,6 +35,8 @@
 | `member:read` | ✅ | ❌ | ❌ | ❌ | P2-04 (REQUIRES_OWNER_APPROVAL) |
 | `member:write` | ✅ | ❌ | ❌ | ❌ | P2-04 (REQUIRES_OWNER_APPROVAL) |
 
+**P2-13 — `project_member` (REQUIRES_OWNER_APPROVAL; Owner chọn phương án A 28/11/2026):** quyền theo bảng trên chỉ có hiệu lực trên project được giao (`project_assignments`, `read`/`write`); project không được giao → 404. Người giữ **nhiều role**: quyền là hợp các role, nhưng phần ghi của `project_member` (`task:write`, `dispatch:execute`) **vẫn chỉ áp dụng cho project được giao `write`** — được ghi trên mọi project chỉ khi có `org_admin`/`maintainer`; `viewer` + `project_member` đọc toàn org, ghi theo assignment (403 khi không được giao). Chỉ `org_admin` giao/gỡ (`project:assign`), có audit.
+
 ## Quản trị nền tảng (platform admin) — P2-03
 
 > **Trạng thái:** `REQUIRES_OWNER_APPROVAL`. Người dùng phiên đồng ý 26/11/2026 (DECISION_LOG D-2026-11-26-13); **chưa nằm trong bản Owner đã ký** (D-2026-11-26-07 mục 5). Phải có chữ ký Owner trước UAT 03/12.

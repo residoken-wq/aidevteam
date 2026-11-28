@@ -173,6 +173,7 @@ beforeAll(async () => {
 
   const testIds = [
     900000001, 900000002, 900000003, 900000004, 900000005, 900000006,
+    900000007,
   ];
   for (const id of testIds) {
     await pool.query(
@@ -191,6 +192,8 @@ beforeAll(async () => {
   // 900000004 has no roles (norole)
   await grantRole(pool, 900000005, "org-test-b", "org_admin");
   await grantPlatformAdmin(pool, 900000006, "test");
+  // P2-13: project_member without any assignment (project-scoped, default deny)
+  await grantRole(pool, 900000007, "org-test-a", "project_member");
 
   orgBId = (
     await pool.query<{ id: string }>(
@@ -204,6 +207,7 @@ beforeAll(async () => {
   tokens.norole = await sessionFor(900000004);
   tokens.admin_b = await sessionFor(900000005);
   tokens.platform = await sessionFor(900000006);
+  tokens.pm_a = await sessionFor(900000007);
 
   app = await createApp({
     config: testConfig(),
@@ -278,6 +282,7 @@ describe("AC-1 RBAC matrix across all operations (7 actors)", () => {
     "admin_a",
     "admin_b",
     "platform",
+    "pm_a",
   ] as const;
 
   it.each(permissionOps)(
@@ -304,6 +309,9 @@ describe("AC-1 RBAC matrix across all operations (7 actors)", () => {
             allowed = ROLE_PERMISSIONS.maintainer.has(
               op.permission as Permission,
             );
+          } else if (actor === "pm_a") {
+            // Guard-level permission; unassigned projects then resolve to 404 (project-access.test.ts covers scope)
+            allowed = ROLE_PERMISSIONS.project_member.has(op.permission as Permission);
           } else if (actor === "admin_a" || actor === "admin_b") {
             allowed = ROLE_PERMISSIONS.org_admin.has(
               op.permission as Permission,
