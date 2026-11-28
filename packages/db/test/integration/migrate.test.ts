@@ -25,6 +25,7 @@ const EXPECTED_TABLES = [
   "schema_migrations",
   "sessions",
   "sprints",
+  "task_comments",
   "task_dependencies",
   "tasks",
   "user_allowlist",

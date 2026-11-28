@@ -559,3 +559,72 @@ describe("planning constraints (P3-01, AC-1)", () => {
   });
 });
 
+describe("task_comments is append-only and scoped to project (P3-07 / AC-1)", () => {
+  it("allows INSERT, rejects UPDATE, DELETE and TRUNCATE, and enforces FK to task in same project", async () => {
+    const projA = (await pool.query<{ id: string }>("SELECT id FROM projects WHERE org_id = $1 ORDER BY slug LIMIT 1", [orgA])).rows[0]!.id;
+    const projB = (await pool.query<{ id: string }>("SELECT id FROM projects WHERE org_id = $1 ORDER BY slug LIMIT 1", [orgB])).rows[0]!.id;
+
+    // Create a task in projA
+    const taskA = (await pool.query<{ id: string }>(
+      "INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 1001, 'Task for Comments') RETURNING id",
+      [orgA, projA],
+    )).rows[0]!.id;
+
+    // Insert valid comment
+    const commentRes = await pool.query<{ id: string }>(
+      "INSERT INTO task_comments (org_id, project_id, task_id, author_user_id, body) VALUES ($1, $2, $3, $4, 'Test comment') RETURNING id",
+      [orgA, projA, taskA, userId],
+    );
+    expect(commentRes.rowCount).toBe(1);
+    const commentId = commentRes.rows[0]!.id;
+
+    // Rejects UPDATE
+    await expect(
+      pool.query("UPDATE task_comments SET body = 'Modified body' WHERE id = $1", [commentId]),
+    ).rejects.toThrow(/append-only/);
+
+    // Rejects DELETE
+    await expect(
+      pool.query("DELETE FROM task_comments WHERE id = $1", [commentId]),
+    ).rejects.toThrow(/append-only/);
+
+    // Rejects TRUNCATE
+    await expect(
+      pool.query("TRUNCATE task_comments"),
+    ).rejects.toThrow(/append-only/);
+
+    // Rejects body length 0
+    await expect(
+      pool.query(
+        "INSERT INTO task_comments (org_id, project_id, task_id, author_user_id, body) VALUES ($1, $2, $3, $4, '')",
+        [orgA, projA, taskA, userId],
+      ),
+    ).rejects.toThrow(/check constraint/);
+
+    // Rejects body length > 5000
+    await expect(
+      pool.query(
+        "INSERT INTO task_comments (org_id, project_id, task_id, author_user_id, body) VALUES ($1, $2, $3, $4, $5)",
+        [orgA, projA, taskA, userId, "a".repeat(5001)],
+      ),
+    ).rejects.toThrow(/check constraint/);
+
+    // Rejects comment pointing to task in wrong project (projB)
+    await expect(
+      pool.query(
+        "INSERT INTO task_comments (org_id, project_id, task_id, author_user_id, body) VALUES ($1, $2, $3, $4, 'Cross project comment')",
+        [orgA, projB, taskA, userId],
+      ),
+    ).rejects.toThrow(/task_comments_task_same_project_fk/);
+
+    // Rejects comment pointing to task in wrong org (orgB)
+    await expect(
+      pool.query(
+        "INSERT INTO task_comments (org_id, project_id, task_id, author_user_id, body) VALUES ($1, $2, $3, $4, 'Cross org comment')",
+        [orgB, projA, taskA, userId],
+      ),
+    ).rejects.toThrow(/task_comments_task_same_project_fk/);
+  });
+});
+
+
