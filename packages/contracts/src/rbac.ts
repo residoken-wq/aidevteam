@@ -12,6 +12,7 @@ export const PERMISSIONS = [
   "agent:write",
   "provider_account:read",
   "provider_account:write",
+  "provider_account:license",
   "worker:read",
   "worker:write",
   "task:read",
@@ -52,7 +53,7 @@ const MAINTAINER: Permission[] = [
 ];
 
 export const ROLE_PERMISSIONS: Readonly<Record<RoleKey, ReadonlySet<Permission>>> = {
-  org_admin: new Set<Permission>([...MAINTAINER, "audit:read", "member:read", "member:write"]),
+  org_admin: new Set<Permission>([...MAINTAINER, "provider_account:license", "audit:read", "member:read", "member:write"]),
   maintainer: new Set<Permission>(MAINTAINER),
   viewer: new Set<Permission>(READ_ONLY),
 };

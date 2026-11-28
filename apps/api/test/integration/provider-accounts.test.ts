@@ -57,10 +57,15 @@ beforeAll(async () => {
   await pool.query("CREATE SCHEMA public");
   await migrateUp(pool);
   await seed(pool, { NODE_ENV: "test" });
-  for (const id of [900000003, 900000004]) await pool.query("INSERT INTO user_allowlist (github_user_id, note) VALUES ($1, 'fake')", [id]);
+  for (const id of [900000001, 900000003, 900000004, 900000005]) await pool.query("INSERT INTO user_allowlist (github_user_id, note) VALUES ($1, 'fake') ON CONFLICT DO NOTHING", [id]);
+  await pool.query("INSERT INTO users (github_user_id, github_login) VALUES (900000005, 'test-user-05') ON CONFLICT DO NOTHING");
+  await grantRole(pool, 900000001, "org-test-a", "org_admin");
   await grantRole(pool, 900000002, "org-test-a", "viewer");
   await grantRole(pool, 900000003, "org-test-a", "maintainer");
   await grantRole(pool, 900000004, "org-test-b", "maintainer");
+  await grantRole(pool, 900000005, "org-test-b", "org_admin");
+  tokens.adminA = await sessionFor(900000001);
+  tokens.adminB = await sessionFor(900000005);
   tokens.viewer = await sessionFor(900000002);
   tokens.maintA = await sessionFor(900000003);
   tokens.maintB = await sessionFor(900000004);
@@ -116,6 +121,65 @@ describe("AC-3 cross-org isolation", () => {
 
   it("org id in the body is rejected", async () => {
     await write("post", "/provider-accounts", "maintA").send({ ...valid("smuggle"), orgId: "x" }).expect(422);
+  });
+});
+
+describe("P2-09 AC-2, AC-3, AC-6: license status management", () => {
+  it("AC-2 RBAC: changing license requires provider_account:license (org_admin only)", async () => {
+    await write("post", "/provider-accounts", "maintA").send(valid("pa-lic-rbac")).expect(201);
+    // Unauthenticated -> 401
+    await api().post("/provider-accounts/pa-lic-rbac/license").send({ licenseStatus: "approved" }).expect(401);
+    // Viewer -> 403
+    await write("post", "/provider-accounts/pa-lic-rbac/license", "viewer").send({ licenseStatus: "approved" }).expect(403);
+    // Maintainer -> 403
+    await write("post", "/provider-accounts/pa-lic-rbac/license", "maintA").send({ licenseStatus: "approved" }).expect(403);
+    // Org admin -> 200
+    const res = await write("post", "/provider-accounts/pa-lic-rbac/license", "adminA").send({ licenseStatus: "approved" }).expect(200);
+    expect(res.body.licenseStatus).toBe("approved");
+  });
+
+  it("AC-3 Cross-org: org_admin of org A cannot change account of org B (404), body with orgId is rejected (422)", async () => {
+    await write("post", "/provider-accounts", "maintB").send(valid("pa-org-b-lic")).expect(201);
+    // Admin A tries to change account in org B -> 404
+    await write("post", "/provider-accounts/pa-org-b-lic/license", "adminA").send({ licenseStatus: "approved" }).expect(404);
+    // Account in org B is unchanged
+    const bAcc = await api().get("/provider-accounts/pa-org-b-lic").set("Cookie", as("maintB")).expect(200);
+    expect(bAcc.body.licenseStatus).toBe("unverified");
+    // Body with orgId is rejected with 422 (strict)
+    await write("post", "/provider-accounts/pa-lic-rbac/license", "adminA").send({ licenseStatus: "approved", orgId: "org-test-b" }).expect(422);
+  });
+
+  it("changing license of archived account returns 409 provider_account_archived", async () => {
+    await write("post", "/provider-accounts", "maintA").send(valid("pa-archived-lic")).expect(201);
+    await write("post", "/provider-accounts/pa-archived-lic/archive", "maintA").expect(200);
+    const r = await write("post", "/provider-accounts/pa-archived-lic/license", "adminA").send({ licenseStatus: "approved" }).expect(409);
+    expect(r.body.message).toBe("provider_account_archived");
+  });
+
+  it("AC-6 Audit: real license change writes 1 audit event; same status does not audit", async () => {
+    await write("post", "/provider-accounts", "maintA").send(valid("pa-audit-lic")).expect(201);
+    const paRow = (await pool.query<{ id: string }>("SELECT id FROM provider_accounts WHERE slug = 'pa-audit-lic'")).rows[0]!;
+
+    // Change unverified -> approved
+    const r1 = await write("post", "/provider-accounts/pa-audit-lic/license", "adminA").send({ licenseStatus: "approved" }).expect(200);
+    expect(r1.body.licenseStatus).toBe("approved");
+
+    const audit1 = await pool.query<{ action: string; metadata: Record<string, unknown>; actor_user_id: string }>(
+      "SELECT action, metadata, actor_user_id FROM audit_events WHERE target_id = $1 AND action = 'provider_account.license_status_changed'",
+      [paRow.id],
+    );
+    expect(audit1.rowCount).toBe(1);
+    expect(audit1.rows[0]!.metadata).toEqual({ from: "unverified", to: "approved" });
+
+    // Change again to approved (no change) -> no new audit event
+    const r2 = await write("post", "/provider-accounts/pa-audit-lic/license", "adminA").send({ licenseStatus: "approved" }).expect(200);
+    expect(r2.body.licenseStatus).toBe("approved");
+
+    const audit2 = await pool.query<{ count: number }>(
+      "SELECT count(*)::int AS count FROM audit_events WHERE target_id = $1 AND action = 'provider_account.license_status_changed'",
+      [paRow.id],
+    );
+    expect(audit2.rows[0]!.count).toBe(1);
   });
 });
 

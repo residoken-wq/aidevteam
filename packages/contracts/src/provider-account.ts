@@ -11,6 +11,17 @@ import { SecretRefSchema } from "./secret-ref";
 export const PROVIDERS = ["anthropic", "openai", "google", "github", "other"] as const;
 export const ProviderSchema = z.enum(PROVIDERS);
 
+export const LICENSE_STATUSES = ["approved", "unverified", "prohibited"] as const;
+export const LicenseStatusSchema = z.enum(LICENSE_STATUSES);
+export type LicenseStatus = z.infer<typeof LicenseStatusSchema>;
+
+export const ProviderAccountLicenseChangeSchema = z
+  .object({
+    licenseStatus: LicenseStatusSchema,
+  })
+  .strict();
+export type ProviderAccountLicenseChange = z.infer<typeof ProviderAccountLicenseChangeSchema>;
+
 export const ProviderAccountCreateSchema = z
   .object({
     slug: SlugSchema,
@@ -37,6 +48,7 @@ export const ProviderAccountSchema = z
     provider: ProviderSchema,
     secretRef: z.string(),
     description: z.string().nullable(),
+    licenseStatus: LicenseStatusSchema,
     createdAt: z.string(),
     updatedAt: z.string(),
     archivedAt: z.string().nullable(),

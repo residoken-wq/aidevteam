@@ -58,6 +58,7 @@ beforeAll(async () => {
   await app.init();
   await write("post", "/provider-accounts", "maintA").send({ slug: "claude-a", name: "Claude A", provider: "anthropic", secretRef: "env:AIDEV_SECRET_CLAUDE_A" }).expect(201);
   await write("post", "/provider-accounts", "maintB").send({ slug: "claude-b", name: "Claude B", provider: "anthropic", secretRef: "env:AIDEV_SECRET_CLAUDE_B" }).expect(201);
+  await pool.query("UPDATE provider_accounts SET license_status = 'approved' WHERE slug IN ('claude-a', 'claude-b')");
   await write("post", "/agents", "maintB").send(valid("lead-b")).expect(201);
 });
 
@@ -153,6 +154,41 @@ describe("AC-4 validation and org chart rules", () => {
     await write("post", "/provider-accounts", "maintA").send({ slug: "old-pa", name: "Old", provider: "openai", secretRef: "env:AIDEV_SECRET_OLD_PA" }).expect(201);
     await write("post", "/provider-accounts/old-pa/archive", "maintA").expect(200);
     await write("post", "/agents", "maintA").send(valid("uses-old", { providerAccountSlug: "old-pa" })).expect(422);
+  });
+
+  it("P2-09 AC-4: rejects unverified or prohibited account with 422 provider_account_not_licensed", async () => {
+    // 1. Create accounts
+    await write("post", "/provider-accounts", "maintA").send({ slug: "pa-unverified", name: "Unverified", provider: "anthropic", secretRef: "env:AIDEV_SECRET_UNVERIFIED" }).expect(201);
+    await write("post", "/provider-accounts", "maintA").send({ slug: "pa-prohibited", name: "Prohibited", provider: "anthropic", secretRef: "env:AIDEV_SECRET_PROHIBITED" }).expect(201);
+    await pool.query("UPDATE provider_accounts SET license_status = 'prohibited' WHERE slug = 'pa-prohibited'");
+
+    // 2. Reject in create
+    const rUnv = await write("post", "/agents", "maintA").send(valid("agent-unv", { providerAccountSlug: "pa-unverified" })).expect(422);
+    expect(rUnv.body.message).toBe("provider_account_not_licensed");
+    expect(rUnv.body.issues[0].message).toBe("provider_account_not_licensed");
+
+    const rProh = await write("post", "/agents", "maintA").send(valid("agent-proh", { providerAccountSlug: "pa-prohibited" })).expect(422);
+    expect(rProh.body.message).toBe("provider_account_not_licensed");
+
+    // 3. Reject in update
+    await write("post", "/agents", "maintA").send(valid("agent-for-update")).expect(201);
+    const rUpUnv = await write("patch", "/agents/agent-for-update", "maintA").send({ providerAccountSlug: "pa-unverified" }).expect(422);
+    expect(rUpUnv.body.message).toBe("provider_account_not_licensed");
+
+    const rUpProh = await write("patch", "/agents/agent-for-update", "maintA").send({ providerAccountSlug: "pa-prohibited" }).expect(422);
+    expect(rUpProh.body.message).toBe("provider_account_not_licensed");
+
+    // 4. Approved account succeeds on create & update
+    await pool.query("UPDATE provider_accounts SET license_status = 'approved' WHERE slug = 'pa-unverified'");
+    const rOkCreate = await write("post", "/agents", "maintA").send(valid("agent-ok", { providerAccountSlug: "pa-unverified" })).expect(201);
+    expect(rOkCreate.body.providerAccountSlug).toBe("pa-unverified");
+
+    const rOkUpdate = await write("patch", "/agents/agent-for-update", "maintA").send({ providerAccountSlug: "pa-unverified" }).expect(200);
+    expect(rOkUpdate.body.providerAccountSlug).toBe("pa-unverified");
+
+    // 5. Unbinding (providerAccountSlug: null) is always allowed
+    const rUnbind = await write("patch", "/agents/agent-for-update", "maintA").send({ providerAccountSlug: null }).expect(200);
+    expect(rUnbind.body.providerAccountSlug).toBeNull();
   });
 
   it("concurrent manager changes cannot create a cycle (org-level lock)", async () => {
