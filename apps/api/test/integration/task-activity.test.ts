@@ -52,7 +52,6 @@ const ACTIVITY = (project: string, n: number) => `/projects/${project}/tasks/${n
 const COMMENTS = (project: string, n: number) => `/projects/${project}/tasks/${n}/comments`;
 
 let orgAId = "";
-let orgBId = "";
 let userIdMaintA = "";
 let pmUserId = "";
 
@@ -69,7 +68,6 @@ beforeAll(async () => {
 
   const orgs = await pool.query<{ id: string; slug: string }>("SELECT id, slug FROM orgs ORDER BY slug");
   orgAId = orgs.rows.find((o) => o.slug === "org-test-a")!.id;
-  orgBId = orgs.rows.find((o) => o.slug === "org-test-b")!.id;
 
   for (const id of [900000003, 900000004, 900000005]) {
     await pool.query("INSERT INTO user_allowlist (github_user_id, note) VALUES ($1, 'fake')", [id]);

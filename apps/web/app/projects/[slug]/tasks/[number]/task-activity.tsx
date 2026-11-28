@@ -1,6 +1,6 @@
 "use client";
 
-import type { TaskActivityItem, TaskActivityResponse } from "@aidevteam/contracts";
+import type { TaskActivityResponse } from "@aidevteam/contracts";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { sendJson } from "../../../../../lib/api-errors";

@@ -131,7 +131,7 @@ export class TaskActivityController {
              NULL::text AS body
             FROM audit_events ae
             LEFT JOIN users u ON u.id = ae.actor_user_id
-           WHERE ae.org_id = $1 AND ae.target_type = 'task' AND ae.target_id = $2 AND ae.action LIKE 'task.%'
+           WHERE ae.org_id = $1 AND ae.target_type = 'task' AND ae.target_id = $2::text AND ae.action LIKE 'task.%'
 
            UNION ALL
 
@@ -146,7 +146,7 @@ export class TaskActivityController {
              tc.body AS body
             FROM task_comments tc
             LEFT JOIN users u ON u.id = tc.author_user_id
-           WHERE tc.org_id = $1 AND tc.project_id = $3 AND tc.task_id = $2
+           WHERE tc.org_id = $1 AND tc.project_id = $3 AND tc.task_id = $2::uuid
          ) combined
         ORDER BY at ASC, id ASC
         LIMIT $4 OFFSET $5`,
