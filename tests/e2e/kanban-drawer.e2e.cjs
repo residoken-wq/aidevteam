@@ -244,6 +244,7 @@ async function contextFor(browser, token) {
       const card = page.getByTestId("task-10");
       await card.scrollIntoViewIfNeeded();
       const scrollBefore = await page.evaluate(() => globalThis.window.scrollY);
+      assert.ok(scrollBefore > 100, `test setup: page should be scrolled down (scrollY=${scrollBefore})`);
 
       // Move task 10 to TODO
       await card.getByLabel("Chuyển sang").selectOption({ label: "Cần làm" });
@@ -254,12 +255,19 @@ async function contextFor(browser, token) {
 
       // Verify scroll position deviation <= 50px
       await page.waitForFunction(
-        (target) => Math.abs(globalThis.window.scrollY - target) <= 50,
+        (target) => {
+          const max = Math.max(0, globalThis.document.documentElement.scrollHeight - globalThis.window.innerHeight);
+          return Math.abs(globalThis.window.scrollY - Math.min(target, max)) <= 50;
+        },
         scrollBefore,
       );
-      const scrollAfterMove = await page.evaluate(() => globalThis.window.scrollY);
+      const [scrollAfterMove, max_scrollAfterMove] = await page.evaluate(() => [
+        globalThis.window.scrollY,
+        Math.max(0, globalThis.document.documentElement.scrollHeight - globalThis.window.innerHeight),
+      ]);
+      assert.ok(scrollAfterMove > 0, "Scroll after move: page jumped back to the top");
       assert.ok(
-        Math.abs(scrollAfterMove - scrollBefore) <= 50,
+        Math.abs(scrollAfterMove - Math.min(scrollBefore, max_scrollAfterMove)) <= 50,
         `Scroll after move (${scrollAfterMove}) deviated too much from before (${scrollBefore})`,
       );
 
@@ -267,12 +275,19 @@ async function contextFor(browser, token) {
       await page.reload();
       await inCol(page, "TODO", 10).waitFor();
       await page.waitForFunction(
-        (target) => Math.abs(globalThis.window.scrollY - target) <= 50,
+        (target) => {
+          const max = Math.max(0, globalThis.document.documentElement.scrollHeight - globalThis.window.innerHeight);
+          return Math.abs(globalThis.window.scrollY - Math.min(target, max)) <= 50;
+        },
         scrollBefore,
       );
-      const scrollAfterReload = await page.evaluate(() => globalThis.window.scrollY);
+      const [scrollAfterReload, max_scrollAfterReload] = await page.evaluate(() => [
+        globalThis.window.scrollY,
+        Math.max(0, globalThis.document.documentElement.scrollHeight - globalThis.window.innerHeight),
+      ]);
+      assert.ok(scrollAfterReload > 0, "Scroll after reload: page jumped back to the top");
       assert.ok(
-        Math.abs(scrollAfterReload - scrollBefore) <= 50,
+        Math.abs(scrollAfterReload - Math.min(scrollBefore, max_scrollAfterReload)) <= 50,
         `Scroll after reload (${scrollAfterReload}) deviated too much from before (${scrollBefore})`,
       );
     });
