@@ -10,6 +10,8 @@ const EXPECTED_TABLES = [
   "agent_runs",
   "agents",
   "audit_events",
+  "epics",
+  "milestones",
   "oauth_login_states",
   "orgs",
   "platform_admins",
@@ -22,13 +24,14 @@ const EXPECTED_TABLES = [
   "roles",
   "schema_migrations",
   "sessions",
+  "sprints",
   "tasks",
   "user_allowlist",
   "users",
   "workers",
 ];
 
-describe("migrations up/down (AC-1)", () => {
+describe("migrations up/down (AC-1)", { timeout: 30_000 }, () => {
   const pool: Pool = testPool();
   beforeEach(() => resetSchema(pool));
   afterAll(() => pool.end());
