@@ -32,6 +32,9 @@ import {
 } from "./agent";
 import {
   TaskCreateSchema,
+  TaskDependenciesSchema,
+  TaskDependencyChangeSchema,
+  TaskDependencyResultSchema,
   TaskListQuerySchema,
   TaskSchema,
   TaskTransitionSchema,
@@ -735,6 +738,50 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
     request: TaskTransitionSchema,
     responses: {
       200: TaskSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+
+  // TaskDependenciesController (/projects/:projectSlug/tasks/:number/dependencies)
+  {
+    method: "GET",
+    path: "/projects/{projectSlug}/tasks/{number}/dependencies",
+    summary: "Get task dependencies and blocked status",
+    permission: "task:read",
+    responses: {
+      200: TaskDependenciesSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{projectSlug}/tasks/{number}/dependencies",
+    summary: "Add a dependency to task",
+    permission: "task:write",
+    request: TaskDependencyChangeSchema,
+    responses: {
+      200: TaskDependencyResultSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "DELETE",
+    path: "/projects/{projectSlug}/tasks/{number}/dependencies",
+    summary: "Remove a dependency from task",
+    permission: "task:write",
+    request: TaskDependencyChangeSchema,
+    responses: {
+      200: TaskDependencyResultSchema,
       401: ErrorResponseSchema,
       403: ErrorResponseSchema,
       404: ErrorResponseSchema,
