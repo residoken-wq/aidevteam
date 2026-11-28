@@ -25,6 +25,7 @@ import type { Request } from "express";
 import { writeAudit } from "../audit";
 import { getAuth, getOrg } from "../rbac/auth-context";
 import { RequirePermission } from "../rbac/decorators";
+import { verifyProjectScope } from "../rbac/project-scope";
 import { DB_POOL } from "../tokens";
 import { parseOr422 } from "../validation";
 
@@ -94,10 +95,19 @@ export class RunsController {
       // Advisory lock per org to serialize queue checks and worker concurrency
       await client.query("SELECT pg_advisory_xact_lock(hashtext('runs:' || $1::text))", [org.orgId]);
 
-      // Check project in org
+      // Check project in org and verify project-scope
+      const projectScope = await verifyProjectScope({
+        pool: client,
+        orgId: org.orgId,
+        userId: auth.userId,
+        roles: org.roles,
+        requiredAccess: "write",
+        projectSlug,
+      });
+
       const projRes = await client.query<{ id: string }>(
-        "SELECT id FROM projects WHERE org_id = $1 AND slug = $2 AND archived_at IS NULL",
-        [org.orgId, projectSlug],
+        "SELECT id FROM projects WHERE org_id = $1 AND id = $2 AND archived_at IS NULL",
+        [org.orgId, projectScope.id],
       );
       if (!projRes.rows[0]) throw new NotFoundException({ statusCode: 404, message: "project_not_found" });
       const projectId = projRes.rows[0].id;
@@ -235,6 +245,16 @@ export class RunsController {
     const number = Number(numberStr);
     const q = parseOr422(RunListQuerySchema, query);
     const org = getOrg(req);
+    const auth = getAuth(req);
+
+    await verifyProjectScope({
+      pool: this.pool,
+      orgId: org.orgId,
+      userId: auth.userId,
+      roles: org.roles,
+      requiredAccess: "read",
+      projectSlug,
+    });
 
     // Verify project and task exist in org
     const taskRes = await this.pool.query<{ id: string }>(
@@ -263,12 +283,29 @@ export class RunsController {
   async getRun(@Req() req: Request, @Param("id") id: string): Promise<Run> {
     if (!UUID_RE.test(id)) throw new NotFoundException({ statusCode: 404, message: "run_not_found" });
     const org = getOrg(req);
+    const auth = getAuth(req);
 
-    const r = await this.pool.query<RunRow>(
-      `${SELECT_RUN} WHERE r.org_id = $1 AND r.id = $2`,
+    const r = await this.pool.query<RunRow & { project_id: string }>(
+      `SELECT r.id, p.id AS project_id, p.slug AS project_slug, t.number AS task_number, w.slug AS worker_slug,
+              r.status, r.attempt, r.queued_at, r.started_at, r.finished_at,
+              r.output_summary, r.log, r.error_code
+         FROM agent_runs r
+         JOIN tasks t ON t.id = r.task_id AND t.org_id = r.org_id
+         JOIN projects p ON p.id = t.project_id AND p.org_id = t.org_id
+         JOIN workers w ON w.id = r.worker_id AND w.org_id = r.org_id
+        WHERE r.org_id = $1 AND r.id = $2`,
       [org.orgId, id],
     );
     if (!r.rows[0]) throw new NotFoundException({ statusCode: 404, message: "run_not_found" });
+
+    await verifyProjectScope({
+      pool: this.pool,
+      orgId: org.orgId,
+      userId: auth.userId,
+      roles: org.roles,
+      requiredAccess: "read",
+      projectId: r.rows[0].project_id,
+    });
 
     return toDto(r.rows[0]);
   }
@@ -282,15 +319,25 @@ export class RunsController {
     const auth = getAuth(req);
 
     // Verify run exists in org
-    const existing = await this.pool.query<{ id: string; status: string; task_number: number }>(
-      `SELECT r.id, r.status, t.number AS task_number
+    const existing = await this.pool.query<{ id: string; status: string; task_number: number; project_id: string }>(
+      `SELECT r.id, r.status, t.number AS task_number, p.id AS project_id
          FROM agent_runs r
          JOIN tasks t ON t.id = r.task_id AND t.org_id = r.org_id
+         JOIN projects p ON p.id = t.project_id AND p.org_id = t.org_id
         WHERE r.org_id = $1 AND r.id = $2`,
       [org.orgId, id],
     );
     if (!existing.rows[0]) throw new NotFoundException({ statusCode: 404, message: "run_not_found" });
     const prev = existing.rows[0];
+
+    await verifyProjectScope({
+      pool: this.pool,
+      orgId: org.orgId,
+      userId: auth.userId,
+      roles: org.roles,
+      requiredAccess: "write",
+      projectId: prev.project_id,
+    });
 
     if (prev.status !== "QUEUED" && prev.status !== "RUNNING") {
       throw new ConflictException({ statusCode: 409, message: "run_not_cancellable" });

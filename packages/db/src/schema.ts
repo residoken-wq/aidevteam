@@ -304,6 +304,32 @@ export const agentRuns = pgTable(
   ],
 );
 
+export const projectAssignments = pgTable(
+  "project_assignments",
+  {
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    projectId: uuid("project_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    access: text("access", { enum: ["read", "write"] }).notNull(),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.projectId, t.userId] }),
+    foreignKey({
+      name: "project_assignments_project_same_org_fk",
+      columns: [t.projectId, t.orgId],
+      foreignColumns: [projects.id, projects.orgId],
+    }),
+    index("project_assignments_org_user_idx").on(t.orgId, t.userId),
+    index("project_assignments_project_idx").on(t.projectId),
+  ],
+);
+
 export const allTables = {
   agent_runs: agentRuns,
   agents,
@@ -311,6 +337,7 @@ export const allTables = {
   oauth_login_states: oauthLoginStates,
   orgs,
   platform_admins: platformAdmins,
+  project_assignments: projectAssignments,
   projects,
   provider_accounts: providerAccounts,
   rate_limit_hits: rateLimitHits,

@@ -5,6 +5,7 @@ import type { Request } from "express";
 import { writeAudit } from "../audit";
 import { getAuth, getOrg } from "../rbac/auth-context";
 import { RequirePermission } from "../rbac/decorators";
+import { verifyProjectScope } from "../rbac/project-scope";
 import { DB_POOL } from "../tokens";
 import { parseOr422 } from "../validation";
 
@@ -63,7 +64,7 @@ export class TasksController {
   async list(@Req() req: Request, @Param("projectSlug") projectSlug: string, @Query() query: unknown): Promise<{ items: Task[]; limit: number; offset: number }> {
     const q = parseOr422(TaskListQuerySchema, query);
     const org = getOrg(req);
-    const project = await this.project(this.pool, org.orgId, projectSlug);
+    const project = await this.project(this.pool, req, projectSlug, "read");
     const r = await this.pool.query<Row>(
       `${SELECT} WHERE t.org_id = $1 AND t.project_id = $2 AND ($3::text IS NULL OR t.status = $3) ORDER BY t.number LIMIT $4 OFFSET $5`,
       [org.orgId, project.id, q.status ?? null, q.limit, q.offset],
@@ -75,7 +76,7 @@ export class TasksController {
   @Get(":number")
   async get(@Req() req: Request, @Param("projectSlug") projectSlug: string, @Param("number") number: string): Promise<Task> {
     const org = getOrg(req);
-    const project = await this.project(this.pool, org.orgId, projectSlug);
+    const project = await this.project(this.pool, req, projectSlug, "read");
     return toDto(await this.find(this.pool, org.orgId, project.id, number));
   }
 
@@ -86,7 +87,7 @@ export class TasksController {
     const input = parseOr422(TaskCreateSchema, body);
     const org = getOrg(req);
     const row = await this.tx(async (c) => {
-      const project = await this.writableProject(c, org.orgId, projectSlug);
+      const project = await this.writableProject(c, req, projectSlug);
       // Serialise numbering per project; the unique (project_id, number) constraint is the backstop.
       await c.query("SELECT pg_advisory_xact_lock(hashtext('tasks:' || $1::text))", [project.id]);
       const agentId = input.agentSlug ? await this.agentId(c, org.orgId, input.agentSlug) : null;
@@ -108,7 +109,7 @@ export class TasksController {
     const input = parseOr422(TaskUpdateSchema, body);
     const org = getOrg(req);
     const row = await this.tx(async (c) => {
-      const project = await this.writableProject(c, org.orgId, projectSlug);
+      const project = await this.writableProject(c, req, projectSlug);
       const current = await this.find(c, org.orgId, project.id, number);
       if (current.status === "DONE" || current.status === "CANCELLED") throw new ConflictException({ statusCode: 409, message: "task_closed" });
       const agentId = input.agentSlug === undefined ? undefined : input.agentSlug === null ? null : await this.agentId(c, org.orgId, input.agentSlug);
@@ -136,7 +137,7 @@ export class TasksController {
     const input = parseOr422(TaskTransitionSchema, body);
     if (!isAllowedTransition(input.expectedFrom, input.to)) throw unprocessable("to", `transition ${input.expectedFrom} -> ${input.to} is not allowed`);
     const org = getOrg(req);
-    const project = await this.writableProject(this.pool, org.orgId, projectSlug);
+    const project = await this.writableProject(this.pool, req, projectSlug);
     const current = await this.find(this.pool, org.orgId, project.id, number);
     const r = await this.pool.query<{ id: string }>(
       `UPDATE tasks SET status = $3, cancel_reason = $4, updated_at = now()
@@ -156,15 +157,24 @@ export class TasksController {
     return toDto(row);
   }
 
-  private async project(c: PoolClient | Pool, orgId: string, slug: string): Promise<ProjectRef> {
+  private async project(c: PoolClient | Pool, req: Request, slug: string, requiredAccess: "read" | "write" = "read"): Promise<ProjectRef> {
     if (!SlugSchema.safeParse(slug).success) throw new NotFoundException();
-    const r = await c.query<{ id: string; archived: boolean }>("SELECT id, archived_at IS NOT NULL AS archived FROM projects WHERE org_id = $1 AND slug = $2", [orgId, slug]);
-    if (!r.rows[0]) throw new NotFoundException();
-    return r.rows[0];
+    const org = getOrg(req);
+    const auth = getAuth(req);
+    const p = await verifyProjectScope({
+      pool: c,
+      orgId: org.orgId,
+      userId: auth.userId,
+      roles: org.roles,
+      requiredAccess,
+      projectSlug: slug,
+    });
+    const r = await c.query<{ archived: boolean }>("SELECT archived_at IS NOT NULL AS archived FROM projects WHERE id = $1", [p.id]);
+    return { id: p.id, archived: r.rows[0]?.archived ?? false };
   }
 
-  private async writableProject(c: PoolClient | Pool, orgId: string, slug: string): Promise<ProjectRef> {
-    const p = await this.project(c, orgId, slug);
+  private async writableProject(c: PoolClient | Pool, req: Request, slug: string): Promise<ProjectRef> {
+    const p = await this.project(c, req, slug, "write");
     if (p.archived) throw new ConflictException({ statusCode: 409, message: "project_archived" });
     return p;
   }

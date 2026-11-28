@@ -18,10 +18,11 @@ describe("permissionsFor", () => {
     expect(p.has("member:write")).toBe(false);
   });
 
-  it("only org_admin can read audit or manage members", () => {
+  it("only org_admin can read audit or manage members or assign projects", () => {
     expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("audit:read"))).toEqual(["org_admin"]);
     expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("member:read"))).toEqual(["org_admin"]);
     expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("member:write"))).toEqual(["org_admin"]);
+    expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("project:assign"))).toEqual(["org_admin"]);
     expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("provider_account:license"))).toEqual(["org_admin"]);
   });
 

@@ -29,6 +29,13 @@ export default async function TasksPage({ params }: { params: Promise<{ slug: st
         <Link href="/projects">← Dự án</Link>
       </p>
       <h1>Task — {project?.name ?? slug}</h1>
+      {can(me, "project:assign") ? (
+        <nav aria-label="Project tabs" style={{ marginBottom: "1rem" }}>
+          <strong>Task</strong>
+          <span style={{ margin: "0 0.5rem" }}>|</span>
+          <Link href={`/projects/${slug}/members`}>Thành viên dự án</Link>
+        </nav>
+      ) : null}
       {data === null || project === null ? (
         <p role="status">Bạn chưa có quyền xem task của dự án này.</p>
       ) : (

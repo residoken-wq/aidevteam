@@ -30,6 +30,9 @@ node "$ROOT/packages/db/dist/admin-cli.js" role grant 900000003 org-test-a maint
 node "$ROOT/packages/db/dist/admin-cli.js" role grant 900000002 org-test-a viewer >/dev/null 2>&1
 node "$ROOT/packages/db/dist/allowlist-cli.js" add 900000005 e2e-platform >/dev/null 2>&1
 node "$ROOT/packages/db/dist/admin-cli.js" platform grant 900000005 e2e >/dev/null 2>&1
+# P2-13: project-scoped user (role project_member, assignments made by project-access.e2e.cjs)
+node "$ROOT/packages/db/dist/allowlist-cli.js" add 900000006 e2e-project-member >/dev/null 2>&1
+node "$ROOT/packages/db/dist/admin-cli.js" role grant 900000006 org-test-a project_member >/dev/null 2>&1
 
 session() { # create a fake session row for a seeded fake user, print the raw token
   local t h n
@@ -43,8 +46,8 @@ session() { # create a fake session row for a seeded fake user, print the raw to
   echo "$t"
 }
 # Assign separately: `export X="$(…)"` would hide a failing session() from set -e.
-ADMIN_TOKEN="$(session 900000001)"; MAINT_TOKEN="$(session 900000003)"; VIEWER_TOKEN="$(session 900000002)"; PLATFORM_TOKEN="$(session 900000005)"
-export ADMIN_TOKEN MAINT_TOKEN VIEWER_TOKEN PLATFORM_TOKEN
+ADMIN_TOKEN="$(session 900000001)"; MAINT_TOKEN="$(session 900000003)"; VIEWER_TOKEN="$(session 900000002)"; PLATFORM_TOKEN="$(session 900000005)"; PM_TOKEN="$(session 900000006)"
+export ADMIN_TOKEN MAINT_TOKEN VIEWER_TOKEN PLATFORM_TOKEN PM_TOKEN
 
 (cd "$ROOT/apps/api" && PORT=$API_PORT PUBLIC_BASE_URL="$BASE_URL" GITHUB_OAUTH_CLIENT_ID=Iv1.e2efakeclient GITHUB_OAUTH_CLIENT_SECRET=fake-secret-e2e-only-0000000 TRUSTED_PROXY_IPS=127.0.0.1 node dist/main.js >/tmp/e2e-api.log 2>&1) & pids+=($!)
 (cd "$ROOT/apps/web/.next/standalone" && PORT=$WEB_PORT HOSTNAME=127.0.0.1 API_INTERNAL_URL="http://127.0.0.1:$API_PORT" node apps/web/server.js >/tmp/e2e-web.log 2>&1) & pids+=($!)
