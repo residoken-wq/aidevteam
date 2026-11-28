@@ -38,6 +38,28 @@ describe("task contracts", () => {
     }
   });
 
+  it("P3-05: validates requiredCapabilities", () => {
+    const valid = TaskCreateSchema.safeParse({
+      title: "Fix bug",
+      requiredCapabilities: ["backend", "database"],
+    });
+    expect(valid.success).toBe(true);
+
+    // duplicate tags rejected
+    const dupes = TaskCreateSchema.safeParse({
+      title: "Fix bug",
+      requiredCapabilities: ["backend", "backend"],
+    });
+    expect(dupes.success).toBe(false);
+
+    // > 10 tags rejected
+    const tooMany = TaskCreateSchema.safeParse({
+      title: "Fix bug",
+      requiredCapabilities: Array.from({ length: 11 }, (_, i) => `cap-${i}`),
+    });
+    expect(tooMany.success).toBe(false);
+  });
+
   it("update cannot change status and allows updating/clearing epicSlug and sprintNumber", () => {
     expect(TaskUpdateSchema.safeParse({ status: "DONE" }).success).toBe(false);
     expect(TaskUpdateSchema.safeParse({}).success).toBe(false);

@@ -18,9 +18,11 @@ describe("AC-6 Migration 0015 & tasks.contract CHECK constraint", () => {
     );
     expect(colCheck.rows.length).toBe(1);
 
-    // Roll back migration 0015
-    const rolledBack = await migrateDown(pool, 1);
-    expect(rolledBack).toEqual(["0015"]);
+    // Roll back from the latest migration down to and including 0015 (later migrations may exist)
+    const idx = all.indexOf("0015");
+    expect(idx).toBeGreaterThanOrEqual(0);
+    const rolledBack = await migrateDown(pool, all.length - idx);
+    expect(rolledBack[rolledBack.length - 1]).toBe("0015");
 
     // Verify contract column is gone
     const colCheckAfter = await pool.query<{ column_name: string }>(
@@ -28,9 +30,9 @@ describe("AC-6 Migration 0015 & tasks.contract CHECK constraint", () => {
     );
     expect(colCheckAfter.rows.length).toBe(0);
 
-    // Re-apply migration 0015
+    // Re-apply 0015 and everything after it
     const reApplied = await migrateUp(pool);
-    expect(reApplied).toEqual(["0015"]);
+    expect(reApplied).toEqual(all.slice(idx));
   }, 30000);
 
   it("DB CHECK blocks contract that is not an object (array, number, string, boolean)", async () => {

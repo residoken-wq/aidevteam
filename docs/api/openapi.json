@@ -62,6 +62,23 @@
                               "null"
                             ]
                           },
+                          "capabilities": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                            }
+                          },
+                          "maxActiveTasks": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "activeTaskCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
                           "createdAt": {
                             "type": "string"
                           },
@@ -84,6 +101,9 @@
                           "reportsToSlug",
                           "enabled",
                           "description",
+                          "capabilities",
+                          "maxActiveTasks",
+                          "activeTaskCount",
                           "createdAt",
                           "updatedAt",
                           "archivedAt"
@@ -232,6 +252,23 @@
                         "null"
                       ]
                     },
+                    "capabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                      }
+                    },
+                    "maxActiveTasks": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "activeTaskCount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -254,6 +291,9 @@
                     "reportsToSlug",
                     "enabled",
                     "description",
+                    "capabilities",
+                    "maxActiveTasks",
+                    "activeTaskCount",
                     "createdAt",
                     "updatedAt",
                     "archivedAt"
@@ -341,6 +381,19 @@
                   "description": {
                     "type": "string",
                     "maxLength": 2000
+                  },
+                  "capabilities": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                    }
+                  },
+                  "maxActiveTasks": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50
                   }
                 },
                 "required": [
@@ -405,6 +458,23 @@
                         "null"
                       ]
                     },
+                    "capabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                      }
+                    },
+                    "maxActiveTasks": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "activeTaskCount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -427,6 +497,9 @@
                     "reportsToSlug",
                     "enabled",
                     "description",
+                    "capabilities",
+                    "maxActiveTasks",
+                    "activeTaskCount",
                     "createdAt",
                     "updatedAt",
                     "archivedAt"
@@ -529,6 +602,23 @@
                         "null"
                       ]
                     },
+                    "capabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                      }
+                    },
+                    "maxActiveTasks": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "activeTaskCount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -551,6 +641,9 @@
                     "reportsToSlug",
                     "enabled",
                     "description",
+                    "capabilities",
+                    "maxActiveTasks",
+                    "activeTaskCount",
                     "createdAt",
                     "updatedAt",
                     "archivedAt"
@@ -692,6 +785,19 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "capabilities": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                    }
+                  },
+                  "maxActiveTasks": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50
                   }
                 },
                 "additionalProperties": false
@@ -752,6 +858,23 @@
                         "null"
                       ]
                     },
+                    "capabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                      }
+                    },
+                    "maxActiveTasks": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "activeTaskCount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -774,6 +897,9 @@
                     "reportsToSlug",
                     "enabled",
                     "description",
+                    "capabilities",
+                    "maxActiveTasks",
+                    "activeTaskCount",
                     "createdAt",
                     "updatedAt",
                     "archivedAt"
@@ -3478,6 +3604,13 @@
                               }
                             ]
                           },
+                          "requiredCapabilities": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                            }
+                          },
                           "createdAt": {
                             "type": "string"
                           },
@@ -3496,6 +3629,7 @@
                           "cancelReason",
                           "epicSlug",
                           "sprintNumber",
+                          "requiredCapabilities",
                           "createdAt",
                           "updatedAt"
                         ],
@@ -3709,6 +3843,13 @@
                         }
                       ]
                     },
+                    "requiredCapabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                      }
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -3727,6 +3868,7 @@
                     "cancelReason",
                     "epicSlug",
                     "sprintNumber",
+                    "requiredCapabilities",
                     "createdAt",
                     "updatedAt"
                   ],
@@ -3833,6 +3975,14 @@
                     "type": "integer",
                     "exclusiveMinimum": 0,
                     "maximum": 9007199254740991
+                  },
+                  "requiredCapabilities": {
+                    "maxItems": 10,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                    }
                   }
                 },
                 "required": [
@@ -3922,6 +4072,13 @@
                         }
                       ]
                     },
+                    "requiredCapabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                      }
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -3940,6 +4097,7 @@
                     "cancelReason",
                     "epicSlug",
                     "sprintNumber",
+                    "requiredCapabilities",
                     "createdAt",
                     "updatedAt"
                   ],
@@ -4075,6 +4233,13 @@
                         }
                       ]
                     },
+                    "requiredCapabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                      }
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -4093,6 +4258,7 @@
                     "cancelReason",
                     "epicSlug",
                     "sprintNumber",
+                    "requiredCapabilities",
                     "createdAt",
                     "updatedAt"
                   ],
@@ -4235,6 +4401,14 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "requiredCapabilities": {
+                    "maxItems": 10,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                    }
                   }
                 },
                 "additionalProperties": false
@@ -5730,6 +5904,13 @@
                         }
                       ]
                     },
+                    "requiredCapabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                      }
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -5748,6 +5929,7 @@
                     "cancelReason",
                     "epicSlug",
                     "sprintNumber",
+                    "requiredCapabilities",
                     "createdAt",
                     "updatedAt"
                   ],

@@ -41,6 +41,8 @@ export default async function AgentsPage({ searchParams }: { searchParams: Promi
                   <th>Model</th>
                   <th>Tài khoản provider</th>
                   <th>Báo cáo cho</th>
+                  <th>Đang làm</th>
+                  <th>Năng lực</th>
                   <th>Trạng thái</th>
                   {canWrite ? <th>Thao tác</th> : null}
                 </tr>
@@ -54,6 +56,8 @@ export default async function AgentsPage({ searchParams }: { searchParams: Promi
                     <td>{a.model ? <code>{a.model}</code> : "—"}</td>
                     <td>{a.providerAccountSlug ?? "—"}</td>
                     <td>{a.reportsToSlug ?? "—"}</td>
+                    <td>Đang làm {a.activeTaskCount} / {a.maxActiveTasks}</td>
+                    <td>{a.capabilities && a.capabilities.length > 0 ? a.capabilities.join(", ") : "—"}</td>
                     <td>{a.archivedAt ? "Đã lưu trữ" : a.enabled ? "Đang bật" : "Đã tắt"}</td>
                     {canWrite ? (
                       <td>

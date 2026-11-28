@@ -30,4 +30,36 @@ describe("agent contracts", () => {
     expect(AgentUpdateSchema.safeParse({ slug: "x" }).success).toBe(false);
     expect(AgentUpdateSchema.safeParse({ title: "   " }).success).toBe(false);
   });
+
+  it("P3-05: validates capabilities and maxActiveTasks", () => {
+    const valid = AgentCreateSchema.safeParse({
+      slug: "dev-1",
+      name: "Dev 1",
+      capabilities: ["backend", "nodejs"],
+      maxActiveTasks: 5,
+    });
+    expect(valid.success).toBe(true);
+
+    // duplicate capabilities rejected
+    const dupes = AgentCreateSchema.safeParse({
+      slug: "dev-1",
+      name: "Dev 1",
+      capabilities: ["backend", "backend"],
+    });
+    expect(dupes.success).toBe(false);
+
+    // > 20 capabilities rejected
+    const tooMany = AgentCreateSchema.safeParse({
+      slug: "dev-1",
+      name: "Dev 1",
+      capabilities: Array.from({ length: 21 }, (_, i) => `cap-${i}`),
+    });
+    expect(tooMany.success).toBe(false);
+
+    // maxActiveTasks range (1..50)
+    expect(AgentCreateSchema.safeParse({ slug: "dev-1", name: "Dev 1", maxActiveTasks: 0 }).success).toBe(false);
+    expect(AgentCreateSchema.safeParse({ slug: "dev-1", name: "Dev 1", maxActiveTasks: 51 }).success).toBe(false);
+    expect(AgentCreateSchema.safeParse({ slug: "dev-1", name: "Dev 1", maxActiveTasks: 1 }).success).toBe(true);
+    expect(AgentCreateSchema.safeParse({ slug: "dev-1", name: "Dev 1", maxActiveTasks: 50 }).success).toBe(true);
+  });
 });

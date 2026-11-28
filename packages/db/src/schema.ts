@@ -228,6 +228,11 @@ export const agents = pgTable(
     reportsToAgentId: uuid("reports_to_agent_id"),
     enabled: boolean("enabled").notNull().default(true),
     description: text("description"),
+    capabilities: text("capabilities")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    maxActiveTasks: integer("max_active_tasks").notNull().default(3),
     createdByUserId: uuid("created_by_user_id").references(() => users.id),
     createdAt: ts("created_at").notNull().defaultNow(),
     updatedAt: ts("updated_at").notNull().defaultNow(),
@@ -238,6 +243,8 @@ export const agents = pgTable(
     unique("agents_id_org_unique").on(t.id, t.orgId),
     foreignKey({ name: "agents_provider_same_org_fk", columns: [t.providerAccountId, t.orgId], foreignColumns: [providerAccounts.id, providerAccounts.orgId] }),
     foreignKey({ name: "agents_manager_same_org_fk", columns: [t.reportsToAgentId, t.orgId], foreignColumns: [t.id, t.orgId] }),
+    check("agents_capabilities_len_check", sql`cardinality(${t.capabilities}) <= 20`),
+    check("agents_max_active_tasks_range", sql`${t.maxActiveTasks} >= 1 AND ${t.maxActiveTasks} <= 50`),
   ],
 );
 
@@ -347,6 +354,10 @@ export const tasks = pgTable(
     updatedAt: ts("updated_at").notNull().defaultNow(),
     epicId: uuid("epic_id"),
     sprintId: uuid("sprint_id"),
+    requiredCapabilities: text("required_capabilities")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
   },
   (t) => [
     unique("tasks_project_number_unique").on(t.projectId, t.number),
@@ -356,6 +367,7 @@ export const tasks = pgTable(
     foreignKey({ name: "tasks_agent_same_org_fk", columns: [t.agentId, t.orgId], foreignColumns: [agents.id, agents.orgId] }),
     foreignKey({ name: "tasks_epic_same_project_fk", columns: [t.epicId, t.projectId], foreignColumns: [epics.id, epics.projectId] }),
     foreignKey({ name: "tasks_sprint_same_project_fk", columns: [t.sprintId, t.projectId], foreignColumns: [sprints.id, sprints.projectId] }),
+    check("tasks_required_capabilities_len_check", sql`cardinality(${t.requiredCapabilities}) <= 10`),
     index("tasks_org_project_status_idx").on(t.orgId, t.projectId, t.status),
   ],
 );
