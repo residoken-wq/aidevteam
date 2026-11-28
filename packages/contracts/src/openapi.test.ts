@@ -77,6 +77,8 @@ describe("OpenAPI 3.1.0 generation", () => {
       "DELETE /org/members/roles",
       "POST /projects",
       "PATCH /projects/{slug}",
+      "POST /projects/{slug}/members",
+      "DELETE /projects/{slug}/members",
       "POST /provider-accounts",
       "PATCH /provider-accounts/{slug}",
       "POST /provider-accounts/{slug}/license",
