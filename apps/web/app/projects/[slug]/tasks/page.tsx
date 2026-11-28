@@ -1,4 +1,4 @@
-import type { Agent, Epic, Project, Sprint, Task, Worker } from "@aidevteam/contracts";
+import type { Agent, Epic, Project, ProjectTaskDependencies, Sprint, Task, TaskDependencies, Worker } from "@aidevteam/contracts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiGet, can, type Me } from "../../../../lib/server-api";
@@ -46,6 +46,18 @@ export default async function TasksPage({
         .map((w) => ({ slug: w.slug, name: w.name }))
     : [];
 
+  // One request for every edge of the project (not one per task), then group per task number.
+  const depsMap: Record<number, TaskDependencies> = {};
+  if (data?.items && data.items.length > 0) {
+    const edges = (await apiGet<ProjectTaskDependencies>(`/projects/${encodeURIComponent(slug)}/task-dependencies`))?.items ?? [];
+    const entry = (n: number): TaskDependencies => (depsMap[n] ??= { dependsOn: [], blockedBy: [], dependents: [] });
+    for (const e of edges) {
+      entry(e.task.number).dependsOn.push(e.dependsOn);
+      if (e.dependsOn.status !== "DONE") entry(e.task.number).blockedBy.push(e.dependsOn);
+      entry(e.dependsOn.number).dependents.push(e.task);
+    }
+  }
+
   return (
     <div>
       <p>
@@ -69,6 +81,7 @@ export default async function TasksPage({
           <Board
             projectSlug={slug}
             initial={data.items}
+            initialDeps={depsMap}
             canWrite={canWrite}
             canDispatch={canDispatch}
             agents={agents}

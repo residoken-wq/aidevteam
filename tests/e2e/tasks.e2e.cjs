@@ -10,7 +10,8 @@ const BASE = process.env.BASE_URL;
 const XSS = '<img src=x onerror="window.__xss=1"><script>window.__xss=1</script>';
 
 async function contextFor(browser, token) {
-  const ctx = await browser.newContext();
+  // Tall viewport: tabs, epic/sprint filters and card badges push the columns down; HTML5 drag needs them on screen.
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 2400 } });
   await ctx.addCookies([{ name: "__Host-cc_session", value: token, domain: new URL(BASE).hostname, path: "/", secure: true, httpOnly: true, sameSite: "Lax" }]);
   return ctx;
 }
@@ -74,7 +75,7 @@ async function contextFor(browser, token) {
       await inCol(page, "BACKLOG", 3).waitFor();
       const card = page.getByTestId("task-1");
       await card.getByText("<b>Task một</b>").waitFor();
-      await card.locator("summary").click();
+      await card.locator("summary", { hasText: "Mô tả" }).click();
       await card.getByText(XSS).waitFor();
       assert.equal(await card.locator("script, img, b").count(), 0, "HTML from task text was rendered");
       assert.equal(await page.evaluate(() => globalThis.__xss), undefined, "script from task text ran");

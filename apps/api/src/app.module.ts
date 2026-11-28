@@ -15,6 +15,7 @@ import { ProviderAccountsController } from "./provider-accounts/provider-account
 import { WorkersController } from "./workers/workers.controller";
 import { AgentsController } from "./agents/agents.controller";
 import { TasksController } from "./tasks/tasks.controller";
+import { ProjectTaskDependenciesController, TaskDependenciesController } from "./tasks/task-dependencies.controller";
 import { RunsController } from "./runs/runs.controller";
 import { RunWorker } from "./runs/run-worker.service";
 import { defaultMockRunner, type MockRunner } from "./runs/mock-runner";
@@ -38,6 +39,8 @@ export const APP_CONTROLLERS: Type[] = [
   WorkersController,
   AgentsController,
   TasksController,
+  TaskDependenciesController,
+  ProjectTaskDependenciesController,
   RunsController,
   PlatformOrgsController,
   DashboardController,

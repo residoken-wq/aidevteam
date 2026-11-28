@@ -108,5 +108,53 @@ export const TaskListQuerySchema = z
   })
   .strict();
 
+export const TaskDependencyChangeSchema = z
+  .object({
+    dependsOn: z.number().int().positive(),
+  })
+  .strict();
+export type TaskDependencyChange = z.infer<typeof TaskDependencyChangeSchema>;
+
+export const TaskDependencyItemSchema = z
+  .object({
+    number: z.number().int().positive(),
+    title: z.string(),
+    status: z.enum(TASK_STATUSES),
+  })
+  .strict();
+export type TaskDependencyItem = z.infer<typeof TaskDependencyItemSchema>;
+
+export const TaskDependenciesSchema = z
+  .object({
+    dependsOn: z.array(TaskDependencyItemSchema),
+    blockedBy: z.array(TaskDependencyItemSchema),
+    dependents: z.array(TaskDependencyItemSchema),
+  })
+  .strict();
+export type TaskDependencies = z.infer<typeof TaskDependenciesSchema>;
+
+/** All dependency edges of one project in a single response (Kanban: avoids one request per task). */
+export const ProjectTaskDependencyEdgeSchema = z
+  .object({
+    task: TaskDependencyItemSchema,
+    dependsOn: TaskDependencyItemSchema,
+  })
+  .strict();
+export type ProjectTaskDependencyEdge = z.infer<typeof ProjectTaskDependencyEdgeSchema>;
+
+export const ProjectTaskDependenciesSchema = z
+  .object({
+    items: z.array(ProjectTaskDependencyEdgeSchema),
+  })
+  .strict();
+export type ProjectTaskDependencies = z.infer<typeof ProjectTaskDependenciesSchema>;
+
+export const TaskDependencyResultSchema = z
+  .object({
+    changed: z.boolean(),
+  })
+  .strict();
+export type TaskDependencyResult = z.infer<typeof TaskDependencyResultSchema>;
+
 export type Task = z.infer<typeof TaskSchema>;
 export type TaskTransition = z.infer<typeof TaskTransitionSchema>;
