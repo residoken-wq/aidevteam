@@ -8,6 +8,9 @@ import {
   RUN_STATUSES,
   RUN_TRANSITIONS,
   RunSchema,
+  RunsQuerySchema,
+  RunsResponseSchema,
+  StatusListQuerySchema,
 } from "./run";
 
 describe("STATE_MACHINES.md §2 mirrors RUN_TRANSITIONS", () => {
@@ -89,5 +92,64 @@ describe("run contracts", () => {
 
     // Refuses orgId
     expect(RunSchema.safeParse({ ...validDto, orgId: "a0000000-0000-4000-a000-000000000000" }).success).toBe(false);
+  });
+
+  it("StatusListQuerySchema parses single, comma-separated, and array statuses", () => {
+    expect(StatusListQuerySchema.parse("QUEUED")).toEqual(["QUEUED"]);
+    expect(StatusListQuerySchema.parse("QUEUED,RUNNING")).toEqual(["QUEUED", "RUNNING"]);
+    expect(StatusListQuerySchema.parse(["QUEUED", "RUNNING"])).toEqual(["QUEUED", "RUNNING"]);
+    expect(StatusListQuerySchema.parse(["QUEUED,RUNNING", "FAILED"])).toEqual(["QUEUED", "RUNNING", "FAILED"]);
+    expect(StatusListQuerySchema.parse(undefined)).toBeUndefined();
+    expect(StatusListQuerySchema.parse("")).toBeUndefined();
+
+    // Rejects invalid status
+    expect(StatusListQuerySchema.safeParse("INVALID").success).toBe(false);
+    expect(StatusListQuerySchema.safeParse("QUEUED,INVALID").success).toBe(false);
+    expect(StatusListQuerySchema.safeParse(["INVALID"]).success).toBe(false);
+  });
+
+  it("RunsQuerySchema applies defaults, validates limits, and rejects unknown fields", () => {
+    expect(RunsQuerySchema.parse({})).toEqual({
+      limit: 50,
+      offset: 0,
+    });
+
+    expect(
+      RunsQuerySchema.parse({
+        limit: "100",
+        offset: "10",
+        status: "QUEUED,RUNNING",
+        project: "alpha-proj",
+        worker: "mock-worker",
+      }),
+    ).toEqual({
+      limit: 100,
+      offset: 10,
+      status: ["QUEUED", "RUNNING"],
+      project: "alpha-proj",
+      worker: "mock-worker",
+    });
+
+    // Limit > 100 is rejected (P3-09 decision 1: limit <= 100)
+    expect(RunsQuerySchema.safeParse({ limit: "101" }).success).toBe(false);
+    expect(RunsQuerySchema.safeParse({ limit: "0" }).success).toBe(false);
+    expect(RunsQuerySchema.safeParse({ offset: "-1" }).success).toBe(false);
+    // Invalid slug
+    expect(RunsQuerySchema.safeParse({ project: "INVALID SLUG" }).success).toBe(false);
+    expect(RunsQuerySchema.safeParse({ worker: "INVALID WORKER" }).success).toBe(false);
+    // Extra fields rejected (.strict())
+    expect(RunsQuerySchema.safeParse({ extra: 1 }).success).toBe(false);
+  });
+
+  it("RunsResponseSchema validates total and items", () => {
+    const valid = {
+      items: [],
+      total: 0,
+      limit: 50,
+      offset: 0,
+    };
+    expect(RunsResponseSchema.parse(valid)).toEqual(valid);
+    expect(RunsResponseSchema.safeParse({ ...valid, total: -1 }).success).toBe(false);
+    expect(RunsResponseSchema.safeParse({ ...valid, extra: true }).success).toBe(false);
   });
 });
