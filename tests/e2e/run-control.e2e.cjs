@@ -57,7 +57,7 @@ async function contextFor(browser, token) {
     const done = page.waitForResponse(
       (r) => r.request().method() === "POST" && r.url().includes(`/tasks/${n}/transitions`),
     );
-    await card.getByRole("button", { name: "Chuyển" }).click();
+    await card.getByRole("button", { name: "Chuyển", exact: true }).click();
     await done;
   };
 
@@ -135,7 +135,7 @@ async function contextFor(browser, token) {
 
     await step("AC-3: clicking Không in dispatch dialog sends no request and closes dialog", async () => {
       const card1 = inCol(page, "TODO", 1);
-      const dispatchButton = card1.getByRole("button", { name: "Chạy mock" });
+      const dispatchButton = card1.getByRole("button", { name: "Chạy mock", exact: true });
       await dispatchButton.waitFor();
       await dispatchButton.click();
 
@@ -162,7 +162,7 @@ async function contextFor(browser, token) {
 
     await step("AC-3: pressing Esc in dispatch dialog sends no request and closes dialog", async () => {
       const card1 = inCol(page, "TODO", 1);
-      const dispatchButton = card1.getByRole("button", { name: "Chạy mock" });
+      const dispatchButton = card1.getByRole("button", { name: "Chạy mock", exact: true });
       await dispatchButton.waitFor();
       await dispatchButton.click();
 
@@ -185,7 +185,7 @@ async function contextFor(browser, token) {
 
     await step("AC-3: confirming dispatch creates run and navigates to /runs/:id", async () => {
       const card1 = inCol(page, "TODO", 1);
-      const dispatchButton = card1.getByRole("button", { name: "Chạy mock" });
+      const dispatchButton = card1.getByRole("button", { name: "Chạy mock", exact: true });
       await dispatchButton.click();
 
       const dialog = page.locator("dialog[open]");
@@ -238,7 +238,7 @@ async function contextFor(browser, token) {
       await page.getByRole("heading", { name: `Task — Run Control Project` }).waitFor();
 
       const card2 = inCol(page, "TODO", 2);
-      const dispatchBtn = card2.getByRole("button", { name: "Chạy mock" });
+      const dispatchBtn = card2.getByRole("button", { name: "Chạy mock", exact: true });
       await dispatchBtn.waitFor();
       await dispatchBtn.click();
 
@@ -295,7 +295,7 @@ async function contextFor(browser, token) {
       await vpage.goto(`${BASE}/projects/${projSlug}/tasks`);
       await inCol(vpage, "TODO", 1).waitFor();
       assert.equal(
-        await vpage.getByRole("button", { name: "Chạy mock" }).count(),
+        await vpage.getByRole("button", { name: "Chạy mock", exact: true }).count(),
         0,
         "Viewer must not see Chạy mock button on Kanban board",
       );

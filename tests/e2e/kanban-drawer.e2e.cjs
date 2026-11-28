@@ -109,6 +109,7 @@ async function contextFor(browser, token) {
       const f = page.getByRole("form", { name: "Bộ lọc task" });
       await f.getByLabel("Ưu tiên:").selectOption("high");
       await f.getByRole("button", { name: "Lọc" }).click();
+      await page.waitForURL(/priority=high/);
 
       // Task 1 (high) shown, Task 2 & 3 hidden
       await inCol(page, "BACKLOG", 1).waitFor();
@@ -122,6 +123,7 @@ async function contextFor(browser, token) {
       await f.getByLabel("Ưu tiên:").selectOption("");
       await f.getByLabel("Agent:").selectOption("unassigned");
       await f.getByRole("button", { name: "Lọc" }).click();
+      await page.waitForURL(/agent=unassigned/);
 
       // Task 2 & 3 (unassigned) shown, Task 1 (assigned) hidden
       await inCol(page, "BACKLOG", 2).waitFor();
@@ -135,6 +137,7 @@ async function contextFor(browser, token) {
       await f.getByLabel("Agent:").selectOption("");
       await f.getByLabel("Tìm:").fill("backend");
       await f.getByRole("button", { name: "Lọc" }).click();
+      await page.waitForURL(/q=backend/);
 
       await inCol(page, "BACKLOG", 1).waitFor();
       assert.equal(await inCol(page, "BACKLOG", 2).count(), 0);
@@ -151,6 +154,7 @@ async function contextFor(browser, token) {
 
     await step("AC-1: Xóa lọc link clears all filters and restores full board", async () => {
       await page.getByRole("link", { name: "Xóa lọc" }).click();
+      await page.waitForURL((url) => !url.searchParams.has("q") && !url.searchParams.has("priority") && !url.searchParams.has("agent"));
       await inCol(page, "BACKLOG", 1).waitFor();
       await inCol(page, "BACKLOG", 2).waitFor();
       await inCol(page, "BACKLOG", 3).waitFor();
@@ -164,6 +168,7 @@ async function contextFor(browser, token) {
       await page.getByTestId("task-1-title-btn").click();
       const drawer = page.getByTestId("task-drawer");
       await drawer.waitFor();
+      await page.waitForURL(/task=1/);
       assert.ok(page.url().includes("task=1"), "URL must have ?task=1");
 
       // Verify content
@@ -190,9 +195,13 @@ async function contextFor(browser, token) {
     await step("AC-2: close drawer via Esc key and verify focus returns to trigger button", async () => {
       await page.keyboard.press("Escape");
       await page.getByTestId("task-drawer").waitFor({ state: "hidden" });
+      await page.waitForURL((url) => !url.searchParams.has("task"));
       assert.ok(!page.url().includes("task=1"), "URL must not contain task=1 after close");
 
       // Focus should be back on task-1 title button
+      await page.waitForFunction(() => {
+        return globalThis.document.activeElement?.getAttribute("data-testid") === "task-1-title-btn";
+      });
       const isFocused = await page.evaluate(() => {
         return globalThis.document.activeElement?.getAttribute("data-testid") === "task-1-title-btn";
       });
@@ -204,10 +213,12 @@ async function contextFor(browser, token) {
       await page.keyboard.press("Enter");
       const drawer = page.getByTestId("task-drawer");
       await drawer.waitFor();
+      await page.waitForURL(/task=2/);
       assert.ok(page.url().includes("task=2"), "URL must have ?task=2");
 
       await drawer.getByTestId("drawer-close-btn").click();
       await drawer.waitFor({ state: "hidden" });
+      await page.waitForURL((url) => !url.searchParams.has("task"));
       assert.ok(!page.url().includes("task=2"));
     });
 
@@ -219,6 +230,7 @@ async function contextFor(browser, token) {
 
       await page.keyboard.press("Escape");
       await drawer.waitFor({ state: "hidden" });
+      await page.waitForURL((url) => !url.searchParams.has("task"));
     });
 
     await step("AC-3: scroll preservation across status transition and page reload", async () => {
@@ -228,19 +240,23 @@ async function contextFor(browser, token) {
         await inCol(page, "BACKLOG", i).waitFor();
       }
 
-      // Scroll down by 300px
-      await page.evaluate(() => globalThis.window.scrollTo(0, 300));
+      // Scroll down to task 10 at the end of the list
+      const card = page.getByTestId("task-10");
+      await card.scrollIntoViewIfNeeded();
       const scrollBefore = await page.evaluate(() => globalThis.window.scrollY);
 
       // Move task 10 to TODO
-      const card = page.getByTestId("task-10");
       await card.getByLabel("Chuyển sang").selectOption({ label: "Cần làm" });
       const done = page.waitForResponse((r) => r.request().method() === "POST" && r.url().includes("/tasks/10/transitions"));
-      await card.getByRole("button", { name: "Chuyển" }).click();
+      await card.getByRole("button", { name: "Chuyển", exact: true }).click();
       await done;
       await inCol(page, "TODO", 10).waitFor();
 
       // Verify scroll position deviation <= 50px
+      await page.waitForFunction(
+        (target) => Math.abs(globalThis.window.scrollY - target) <= 50,
+        scrollBefore,
+      );
       const scrollAfterMove = await page.evaluate(() => globalThis.window.scrollY);
       assert.ok(
         Math.abs(scrollAfterMove - scrollBefore) <= 50,
@@ -250,6 +266,10 @@ async function contextFor(browser, token) {
       // Reload page with same URL and verify scroll restored
       await page.reload();
       await inCol(page, "TODO", 10).waitFor();
+      await page.waitForFunction(
+        (target) => Math.abs(globalThis.window.scrollY - target) <= 50,
+        scrollBefore,
+      );
       const scrollAfterReload = await page.evaluate(() => globalThis.window.scrollY);
       assert.ok(
         Math.abs(scrollAfterReload - scrollBefore) <= 50,

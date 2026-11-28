@@ -8,29 +8,28 @@ export const dynamic = "force-dynamic";
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,62}$/;
 
+function getSearchParam(val: string | string[] | undefined): string | undefined {
+  if (Array.isArray(val)) return val[0]?.trim() || undefined;
+  return typeof val === "string" ? val.trim() || undefined : undefined;
+}
+
 export default async function TasksPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{
-    epic?: string;
-    sprint?: string;
-    priority?: string;
-    agent?: string;
-    q?: string;
-    task?: string;
-  }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
   if (!SLUG_RE.test(slug)) notFound();
   const sp = (await searchParams) ?? {};
-  const epicFilter = sp.epic?.trim() || undefined;
-  const sprintFilter = sp.sprint?.trim() || undefined;
-  const priorityFilter = sp.priority?.trim() || undefined;
-  const agentFilter = sp.agent?.trim() || undefined;
-  const qFilter = sp.q?.trim() || undefined;
-  const taskDrawerParam = sp.task ? parseInt(sp.task.trim(), 10) : undefined;
+  const epicFilter = getSearchParam(sp.epic);
+  const sprintFilter = getSearchParam(sp.sprint);
+  const priorityFilter = getSearchParam(sp.priority);
+  const agentFilter = getSearchParam(sp.agent);
+  const qFilter = getSearchParam(sp.q);
+  const rawTask = getSearchParam(sp.task);
+  const taskDrawerParam = rawTask ? parseInt(rawTask, 10) : undefined;
   const initialTaskNumber = Number.isInteger(taskDrawerParam) && taskDrawerParam! > 0 ? taskDrawerParam : undefined;
 
   const me = await apiGet<Me>("/auth/me");

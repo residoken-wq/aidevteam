@@ -44,7 +44,7 @@ async function contextFor(browser, token) {
     const done = page.waitForResponse(
       (r) => r.request().method() === "POST" && r.url().includes(`/tasks/${n}/transitions`),
     );
-    await card.getByRole("button", { name: "Chuyển" }).click();
+    await card.getByRole("button", { name: "Chuyển", exact: true }).click();
     await done;
   };
 
@@ -127,7 +127,7 @@ async function contextFor(browser, token) {
       const dispatchPost = page.waitForResponse(
         (r) => r.request().method() === "POST" && r.url().includes("/tasks/2/dispatch"),
       );
-      await dispatchForm.getByRole("button", { name: "Chạy mock" }).click();
+      await dispatchForm.getByRole("button", { name: "Chạy mock", exact: true }).click();
       // P3-09: dispatch now asks for confirmation in a dialog
       await page.locator("dialog[open]").getByRole("button", { name: "Xác nhận", exact: true }).click();
       const res = await dispatchPost;

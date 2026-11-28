@@ -91,8 +91,8 @@ export function Board({
 
   // Drawer state
   const [selectedTaskNumber, setSelectedTaskNumber] = useState<number | null>(initialTaskNumber ?? null);
+  const lastOpenedTaskNumberRef = useRef<number | null>(initialTaskNumber ?? null);
   const taskButtonRefs = useRef<Record<number, HTMLButtonElement | null>>({});
-  const lastFocusedBtnRef = useRef<HTMLButtonElement | null>(null);
 
   // Scroll preservation
   const boardRef = useRef<HTMLDivElement>(null);
@@ -127,18 +127,24 @@ export function Board({
     if (typeof window === "undefined") return;
     const saved = loadScrollPosition(projectSlug, window.location.search);
     if (saved) {
-      requestAnimationFrame(() => {
-        restoreScroll(saved);
-      });
+      const apply = () => restoreScroll(saved);
+      requestAnimationFrame(apply);
+      setTimeout(apply, 50);
+      setTimeout(apply, 150);
+      setTimeout(apply, 300);
     }
   }, [projectSlug]);
 
-  // Listen to scroll events to persist position in sessionStorage
+  // Debounced listener to persist scroll position in sessionStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
     function onScroll() {
-      const pos = captureCurrentScroll();
-      saveScrollPosition(projectSlug, window.location.search, pos);
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        const pos = captureCurrentScroll();
+        saveScrollPosition(projectSlug, window.location.search, pos);
+      }, 100);
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     const boardEl = boardRef.current;
@@ -146,6 +152,7 @@ export function Board({
       boardEl.addEventListener("scroll", onScroll, { passive: true });
     }
     return () => {
+      if (timer) clearTimeout(timer);
       window.removeEventListener("scroll", onScroll);
       if (boardEl) boardEl.removeEventListener("scroll", onScroll);
     };
@@ -154,13 +161,14 @@ export function Board({
   // Update tasks and restore scroll on initial prop update (e.g. router.refresh())
   useEffect(() => {
     setTasks(initial);
-    if (preservedScrollRef.current) {
-      const pos = preservedScrollRef.current;
-      requestAnimationFrame(() => {
-        restoreScroll(pos);
-      });
+    const pos = preservedScrollRef.current ?? loadScrollPosition(projectSlug, window.location.search);
+    if (pos) {
+      const apply = () => restoreScroll(pos);
+      requestAnimationFrame(apply);
+      setTimeout(apply, 50);
+      setTimeout(apply, 150);
     }
-  }, [initial]);
+  }, [initial, projectSlug]);
 
   useEffect(() => setDeps(initialDeps), [initialDeps]);
   useEffect(() => setPriorityFilter(currentPriority ?? ""), [currentPriority]);
@@ -171,8 +179,30 @@ export function Board({
   useEffect(() => {
     if (initialTaskNumber) {
       setSelectedTaskNumber(initialTaskNumber);
+      lastOpenedTaskNumberRef.current = initialTaskNumber;
     }
   }, [initialTaskNumber]);
+
+  // When drawer closes, restore focus to the trigger button
+  useEffect(() => {
+    if (selectedTaskNumber === null && lastOpenedTaskNumberRef.current !== null) {
+      const taskNum = lastOpenedTaskNumberRef.current;
+      const returnFocus = () => {
+        const btn =
+          (document.querySelector(`[data-testid="task-${taskNum}-title-btn"]`) as HTMLButtonElement | null) ??
+          taskButtonRefs.current[taskNum];
+        btn?.focus();
+      };
+      returnFocus();
+      requestAnimationFrame(() => {
+        returnFocus();
+        requestAnimationFrame(returnFocus);
+      });
+      setTimeout(returnFocus, 50);
+    } else if (selectedTaskNumber !== null) {
+      lastOpenedTaskNumberRef.current = selectedTaskNumber;
+    }
+  }, [selectedTaskNumber]);
 
   // Listen for browser Back/Forward (popstate) to sync drawer with ?task= parameter
   useEffect(() => {
@@ -184,6 +214,7 @@ export function Board({
         const num = parseInt(t, 10);
         if (Number.isInteger(num) && num > 0) {
           setSelectedTaskNumber(num);
+          lastOpenedTaskNumberRef.current = num;
           return;
         }
       }
@@ -194,25 +225,43 @@ export function Board({
   }, []);
 
   function openDrawer(taskNumber: number) {
-    lastFocusedBtnRef.current = taskButtonRefs.current[taskNumber] ?? null;
+    lastOpenedTaskNumberRef.current = taskNumber;
     setSelectedTaskNumber(taskNumber);
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
       sp.set("task", String(taskNumber));
-      window.history.pushState(null, "", `${window.location.pathname}?${sp.toString()}`);
+      const qs = sp.toString();
+      const newUrl = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
+      window.history.replaceState(null, "", newUrl);
+      router.replace(newUrl, { scroll: false });
     }
   }
 
   function closeDrawer() {
+    const taskNum = selectedTaskNumber ?? lastOpenedTaskNumberRef.current;
     setSelectedTaskNumber(null);
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
       sp.delete("task");
       const qs = sp.toString();
-      window.history.pushState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+      const newUrl = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
+      window.history.replaceState(null, "", newUrl);
+      router.replace(newUrl, { scroll: false });
     }
-    // Return focus to the trigger button
-    lastFocusedBtnRef.current?.focus();
+    if (taskNum !== null) {
+      const returnFocus = () => {
+        const btn =
+          (document.querySelector(`[data-testid="task-${taskNum}-title-btn"]`) as HTMLButtonElement | null) ??
+          taskButtonRefs.current[taskNum];
+        btn?.focus();
+      };
+      returnFocus();
+      requestAnimationFrame(() => {
+        returnFocus();
+        requestAnimationFrame(returnFocus);
+      });
+      setTimeout(returnFocus, 50);
+    }
   }
 
   function onFilterSubmit(e: FormEvent<HTMLFormElement>) {
@@ -238,7 +287,7 @@ export function Board({
       ...(selectedTaskNumber ? { task: selectedTaskNumber } : {}),
     });
 
-    router.push(`/projects/${encodeURIComponent(projectSlug)}/tasks${query ? `?${query}` : ""}`);
+    router.push(`/projects/${encodeURIComponent(projectSlug)}/tasks${query ? `?${query}` : ""}`, { scroll: false });
   }
 
   async function reloadDeps(n: number) {
@@ -334,62 +383,75 @@ export function Board({
         onSubmit={onFilterSubmit}
         style={{ marginBottom: "1rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}
       >
-        <label>
+        <label htmlFor="kanban-filter-epic">
           Epic:{" "}
-          <select name="epic" defaultValue={currentEpic ?? ""}>
-            <option value="">Tất cả epic</option>
-            {epics.map((e) => (
-              <option key={e.slug} value={e.slug}>
-                {e.title}
-              </option>
-            ))}
-          </select>
         </label>
-        <label>
+        <select id="kanban-filter-epic" name="epic" defaultValue={currentEpic ?? ""}>
+          <option value="">Tất cả epic</option>
+          {epics.map((e) => (
+            <option key={e.slug} value={e.slug}>
+              {e.title}
+            </option>
+          ))}
+        </select>
+        <label htmlFor="kanban-filter-sprint">
           Sprint:{" "}
-          <select name="sprint" defaultValue={currentSprint ?? ""}>
-            <option value="">Tất cả sprint</option>
-            {sprints.map((s) => (
-              <option key={s.number} value={String(s.number)}>
-                Sprint #{s.number} — {s.name}
-              </option>
-            ))}
-          </select>
         </label>
-        <label>
+        <select id="kanban-filter-sprint" name="sprint" defaultValue={currentSprint ?? ""}>
+          <option value="">Tất cả sprint</option>
+          {sprints.map((s) => (
+            <option key={s.number} value={String(s.number)}>
+              Sprint #{s.number} — {s.name}
+            </option>
+          ))}
+        </select>
+        <label htmlFor="kanban-filter-priority">
           Ưu tiên:{" "}
-          <select name="priority" defaultValue={currentPriority ?? ""}>
-            <option value="">Tất cả ưu tiên</option>
-            <option value="low">Thấp</option>
-            <option value="medium">Trung bình</option>
-            <option value="high">Cao</option>
-          </select>
         </label>
-        <label>
+        <select
+          id="kanban-filter-priority"
+          name="priority"
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value)}
+        >
+          <option value="">Tất cả ưu tiên</option>
+          <option value="low">Thấp</option>
+          <option value="medium">Trung bình</option>
+          <option value="high">Cao</option>
+        </select>
+        <label htmlFor="kanban-filter-agent">
           Agent:{" "}
-          <select name="agent" defaultValue={currentAgent ?? ""}>
-            <option value="">Tất cả agent</option>
-            <option value="unassigned">Chưa gán</option>
-            {allAgentOptions.map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
         </label>
-        <label>
+        <select
+          id="kanban-filter-agent"
+          name="agent"
+          value={agentFilter}
+          onChange={(e) => setAgentFilter(e.target.value)}
+        >
+          <option value="">Tất cả agent</option>
+          <option value="unassigned">Chưa gán</option>
+          {allAgentOptions.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+        <label htmlFor="kanban-filter-q">
           Tìm:{" "}
-          <input
-            type="text"
-            name="q"
-            defaultValue={currentQ ?? ""}
-            placeholder="Tìm theo tiêu đề..."
-            aria-label="Tìm theo tiêu đề"
-          />
         </label>
+        <input
+          id="kanban-filter-q"
+          type="text"
+          name="q"
+          value={qFilter}
+          onChange={(e) => setQFilter(e.target.value)}
+          placeholder="Tìm theo tiêu đề..."
+        />
         <button type="submit">Lọc</button>
         {isFiltered ? (
-          <Link href={`/projects/${encodeURIComponent(projectSlug)}/tasks`}>Xóa lọc</Link>
+          <Link href={`/projects/${encodeURIComponent(projectSlug)}/tasks`} scroll={false}>
+            Xóa lọc
+          </Link>
         ) : null}
       </form>
 
