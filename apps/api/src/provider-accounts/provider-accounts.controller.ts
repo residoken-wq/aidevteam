@@ -123,15 +123,23 @@ export class ProviderAccountsController {
     const input = parseOr422(ProviderAccountLicenseChangeSchema, body);
     const org = getOrg(req);
     const actor = getAuth(req);
-    const current = await this.find(org.orgId, slug);
-    if (current.archived_at) throw new ConflictException({ statusCode: 409, message: "provider_account_archived" });
-    if (current.license_status === input.licenseStatus) {
-      return toDto(current);
-    }
+    const found = await this.find(org.orgId, slug);
     const client = await this.pool.connect();
     let updatedRow: Row;
     try {
       await client.query("BEGIN");
+      // Re-read under a row lock so concurrent changes serialize and the audited "from" is the real previous value.
+      const locked = await client.query<Row>(`SELECT ${COLUMNS} FROM provider_accounts WHERE org_id = $1 AND id = $2 FOR UPDATE`, [
+        org.orgId,
+        found.id,
+      ]);
+      const current = locked.rows[0];
+      if (!current) throw new NotFoundException();
+      if (current.archived_at) throw new ConflictException({ statusCode: 409, message: "provider_account_archived" });
+      if (current.license_status === input.licenseStatus) {
+        await client.query("COMMIT");
+        return toDto(current);
+      }
       const r = await client.query<Row>(
         `UPDATE provider_accounts
             SET license_status = $3,
