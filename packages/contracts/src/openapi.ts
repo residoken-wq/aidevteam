@@ -9,6 +9,8 @@ import {
   ProjectMemberSchema,
   ProjectMemberUnassignSchema,
   ProjectSchema,
+  ProjectStatsQuerySchema,
+  ProjectStatsResponseSchema,
   ProjectUpdateSchema,
 } from "./project";
 import {
@@ -38,6 +40,8 @@ import {
   TaskDependencyResultSchema,
   TaskListQuerySchema,
   TaskSchema,
+  TaskSearchQuerySchema,
+  TaskSearchResponseSchema,
   TaskTransitionSchema,
   TaskUpdateSchema,
 } from "./task";
@@ -355,6 +359,19 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
   },
 
   // ProjectsController (/projects)
+  {
+    method: "GET",
+    path: "/projects/stats",
+    summary: "Get task status statistics by project",
+    permission: "project:read",
+    query: ProjectStatsQuerySchema,
+    responses: {
+      200: ProjectStatsResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
   {
     method: "GET",
     path: "/projects",
@@ -898,6 +915,19 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
   },
 
   // TasksController (/projects/:projectSlug/tasks)
+  {
+    method: "GET",
+    path: "/tasks/search",
+    summary: "Search and filter tasks across projects in organization",
+    permission: "task:read",
+    query: TaskSearchQuerySchema,
+    responses: {
+      200: TaskSearchResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
   {
     method: "GET",
     path: "/projects/{projectSlug}/tasks",
