@@ -51,8 +51,8 @@ async function contextFor(browser, token) {
         await apage.goto(`${BASE}/provider-accounts`);
         const row = apage.getByTestId("pa-agent-e2e-pa");
         await row.locator('select[name="licenseStatus"]').selectOption("approved");
-        await row.getByRole("button", { name: "Đổi" }).click();
-        await row.filter({ hasText: "Đã duyệt" }).waitFor();
+        await row.getByRole("button", { name: "Đổi giấy phép", exact: true }).click();
+        await row.getByTestId("license-status").filter({ hasText: "Đã duyệt" }).waitFor();
         await apage.close();
       }
       await page.goto(`${BASE}/agents`);

@@ -132,12 +132,12 @@ export function ChangeLicenseForm({ slug, currentStatus }: { slug: string; curre
 
   return (
     <form onSubmit={onChangeLicense} aria-label={`Đổi giấy phép ${slug}`} style={{ display: "inline" }}>
-      <select name="licenseStatus" defaultValue={currentStatus}>
+      <select name="licenseStatus" aria-label={`Giấy phép ${slug}`} defaultValue={currentStatus}>
         <option value="approved">Đã duyệt</option>
         <option value="unverified">Chưa xác minh</option>
         <option value="prohibited">Cấm</option>
       </select>{" "}
-      <button type="submit">Đổi</button>
+      <button type="submit">Đổi giấy phép</button>
       {error ? <span role="alert"> {error}</span> : null}
     </form>
   );

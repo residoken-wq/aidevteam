@@ -57,7 +57,7 @@ export default async function ProviderAccountsPage({ searchParams }: { searchPar
                       <code>{a.secretRef}</code>
                     </td>
                     <td>
-                      <span>{LICENSE_LABELS[a.licenseStatus] ?? a.licenseStatus}</span>
+                      <span data-testid="license-status">{LICENSE_LABELS[a.licenseStatus] ?? a.licenseStatus}</span>
                       {canLicense && !a.archivedAt ? (
                         <>
                           {" "}

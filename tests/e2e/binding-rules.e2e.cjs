@@ -66,8 +66,8 @@ async function contextFor(browser, token) {
       const row = adminPage.getByTestId("pa-pa-bind-e2e");
       await row.waitFor();
       await row.locator('select[name="licenseStatus"]').selectOption("approved");
-      await row.getByRole("button", { name: "Đổi" }).click();
-      await adminPage.getByTestId("pa-pa-bind-e2e").filter({ hasText: "Đã duyệt" }).waitFor();
+      await row.getByRole("button", { name: "Đổi giấy phép", exact: true }).click();
+      await adminPage.getByTestId("pa-pa-bind-e2e").getByTestId("license-status").filter({ hasText: "Đã duyệt" }).waitFor();
     });
 
     await step("maintainer can attach approved account to agent via form", async () => {
@@ -83,8 +83,8 @@ async function contextFor(browser, token) {
       await adminPage.goto(`${BASE}/provider-accounts`);
       const row = adminPage.getByTestId("pa-pa-bind-e2e");
       await row.locator('select[name="licenseStatus"]').selectOption("prohibited");
-      await row.getByRole("button", { name: "Đổi" }).click();
-      await adminPage.getByTestId("pa-pa-bind-e2e").filter({ hasText: "Cấm" }).waitFor();
+      await row.getByRole("button", { name: "Đổi giấy phép", exact: true }).click();
+      await adminPage.getByTestId("pa-pa-bind-e2e").getByTestId("license-status").filter({ hasText: "Cấm" }).waitFor();
     });
 
     await step("attaching prohibited account is refused with error message", async () => {
