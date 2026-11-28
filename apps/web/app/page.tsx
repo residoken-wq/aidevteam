@@ -8,7 +8,7 @@ export default async function HomePage() {
   const me = await currentUser();
   if (!me) redirect("/login");
   return (
-    <main>
+    <div>
       <h1>AI Dev Team Control Center</h1>
       <p>
         Đã đăng nhập: <strong>{me.githubLogin ?? `GitHub #${me.githubUserId}`}</strong>
@@ -38,6 +38,6 @@ export default async function HomePage() {
           ))}
         </ul>
       ) : null}
-    </main>
+    </div>
   );
 }

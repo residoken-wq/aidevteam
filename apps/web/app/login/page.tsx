@@ -6,7 +6,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const params = await searchParams;
   const error = loginErrorMessage(params.error);
   return (
-    <main>
+    <main id="main-content">
       <h1>AI Dev Team Control Center</h1>
       {error ? <p role="alert">{error}</p> : null}
       <p>

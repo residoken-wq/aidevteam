@@ -14,7 +14,7 @@ export default async function WorkersPage({ searchParams }: { searchParams: Prom
   const projectSlugs = projects.map((p) => p.slug);
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link>
       </p>
@@ -62,6 +62,6 @@ export default async function WorkersPage({ searchParams }: { searchParams: Prom
           )}
         </>
       )}
-    </main>
+    </div>
   );
 }

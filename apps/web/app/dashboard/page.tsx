@@ -9,7 +9,7 @@ export default async function DashboardPage() {
   const data = await apiGet<Dashboard>("/dashboard");
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link>
       </p>
@@ -127,6 +127,6 @@ export default async function DashboardPage() {
           </section>
         </>
       )}
-    </main>
+    </div>
   );
 }

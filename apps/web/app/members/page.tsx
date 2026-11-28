@@ -12,7 +12,7 @@ export default async function MembersPage() {
   const canWrite = can(me, "member:write");
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link>
       </p>
@@ -52,6 +52,6 @@ export default async function MembersPage() {
           )}
         </>
       )}
-    </main>
+    </div>
   );
 }

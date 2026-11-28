@@ -12,7 +12,7 @@ export default async function OrgChartPage() {
   const activeAgents = (data?.items ?? []).filter((a) => !a.archivedAt);
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/agents">← Danh sách agent</Link>
       </p>
@@ -22,6 +22,6 @@ export default async function OrgChartPage() {
       ) : (
         <OrgChart agents={activeAgents} canWrite={canWrite} />
       )}
-    </main>
+    </div>
   );
 }

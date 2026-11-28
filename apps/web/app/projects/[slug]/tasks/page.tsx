@@ -24,7 +24,7 @@ export default async function TasksPage({ params }: { params: Promise<{ slug: st
     : [];
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/projects">← Dự án</Link>
       </p>
@@ -37,6 +37,6 @@ export default async function TasksPage({ params }: { params: Promise<{ slug: st
           <Board projectSlug={slug} initial={data.items} canWrite={canWrite} canDispatch={canDispatch} agents={agents} workers={workers} />
         </>
       )}
-    </main>
+    </div>
   );
 }

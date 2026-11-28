@@ -13,6 +13,7 @@
 | `dashboard.e2e.cjs` | P2-02: org mới → dashboard hiện 0 và "Chưa có dữ liệu"; tạo 1 project + 1 task → số project đang dùng và số task BACKLOG tăng đúng 1 |
 | `approvals.e2e.cjs` | P6-06: Approval Center chỉ đọc — banner + "Chưa có bản ghi duyệt" khi rỗng; chèn bản ghi giả qua psql → hiện đủ cột, đúng environment, không có button/form, không có link github khi chưa cấu hình APPROVAL_REPO; viewer xem được |
 | `members.e2e.cjs` | P2-04: org_admin gán role viewer cho user allowlist → thấy trong bảng → gỡ → biến mất; maintainer không có quyền xem |
+| `a11y.e2e.cjs` | P2-11: a11y — skip link, keyboard navigation, accessible form labels, single h1, html lang="vi", profile trang chỉ đọc không lộ email/token |
 | `app-shell.e2e.cjs` | P2-01: App shell — sidebar theo RBAC, header có logout, mobile viewport không cuộn ngang, aria-current="page" |
 
 ## Chạy cục bộ
