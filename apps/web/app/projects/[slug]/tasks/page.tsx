@@ -1,4 +1,4 @@
-import type { Agent, Project, Task, Worker } from "@aidevteam/contracts";
+import type { Agent, Project, Task, TaskDependencies, Worker } from "@aidevteam/contracts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiGet, can, type Me } from "../../../../lib/server-api";
@@ -23,6 +23,19 @@ export default async function TasksPage({ params }: { params: Promise<{ slug: st
         .map((w) => ({ slug: w.slug, name: w.name }))
     : [];
 
+  const depsMap: Record<number, TaskDependencies> = {};
+  if (data?.items && data.items.length > 0) {
+    const depsResults = await Promise.all(
+      data.items.map(async (t) => {
+        const dep = await apiGet<TaskDependencies>(`/projects/${slug}/tasks/${t.number}/dependencies`);
+        return [t.number, dep] as const;
+      }),
+    );
+    for (const [num, dep] of depsResults) {
+      if (dep) depsMap[num] = dep;
+    }
+  }
+
   return (
     <div>
       <p>
@@ -41,7 +54,15 @@ export default async function TasksPage({ params }: { params: Promise<{ slug: st
       ) : (
         <>
           {project.archivedAt ? <p role="status">Dự án đã lưu trữ: chỉ xem, không sửa được.</p> : null}
-          <Board projectSlug={slug} initial={data.items} canWrite={canWrite} canDispatch={canDispatch} agents={agents} workers={workers} />
+          <Board
+            projectSlug={slug}
+            initial={data.items}
+            initialDeps={depsMap}
+            canWrite={canWrite}
+            canDispatch={canDispatch}
+            agents={agents}
+            workers={workers}
+          />
         </>
       )}
     </div>

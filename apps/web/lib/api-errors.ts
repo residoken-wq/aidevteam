@@ -13,6 +13,8 @@ const CONFLICTS: Record<string, string> = {
   org_slug_taken: "Mã tổ chức đã tồn tại.",
   task_status_changed: "Task vừa được chuyển trạng thái ở nơi khác. Bảng đã được tải lại, vui lòng thử lại.",
   task_closed: "Task đã hoàn thành hoặc đã hủy, không sửa được.",
+  task_blocked: "Task đang bị chặn bởi các task phụ thuộc chưa hoàn thành.",
+  dependency_cycle: "Không thể thêm phụ thuộc: phát hiện vòng lặp giữa các task.",
   agent_slug_taken: "Mã agent đã tồn tại trong tổ chức.",
   agent_archived: "Agent đã lưu trữ, không sửa được.",
   agent_already_archived: "Agent đã được lưu trữ trước đó.",
