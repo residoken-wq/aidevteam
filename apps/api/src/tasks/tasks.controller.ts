@@ -19,6 +19,8 @@ interface Row {
   priority: Task["priority"];
   agent_slug: string | null;
   cancel_reason: string | null;
+  epic_slug: string | null;
+  sprint_number: number | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -29,10 +31,12 @@ interface ProjectRef {
 }
 
 const SELECT = `SELECT t.id, t.number, p.slug AS project_slug, t.title, t.description, t.status, t.priority, a.slug AS agent_slug,
-                       t.cancel_reason, t.created_at, t.updated_at
+                       t.cancel_reason, e.slug AS epic_slug, s.number AS sprint_number, t.created_at, t.updated_at
                   FROM tasks t
                   JOIN projects p ON p.id = t.project_id AND p.org_id = t.org_id
-                  LEFT JOIN agents a ON a.id = t.agent_id AND a.org_id = t.org_id`;
+                  LEFT JOIN agents a ON a.id = t.agent_id AND a.org_id = t.org_id
+                  LEFT JOIN epics e ON e.id = t.epic_id AND e.project_id = t.project_id
+                  LEFT JOIN sprints s ON s.id = t.sprint_id AND s.project_id = t.project_id`;
 
 const toDto = (r: Row): Task => ({
   number: r.number,
@@ -43,6 +47,8 @@ const toDto = (r: Row): Task => ({
   priority: r.priority,
   agentSlug: r.agent_slug,
   cancelReason: r.cancel_reason,
+  epicSlug: r.epic_slug,
+  sprintNumber: r.sprint_number,
   createdAt: r.created_at.toISOString(),
   updatedAt: r.updated_at.toISOString(),
 });
@@ -66,8 +72,12 @@ export class TasksController {
     const org = getOrg(req);
     const project = await this.project(this.pool, req, projectSlug, "read");
     const r = await this.pool.query<Row>(
-      `${SELECT} WHERE t.org_id = $1 AND t.project_id = $2 AND ($3::text IS NULL OR t.status = $3) ORDER BY t.number LIMIT $4 OFFSET $5`,
-      [org.orgId, project.id, q.status ?? null, q.limit, q.offset],
+      `${SELECT} WHERE t.org_id = $1 AND t.project_id = $2
+                   AND ($3::text IS NULL OR t.status = $3)
+                   AND ($4::text IS NULL OR e.slug = $4)
+                   AND ($5::int IS NULL OR s.number = $5)
+                 ORDER BY t.number LIMIT $6 OFFSET $7`,
+      [org.orgId, project.id, q.status ?? null, q.epic ?? null, q.sprint ?? null, q.limit, q.offset],
     );
     return { items: r.rows.map(toDto), limit: q.limit, offset: q.offset };
   }
@@ -91,15 +101,18 @@ export class TasksController {
       // Serialise numbering per project; the unique (project_id, number) constraint is the backstop.
       await c.query("SELECT pg_advisory_xact_lock(hashtext('tasks:' || $1::text))", [project.id]);
       const agentId = input.agentSlug ? await this.agentId(c, org.orgId, input.agentSlug) : null;
+      const epicId = input.epicSlug ? await this.epicId(c, org.orgId, project.id, input.epicSlug) : null;
+      const sprintId = input.sprintNumber !== undefined ? await this.sprintId(c, org.orgId, project.id, input.sprintNumber) : null;
       const r = await c.query<{ id: string }>(
-        `INSERT INTO tasks (org_id, project_id, number, title, description, priority, agent_id, created_by_user_id)
-         SELECT $1, $2, COALESCE(MAX(number), 0) + 1, $3, $4, $5, $6, $7 FROM tasks WHERE project_id = $2
+        `INSERT INTO tasks (org_id, project_id, number, title, description, priority, agent_id, epic_id, sprint_id, created_by_user_id)
+         SELECT $1, $2, COALESCE(MAX(number), 0) + 1, $3, $4, $5, $6, $7, $8, $9 FROM tasks WHERE project_id = $2
          RETURNING id`,
-        [org.orgId, project.id, input.title, input.description ?? null, input.priority ?? "medium", agentId, getAuth(req).userId],
+        [org.orgId, project.id, input.title, input.description ?? null, input.priority ?? "medium", agentId, epicId, sprintId, getAuth(req).userId],
       );
-      return this.findById(c, org.orgId, r.rows[0]!.id);
+      const created = await this.findById(c, org.orgId, r.rows[0]!.id);
+      await this.audit(c, req, "task.created", created, {});
+      return created;
     });
-    await this.audit(req, "task.created", row, {});
     return toDto(row);
   }
 
@@ -113,20 +126,38 @@ export class TasksController {
       const current = await this.find(c, org.orgId, project.id, number);
       if (current.status === "DONE" || current.status === "CANCELLED") throw new ConflictException({ statusCode: 409, message: "task_closed" });
       const agentId = input.agentSlug === undefined ? undefined : input.agentSlug === null ? null : await this.agentId(c, org.orgId, input.agentSlug);
+      const epicId = input.epicSlug === undefined ? undefined : input.epicSlug === null ? null : await this.epicId(c, org.orgId, project.id, input.epicSlug);
+      const sprintId = input.sprintNumber === undefined ? undefined : input.sprintNumber === null ? null : await this.sprintId(c, org.orgId, project.id, input.sprintNumber);
       const r = await c.query(
         `UPDATE tasks
             SET title = COALESCE($3, title),
                 priority = COALESCE($4, priority),
                 description = CASE WHEN $5::boolean THEN $6 ELSE description END,
                 agent_id = CASE WHEN $7::boolean THEN $8::uuid ELSE agent_id END,
+                epic_id = CASE WHEN $9::boolean THEN $10::uuid ELSE epic_id END,
+                sprint_id = CASE WHEN $11::boolean THEN $12::uuid ELSE sprint_id END,
                 updated_at = now()
           WHERE org_id = $1 AND id = $2 AND status NOT IN ('DONE', 'CANCELLED')`,
-        [org.orgId, current.id, input.title ?? null, input.priority ?? null, input.description !== undefined, input.description ?? null, agentId !== undefined, agentId ?? null],
+        [
+          org.orgId,
+          current.id,
+          input.title ?? null,
+          input.priority ?? null,
+          input.description !== undefined,
+          input.description ?? null,
+          agentId !== undefined,
+          agentId ?? null,
+          epicId !== undefined,
+          epicId ?? null,
+          sprintId !== undefined,
+          sprintId ?? null,
+        ],
       );
       if (r.rowCount === 0) throw new ConflictException({ statusCode: 409, message: "task_closed" });
-      return this.findById(c, org.orgId, current.id);
+      const updated = await this.findById(c, org.orgId, current.id);
+      await this.audit(c, req, "task.updated", updated, { fields: Object.keys(input).sort().join(",") });
+      return updated;
     });
-    await this.audit(req, "task.updated", row, { fields: Object.keys(input).sort().join(",") });
     return toDto(row);
   }
 
@@ -148,7 +179,7 @@ export class TasksController {
     // Another request (or a stale board) changed the status first: tell the client, never overwrite.
     if (r.rowCount === 0) throw new ConflictException({ statusCode: 409, message: "task_status_changed" });
     const row = await this.findById(this.pool, org.orgId, current.id);
-    await this.audit(req, "task.transitioned", row, {
+    await this.audit(this.pool, req, "task.transitioned", row, {
       from: input.expectedFrom,
       to: input.to,
       ...(input.to === "DONE" ? { confirmedReviewed: "true" } : {}),
@@ -185,6 +216,26 @@ export class TasksController {
     return r.rows[0].id;
   }
 
+  private async epicId(c: PoolClient, orgId: string, projectId: string, slug: string): Promise<string> {
+    const r = await c.query<{ id: string; archived_at: Date | null }>(
+      "SELECT id, archived_at FROM epics WHERE org_id = $1 AND project_id = $2 AND slug = $3",
+      [orgId, projectId, slug],
+    );
+    if (!r.rows[0]) throw unprocessable("epicSlug", "unknown epic in this project");
+    if (r.rows[0].archived_at) throw unprocessable("epicSlug", "cannot assign archived epic");
+    return r.rows[0].id;
+  }
+
+  private async sprintId(c: PoolClient, orgId: string, projectId: string, number: number): Promise<string> {
+    const r = await c.query<{ id: string; status: string }>(
+      "SELECT id, status FROM sprints WHERE org_id = $1 AND project_id = $2 AND number = $3",
+      [orgId, projectId, number],
+    );
+    if (!r.rows[0]) throw unprocessable("sprintNumber", "unknown sprint in this project");
+    if (r.rows[0].status === "CLOSED") throw unprocessable("sprintNumber", "cannot assign closed sprint");
+    return r.rows[0].id;
+  }
+
   private async find(c: PoolClient | Pool, orgId: string, projectId: string, number: string): Promise<Row> {
     if (!NUMBER_RE.test(number)) throw new NotFoundException();
     const r = await c.query<Row>(`${SELECT} WHERE t.org_id = $1 AND t.project_id = $2 AND t.number = $3`, [orgId, projectId, Number(number)]);
@@ -212,9 +263,9 @@ export class TasksController {
     }
   }
 
-  private async audit(req: Request, action: string, row: Row, extra: Record<string, string>): Promise<void> {
+  private async audit(c: PoolClient | Pool, req: Request, action: string, row: Row, extra: Record<string, string>): Promise<void> {
     const actor = getAuth(req);
-    await writeAudit(this.pool, {
+    await writeAudit(c, {
       action,
       orgId: getOrg(req).orgId,
       actorUserId: actor.userId,

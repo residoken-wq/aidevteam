@@ -21,6 +21,7 @@ import { defaultMockRunner, type MockRunner } from "./runs/mock-runner";
 import { PlatformOrgsController } from "./platform/platform-orgs.controller";
 import { DashboardController } from "./dashboard/dashboard.controller";
 import { ApprovalsController } from "./approvals/approvals.controller";
+import { EpicsController, MilestonesController, SprintsController } from "./planning";
 import { RateLimitService } from "./rate-limit";
 import { RbacGuard } from "./rbac/rbac.guard";
 import { RbacService } from "./rbac/rbac.service";
@@ -41,6 +42,9 @@ export const APP_CONTROLLERS: Type[] = [
   PlatformOrgsController,
   DashboardController,
   ApprovalsController,
+  EpicsController,
+  MilestonesController,
+  SprintsController,
 ];
 
 export interface AppOptions {
