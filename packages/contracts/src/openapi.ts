@@ -58,6 +58,8 @@ import {
   DispatchRunSchema,
   RunListQuerySchema,
   RunSchema,
+  RunsQuerySchema,
+  RunsResponseSchema,
 } from "./run";
 import {
   OrgCreateSchema,
@@ -1140,6 +1142,19 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
   },
 
   // RunsController (/projects/:projectSlug/tasks/:number/dispatch, /runs/:id, etc.)
+  {
+    method: "GET",
+    path: "/runs",
+    summary: "List all agent runs for organization with filtering and pagination",
+    permission: "run:read",
+    query: RunsQuerySchema,
+    responses: {
+      200: RunsResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
   {
     method: "POST",
     path: "/projects/{projectSlug}/tasks/{number}/dispatch",

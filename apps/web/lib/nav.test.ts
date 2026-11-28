@@ -38,6 +38,7 @@ describe("navItems (AC-1)", () => {
       "Agent",
       "Tài khoản provider",
       "Worker",
+      "Lượt chạy",
       "Duyệt release",
       "Thành viên",
     ]);
@@ -56,6 +57,7 @@ describe("navItems (AC-1)", () => {
       "Agent",
       "Tài khoản provider",
       "Worker",
+      "Lượt chạy",
       "Duyệt release",
     ]);
     expect(items.map((i) => i.href)).not.toContain("/members");
@@ -73,6 +75,7 @@ describe("navItems (AC-1)", () => {
       "Agent",
       "Tài khoản provider",
       "Worker",
+      "Lượt chạy",
       "Duyệt release",
     ]);
     expect(items.map((i) => i.href)).not.toContain("/members");
@@ -112,18 +115,19 @@ describe("navItems (AC-1)", () => {
       "Agent",
       "Tài khoản provider",
       "Worker",
+      "Lượt chạy",
       "Duyệt release",
       "Quản trị tổ chức",
     ]);
     expect(items.find((i) => i.href === "/platform/orgs")?.section).toBe("platform");
   });
 
-  it("returns concise sidebar for project_member (Dự án, Tìm task, Agent, Worker)", () => {
+  it("returns concise sidebar for project_member (Dự án, Tìm task, Agent, Worker, Lượt chạy)", () => {
     const perms = Array.from(ROLE_PERMISSIONS.project_member);
     const me = fakeMe({ roles: ["project_member"], permissions: perms });
     const items = navItems(me);
 
-    expect(items.map((i) => i.label)).toEqual(["Dự án", "Tìm task", "Agent", "Worker"]);
+    expect(items.map((i) => i.label)).toEqual(["Dự án", "Tìm task", "Agent", "Worker", "Lượt chạy"]);
     expect(items.map((i) => i.href)).not.toContain("/dashboard");
     expect(items.map((i) => i.href)).not.toContain("/provider-accounts");
     expect(items.map((i) => i.href)).not.toContain("/approvals");
@@ -160,6 +164,7 @@ describe("navSections", () => {
       "Agent",
       "Tài khoản provider",
       "Worker",
+      "Lượt chạy",
       "Duyệt release",
     ]);
     expect(sections.platform.map((i) => i.label)).toEqual(["Quản trị tổ chức"]);

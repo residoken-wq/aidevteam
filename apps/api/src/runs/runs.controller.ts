@@ -17,7 +17,9 @@ import {
   DispatchRunSchema,
   redact,
   RunListQuerySchema,
+  RunsQuerySchema,
   type Run,
+  type RunsResponse,
   type RunStatus,
 } from "@aidevteam/contracts";
 import type { Pool } from "@aidevteam/db";
@@ -25,7 +27,7 @@ import type { Request } from "express";
 import { writeAudit } from "../audit";
 import { getAuth, getOrg } from "../rbac/auth-context";
 import { RequirePermission } from "../rbac/decorators";
-import { verifyProjectScope } from "../rbac/project-scope";
+import { hasOrgWideAccess, verifyProjectScope } from "../rbac/project-scope";
 import { DB_POOL } from "../tokens";
 import { parseOr422 } from "../validation";
 
@@ -289,6 +291,74 @@ export class RunsController {
     );
 
     return { items: r.rows.map(toDto), limit: q.limit, offset: q.offset };
+  }
+
+  @RequirePermission("run:read")
+  @Get("runs")
+  async listRuns(@Req() req: Request, @Query() query: unknown): Promise<RunsResponse> {
+    const q = parseOr422(RunsQuerySchema, query);
+    const org = getOrg(req);
+    const auth = getAuth(req);
+
+    const params: unknown[] = [org.orgId];
+    const whereClauses: string[] = ["r.org_id = $1"];
+
+    if (!hasOrgWideAccess(org.roles, "read")) {
+      params.push(auth.userId);
+      whereClauses.push(
+        `EXISTS (
+          SELECT 1 FROM project_assignments pa
+           WHERE pa.org_id = r.org_id
+             AND pa.project_id = p.id
+             AND pa.user_id = $${params.length}
+        )`,
+      );
+    }
+
+    if (q.status && q.status.length > 0) {
+      params.push(q.status);
+      whereClauses.push(`r.status = ANY($${params.length}::text[])`);
+    }
+
+    if (q.project) {
+      params.push(q.project);
+      whereClauses.push(`p.slug = $${params.length}`);
+    }
+
+    if (q.worker) {
+      params.push(q.worker);
+      whereClauses.push(`w.slug = $${params.length}`);
+    }
+
+    const whereSql = whereClauses.join(" AND ");
+
+    const countSql = `SELECT count(*)::int AS total
+      FROM agent_runs r
+      JOIN tasks t ON t.id = r.task_id AND t.org_id = r.org_id
+      JOIN projects p ON p.id = t.project_id AND p.org_id = t.org_id
+      JOIN workers w ON w.id = r.worker_id AND w.org_id = r.org_id
+     WHERE ${whereSql}`;
+
+    const limitParamIndex = params.length + 1;
+    const offsetParamIndex = params.length + 2;
+
+    const dataSql = `${SELECT_RUN}
+     WHERE ${whereSql}
+     ORDER BY r.queued_at DESC, r.id
+     LIMIT $${limitParamIndex} OFFSET $${offsetParamIndex}`;
+
+    const [countRes, rowsRes] = await Promise.all([
+      this.pool.query<{ total: number }>(countSql, params),
+      this.pool.query<RunRow>(dataSql, [...params, q.limit, q.offset]),
+    ]);
+
+    const total = countRes.rows[0]?.total ?? 0;
+    return {
+      items: rowsRes.rows.map(toDto),
+      total,
+      limit: q.limit,
+      offset: q.offset,
+    };
   }
 
   @RequirePermission("run:read")

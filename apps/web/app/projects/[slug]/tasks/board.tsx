@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type DragEvent, type FormEvent } from "react";
 import { sendJson } from "../../../../lib/api-errors";
+import { ConfirmDialog } from "../../../../lib/confirm-dialog";
 
 const LABELS: Record<TaskStatus, string> = {
   BACKLOG: "Backlog",
@@ -485,56 +486,84 @@ function DispatchMockForm({
   workers: Array<{ slug: string; name: string }>;
 }) {
   const router = useRouter();
+  const [selectedWorkerSlug, setSelectedWorkerSlug] = useState(workers[0]?.slug ?? "");
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const d = new FormData(e.currentTarget);
-    const workerSlug = String(d.get("workerSlug") ?? "");
-    if (!workerSlug) {
+    if (!selectedWorkerSlug) {
       setError("Vui lòng chọn worker mock.");
       return;
     }
+    setError(null);
+    setConfirmOpen(true);
+  }
+
+  async function handleConfirmDispatch() {
     setLoading(true);
     setError(null);
     const r = await sendJson<{ id: string }>(
       "POST",
       `/api/projects/${encodeURIComponent(projectSlug)}/tasks/${taskNumber}/dispatch`,
-      { workerSlug },
+      { workerSlug: selectedWorkerSlug },
     );
     if (!r.ok) {
       setError(r.error);
       setLoading(false);
+      setConfirmOpen(false);
       return;
     }
+    setConfirmOpen(false);
     router.push(`/runs/${r.data.id}`);
   }
 
+  const selectedWorker = workers.find((w) => w.slug === selectedWorkerSlug);
+
   return (
-    <form onSubmit={onSubmit} aria-label={`Chạy mock task #${taskNumber}`} style={{ marginTop: "0.25rem" }}>
-      <select name="workerSlug" defaultValue={workers[0]?.slug ?? ""} aria-label="Worker" required>
-        {workers.length === 0 ? (
-          <option value="" disabled>
-            (không có worker mock)
-          </option>
-        ) : (
-          workers.map((w) => (
-            <option key={w.slug} value={w.slug}>
-              {w.name}
+    <>
+      <form onSubmit={onSubmit} aria-label={`Chạy mock task #${taskNumber}`} style={{ marginTop: "0.25rem" }}>
+        <select
+          name="workerSlug"
+          value={selectedWorkerSlug}
+          onChange={(e) => setSelectedWorkerSlug(e.target.value)}
+          aria-label="Worker"
+          required
+        >
+          {workers.length === 0 ? (
+            <option value="" disabled>
+              (không có worker mock)
             </option>
-          ))
-        )}
-      </select>{" "}
-      <button type="submit" disabled={loading || workers.length === 0}>
-        Chạy mock
-      </button>
-      {error ? (
-        <p role="alert" style={{ color: "#c00", margin: "0.25rem 0" }}>
-          {error}
-        </p>
-      ) : null}
-    </form>
+          ) : (
+            workers.map((w) => (
+              <option key={w.slug} value={w.slug}>
+                {w.name}
+              </option>
+            ))
+          )}
+        </select>{" "}
+        <button type="submit" disabled={loading || workers.length === 0}>
+          Chạy mock
+        </button>
+        {error ? (
+          <p role="alert" style={{ color: "#c00", margin: "0.25rem 0" }}>
+            {error}
+          </p>
+        ) : null}
+      </form>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Xác nhận chạy mock"
+        message={`Bạn có chắc chắn muốn chạy mock task #${taskNumber} với worker "${selectedWorker?.name ?? selectedWorkerSlug}"?`}
+        confirmLabel="Xác nhận"
+        cancelLabel="Không"
+        loading={loading}
+        onConfirm={handleConfirmDispatch}
+        onCancel={() => setConfirmOpen(false)}
+      />
+    </>
   );
 }
 

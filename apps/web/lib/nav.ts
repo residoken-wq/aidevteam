@@ -31,6 +31,9 @@ export function navItems(me: Me | null): NavItem[] {
     if (can(me, "worker:read")) {
       items.push({ href: "/workers", label: "Worker", section: "main" });
     }
+    if (can(me, "run:read")) {
+      items.push({ href: "/runs", label: "Lượt chạy", section: "main" });
+    }
     if (can(me, "approval:read")) {
       items.push({ href: "/approvals", label: "Duyệt release", section: "main" });
     }

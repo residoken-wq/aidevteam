@@ -89,6 +89,12 @@ async function contextFor(browser, token) {
       await dispatchButton.waitFor();
       await dispatchButton.click();
 
+      // P3-09: confirm dialog before dispatch
+      const confirmDialog = mpage.locator("dialog[open]");
+      if ((await confirmDialog.count()) > 0) {
+        await confirmDialog.getByRole("button", { name: "Xác nhận" }).click();
+      }
+
       await mpage.waitForURL(/\/runs\/[0-9a-f-]{36}/);
       runUrl = mpage.url();
 

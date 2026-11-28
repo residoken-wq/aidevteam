@@ -67,3 +67,47 @@ export const RunListQuerySchema = z
   })
   .strict();
 export type RunListQuery = z.infer<typeof RunListQuerySchema>;
+
+/**
+ * Filter status for org runs query.
+ * Accepts single status ('QUEUED'), comma-separated ('QUEUED,RUNNING'), or array (['QUEUED', 'RUNNING']).
+ */
+export const StatusListQuerySchema = z.preprocess((val) => {
+  if (val === undefined || val === null || val === "") return undefined;
+  if (Array.isArray(val)) {
+    return val.flatMap((v) => (typeof v === "string" ? v.split(",").map((x) => x.trim()) : v)).filter(Boolean);
+  }
+  if (typeof val === "string") {
+    return val.split(",").map((x) => x.trim()).filter(Boolean);
+  }
+  return val;
+}, z.array(z.enum(RUN_STATUSES)).min(1).optional());
+
+/**
+ * P3-09: Org-wide runs list query: GET /runs (run:read).
+ * limit <= 100, default 50.
+ */
+export const RunsQuerySchema = z
+  .object({
+    limit: z.coerce.number().int().min(1).max(100).default(50),
+    offset: z.coerce.number().int().min(0).max(100_000).default(0),
+    status: StatusListQuerySchema,
+    project: SlugSchema.optional(),
+    worker: SlugSchema.optional(),
+  })
+  .strict();
+export type RunsQuery = z.infer<typeof RunsQuerySchema>;
+
+/**
+ * P3-09: Org-wide runs list response with total count.
+ */
+export const RunsResponseSchema = z
+  .object({
+    items: z.array(RunSchema),
+    total: z.number().int().min(0),
+    limit: z.number().int().min(1),
+    offset: z.number().int().min(0),
+  })
+  .strict();
+export type RunsResponse = z.infer<typeof RunsResponseSchema>;
+
