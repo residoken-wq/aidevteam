@@ -9,6 +9,7 @@ import {
 } from "./project";
 import {
   ProviderAccountCreateSchema,
+  ProviderAccountLicenseChangeSchema,
   ProviderAccountListQuerySchema,
   ProviderAccountSchema,
   ProviderAccountUpdateSchema,
@@ -465,6 +466,21 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
       403: ErrorResponseSchema,
       404: ErrorResponseSchema,
       409: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/provider-accounts/{slug}/license",
+    summary: "Change provider account license status (P2-09)",
+    permission: "provider_account:license",
+    request: ProviderAccountLicenseChangeSchema,
+    responses: {
+      200: ProviderAccountSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
     },
   },
 

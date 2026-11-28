@@ -4975,6 +4975,14 @@
                               "null"
                             ]
                           },
+                          "licenseStatus": {
+                            "type": "string",
+                            "enum": [
+                              "approved",
+                              "unverified",
+                              "prohibited"
+                            ]
+                          },
                           "createdAt": {
                             "type": "string"
                           },
@@ -4994,6 +5002,7 @@
                           "provider",
                           "secretRef",
                           "description",
+                          "licenseStatus",
                           "createdAt",
                           "updatedAt",
                           "archivedAt"
@@ -5128,6 +5137,14 @@
                         "null"
                       ]
                     },
+                    "licenseStatus": {
+                      "type": "string",
+                      "enum": [
+                        "approved",
+                        "unverified",
+                        "prohibited"
+                      ]
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -5147,6 +5164,7 @@
                     "provider",
                     "secretRef",
                     "description",
+                    "licenseStatus",
                     "createdAt",
                     "updatedAt",
                     "archivedAt"
@@ -5282,6 +5300,14 @@
                         "null"
                       ]
                     },
+                    "licenseStatus": {
+                      "type": "string",
+                      "enum": [
+                        "approved",
+                        "unverified",
+                        "prohibited"
+                      ]
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -5301,6 +5327,7 @@
                     "provider",
                     "secretRef",
                     "description",
+                    "licenseStatus",
                     "createdAt",
                     "updatedAt",
                     "archivedAt"
@@ -5389,6 +5416,14 @@
                         "null"
                       ]
                     },
+                    "licenseStatus": {
+                      "type": "string",
+                      "enum": [
+                        "approved",
+                        "unverified",
+                        "prohibited"
+                      ]
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -5408,6 +5443,7 @@
                     "provider",
                     "secretRef",
                     "description",
+                    "licenseStatus",
                     "createdAt",
                     "updatedAt",
                     "archivedAt"
@@ -5550,6 +5586,14 @@
                         "null"
                       ]
                     },
+                    "licenseStatus": {
+                      "type": "string",
+                      "enum": [
+                        "approved",
+                        "unverified",
+                        "prohibited"
+                      ]
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -5569,6 +5613,7 @@
                     "provider",
                     "secretRef",
                     "description",
+                    "licenseStatus",
                     "createdAt",
                     "updatedAt",
                     "archivedAt"
@@ -5630,6 +5675,168 @@
             }
           }
         ]
+      }
+    },
+    "/provider-accounts/{slug}/license": {
+      "post": {
+        "summary": "Change provider account license status (P2-09)",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "provider": {
+                      "type": "string",
+                      "enum": [
+                        "anthropic",
+                        "openai",
+                        "google",
+                        "github",
+                        "other"
+                      ]
+                    },
+                    "secretRef": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "licenseStatus": {
+                      "type": "string",
+                      "enum": [
+                        "approved",
+                        "unverified",
+                        "prohibited"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "archivedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "slug",
+                    "name",
+                    "provider",
+                    "secretRef",
+                    "description",
+                    "licenseStatus",
+                    "createdAt",
+                    "updatedAt",
+                    "archivedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (authentication required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions or denied)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (state conflict or uniqueness violation)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity (validation failure)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-permission": "provider_account:license",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "licenseStatus": {
+                    "type": "string",
+                    "enum": [
+                      "approved",
+                      "unverified",
+                      "prohibited"
+                    ]
+                  }
+                },
+                "required": [
+                  "licenseStatus"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
       }
     },
     "/runs/{id}": {

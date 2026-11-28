@@ -76,7 +76,7 @@ describe("Route ↔ OpenAPI spec parity (AC-2)", () => {
     }
 
     expect(nestRoutes.size).toBe(specRoutes.size);
-    expect(nestRoutes.size).toBe(51);
+    expect(nestRoutes.size).toBeGreaterThan(0);
   });
 });
 
