@@ -81,6 +81,11 @@ const PathGlobSchema = z
     if (/^[a-zA-Z]:/.test(p)) {
       ctx.addIssue({ code: "custom", message: "drive letter path is not allowed" });
     }
+    // Paths are rendered in the prompt's instruction section (outside the untrusted-data block), so they must not be
+    // able to carry text: no whitespace, newlines or other control characters — glob characters only.
+    if (!/^[A-Za-z0-9._@+\-/*?{}[\]!,]+$/.test(p)) {
+      ctx.addIssue({ code: "custom", message: "path: only letters, digits and . _ @ + - / * ? { } [ ] ! , are allowed" });
+    }
   });
 
 const FORBIDDEN_SHELL_CHARS = [";", "&&", "|", "`", "$("];
@@ -93,6 +98,10 @@ const TestCommandSchema = z
     for (let i = 0; i < argv.length; i++) {
       const arg = argv[i];
       if (!arg) continue;
+      // eslint-disable-next-line no-control-regex -- rejecting control characters is the point
+      if (/[\u0000-\u001f\u007f]/.test(arg)) {
+        ctx.addIssue({ code: "custom", path: [i], message: "control characters (newline, tab…) are forbidden in test command argv" });
+      }
       for (const forbidden of FORBIDDEN_SHELL_CHARS) {
         if (arg.includes(forbidden)) {
           ctx.addIssue({
