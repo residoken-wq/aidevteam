@@ -13,3 +13,5 @@ export * from "./run";
 export * from "./dashboard";
 export * from "./approval";
 export * from "./member";
+export * from "./error";
+export * from "./openapi";

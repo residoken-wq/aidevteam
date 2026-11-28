@@ -13,6 +13,8 @@
     "test": "pnpm build:packages && pnpm -r test",
     "test:integration": "pnpm build:packages && pnpm -r --workspace-concurrency=1 --if-present test:integration",
     "test:scripts": "node --test scripts/progress.test.mjs tests/dev/test_dev_compose.mjs",
+    "openapi": "node scripts/openapi.mjs",
+    "openapi:check": "node scripts/openapi.mjs --check",
     "progress": "node scripts/progress.mjs",
     "dev:up": "bash dev/up.sh",
     "dev:down": "bash dev/down.sh"
