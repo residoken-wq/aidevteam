@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SlugSchema } from "./common";
+import { ListQuerySchema, SlugSchema } from "./common";
 import { HealthResponseSchema } from "./health";
 import {
   ProjectCreateSchema,
@@ -32,6 +32,10 @@ import {
 } from "./agent";
 import {
   TaskCreateSchema,
+  TaskDependenciesSchema,
+  ProjectTaskDependenciesSchema,
+  TaskDependencyChangeSchema,
+  TaskDependencyResultSchema,
   TaskListQuerySchema,
   TaskSchema,
   TaskTransitionSchema,
@@ -64,6 +68,21 @@ import {
   MemberRoleChangeSchema,
   MemberSchema,
 } from "./member";
+import {
+  EpicCreateSchema,
+  EpicListResponseSchema,
+  EpicSchema,
+  EpicUpdateSchema,
+  MilestoneCreateSchema,
+  MilestoneListResponseSchema,
+  MilestoneSchema,
+  MilestoneUpdateSchema,
+  SprintCreateSchema,
+  SprintListResponseSchema,
+  SprintSchema,
+  SprintTransitionSchema,
+  SprintUpdateSchema,
+} from "./planning";
 import { ErrorIssueSchema, ErrorResponseSchema } from "./error";
 
 export type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE" | "PUT";
@@ -453,6 +472,214 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
     },
   },
 
+  // PlanningControllers (/projects/:slug/epics, /projects/:slug/milestones, /projects/:slug/sprints)
+  {
+    method: "GET",
+    path: "/projects/{slug}/epics",
+    summary: "List epics of a project",
+    permission: "project:read",
+    query: ListQuerySchema,
+    responses: {
+      200: EpicListResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{slug}/epics",
+    summary: "Create an epic in project",
+    permission: "project:write",
+    request: EpicCreateSchema,
+    responses: {
+      201: EpicSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "GET",
+    path: "/projects/{slug}/epics/{epicSlug}",
+    summary: "Get epic by slug",
+    permission: "project:read",
+    responses: {
+      200: EpicSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "PATCH",
+    path: "/projects/{slug}/epics/{epicSlug}",
+    summary: "Update epic details",
+    permission: "project:write",
+    request: EpicUpdateSchema,
+    responses: {
+      200: EpicSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{slug}/epics/{epicSlug}/archive",
+    summary: "Archive epic",
+    permission: "project:write",
+    responses: {
+      200: EpicSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "GET",
+    path: "/projects/{slug}/milestones",
+    summary: "List milestones of a project",
+    permission: "project:read",
+    query: ListQuerySchema,
+    responses: {
+      200: MilestoneListResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{slug}/milestones",
+    summary: "Create a milestone in project",
+    permission: "project:write",
+    request: MilestoneCreateSchema,
+    responses: {
+      201: MilestoneSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "GET",
+    path: "/projects/{slug}/milestones/{milestoneSlug}",
+    summary: "Get milestone by slug",
+    permission: "project:read",
+    responses: {
+      200: MilestoneSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "PATCH",
+    path: "/projects/{slug}/milestones/{milestoneSlug}",
+    summary: "Update milestone details",
+    permission: "project:write",
+    request: MilestoneUpdateSchema,
+    responses: {
+      200: MilestoneSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{slug}/milestones/{milestoneSlug}/archive",
+    summary: "Archive milestone",
+    permission: "project:write",
+    responses: {
+      200: MilestoneSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "GET",
+    path: "/projects/{slug}/sprints",
+    summary: "List sprints of a project",
+    permission: "project:read",
+    query: ListQuerySchema,
+    responses: {
+      200: SprintListResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{slug}/sprints",
+    summary: "Create a sprint in project",
+    permission: "project:write",
+    request: SprintCreateSchema,
+    responses: {
+      201: SprintSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "GET",
+    path: "/projects/{slug}/sprints/{number}",
+    summary: "Get sprint by number",
+    permission: "project:read",
+    responses: {
+      200: SprintSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "PATCH",
+    path: "/projects/{slug}/sprints/{number}",
+    summary: "Update sprint details",
+    permission: "project:write",
+    request: SprintUpdateSchema,
+    responses: {
+      200: SprintSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{slug}/sprints/{number}/transitions",
+    summary: "Transition sprint status",
+    permission: "project:write",
+    request: SprintTransitionSchema,
+    responses: {
+      200: SprintSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+
   // ProviderAccountsController (/provider-accounts)
   {
     method: "GET",
@@ -740,6 +967,63 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
     request: TaskTransitionSchema,
     responses: {
       200: TaskSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+
+  // ProjectTaskDependenciesController (/projects/:projectSlug/task-dependencies)
+  {
+    method: "GET",
+    path: "/projects/{projectSlug}/task-dependencies",
+    summary: "List every task dependency edge of a project",
+    permission: "task:read",
+    responses: {
+      200: ProjectTaskDependenciesSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  // TaskDependenciesController (/projects/:projectSlug/tasks/:number/dependencies)
+  {
+    method: "GET",
+    path: "/projects/{projectSlug}/tasks/{number}/dependencies",
+    summary: "Get task dependencies and blocked status",
+    permission: "task:read",
+    responses: {
+      200: TaskDependenciesSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{projectSlug}/tasks/{number}/dependencies",
+    summary: "Add a dependency to task",
+    permission: "task:write",
+    request: TaskDependencyChangeSchema,
+    responses: {
+      200: TaskDependencyResultSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "DELETE",
+    path: "/projects/{projectSlug}/tasks/{number}/dependencies",
+    summary: "Remove a dependency from task",
+    permission: "task:write",
+    request: TaskDependencyChangeSchema,
+    responses: {
+      200: TaskDependencyResultSchema,
       401: ErrorResponseSchema,
       403: ErrorResponseSchema,
       404: ErrorResponseSchema,

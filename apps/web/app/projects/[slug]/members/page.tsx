@@ -29,6 +29,9 @@ export default async function ProjectMembersPage({ params }: { params: Promise<{
         <Link href={`/projects/${slug}/tasks`} style={{ marginRight: "1rem" }}>
           Task
         </Link>
+        <Link href={`/projects/${slug}/planning`} style={{ marginRight: "1rem" }}>
+          Kế hoạch
+        </Link>
         <strong>Thành viên dự án</strong>
       </nav>
 

@@ -1,4 +1,4 @@
--- 0013_task_contract (up) — P3-06: Task contract (JSON schema) and agent prompt.
+-- 0015_task_contract (up) — P3-06: Task contract (JSON schema) and agent prompt.
 ALTER TABLE tasks
   ADD COLUMN contract jsonb;
 

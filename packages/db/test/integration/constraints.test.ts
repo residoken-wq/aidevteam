@@ -401,3 +401,161 @@ describe("project_assignments (P2-13, DB backstop)", () => {
   });
 });
 
+describe("task_dependencies (P3-03, DB backstop)", () => {
+  let projectA: string;
+  let projectB: string;
+  let taskA1: string;
+  let taskA2: string;
+  let taskB1: string;
+
+  beforeAll(async () => {
+    projectA = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'td-proj-a', 'TD Proj A') RETURNING id", [orgA])).rows[0]!.id;
+    projectB = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'td-proj-b', 'TD Proj B') RETURNING id", [orgB])).rows[0]!.id;
+    taskA1 = (await pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 1, 'Task A1') RETURNING id", [orgA, projectA])).rows[0]!.id;
+    taskA2 = (await pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 2, 'Task A2') RETURNING id", [orgA, projectA])).rows[0]!.id;
+    taskB1 = (await pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 1, 'Task B1') RETURNING id", [orgB, projectB])).rows[0]!.id;
+  });
+
+  it("allows valid dependency in the same project", async () => {
+    const res = await pool.query(
+      "INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $4) RETURNING task_id",
+      [orgA, projectA, taskA2, taskA1],
+    );
+    expect(res.rowCount).toBe(1);
+    await pool.query("DELETE FROM task_dependencies WHERE task_id = $1 AND depends_on_task_id = $2", [taskA2, taskA1]);
+  });
+
+  it("rejects self-dependency (task_id = depends_on_task_id)", async () => {
+    await expect(
+      pool.query("INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $3)", [orgA, projectA, taskA1]),
+    ).rejects.toThrow(/task_dependencies_no_self_dep/);
+  });
+
+  it("rejects cross-project dependency", async () => {
+    await expect(
+      pool.query("INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $4)", [orgA, projectA, taskA1, taskB1]),
+    ).rejects.toThrow(/task_dependencies_depends_on_same_project_fk/);
+  });
+
+  it("enforces primary key (task_id, depends_on_task_id)", async () => {
+    await pool.query("INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $4)", [orgA, projectA, taskA2, taskA1]);
+    await expect(
+      pool.query("INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $4)", [orgA, projectA, taskA2, taskA1]),
+    ).rejects.toThrow(/task_dependencies_pkey/);
+    await pool.query("DELETE FROM task_dependencies WHERE task_id = $1 AND depends_on_task_id = $2", [taskA2, taskA1]);
+  });
+});
+
+describe("planning constraints (P3-01, AC-1)", () => {
+  let projA: string;
+  let projB: string;
+
+  beforeAll(async () => {
+    projA = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'plan-proj-a', 'Plan Proj A') RETURNING id", [orgA])).rows[0]!.id;
+    projB = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'plan-proj-b', 'Plan Proj B') RETURNING id", [orgB])).rows[0]!.id;
+  });
+
+  it("sprints: allows only 1 ACTIVE sprint per project, but different projects can each have 1 ACTIVE sprint", async () => {
+    await pool.query(
+      "INSERT INTO sprints (org_id, project_id, number, name, start_date, end_date, status) VALUES ($1, $2, 1, 'Sprint 1', '2026-01-01', '2026-01-14', 'PLANNED')",
+      [orgA, projA],
+    );
+    await pool.query("UPDATE sprints SET status = 'ACTIVE' WHERE project_id = $1 AND number = 1", [projA]);
+
+    await pool.query(
+      "INSERT INTO sprints (org_id, project_id, number, name, start_date, end_date, status) VALUES ($1, $2, 2, 'Sprint 2', '2026-01-15', '2026-01-28', 'PLANNED')",
+      [orgA, projA],
+    );
+    // Setting second sprint to ACTIVE in projA must fail unique constraint
+    await expect(pool.query("UPDATE sprints SET status = 'ACTIVE' WHERE project_id = $1 AND number = 2", [projA])).rejects.toThrow(
+      /sprints_one_active_per_project_idx/,
+    );
+
+    // Another project can have an ACTIVE sprint
+    await pool.query(
+      "INSERT INTO sprints (org_id, project_id, number, name, start_date, end_date, status) VALUES ($1, $2, 1, 'Sprint B1', '2026-01-01', '2026-01-14', 'PLANNED')",
+      [orgB, projB],
+    );
+    await expect(pool.query("UPDATE sprints SET status = 'ACTIVE' WHERE project_id = $1 AND number = 1", [projB])).resolves.toBeDefined();
+  });
+
+  it("sprints: enforces end_date >= start_date", async () => {
+    await expect(
+      pool.query(
+        "INSERT INTO sprints (org_id, project_id, number, name, start_date, end_date, status) VALUES ($1, $2, 10, 'Invalid dates', '2026-02-15', '2026-02-01', 'PLANNED')",
+        [orgA, projA],
+      ),
+    ).rejects.toThrow(/sprints_dates_check/);
+  });
+
+  it("sprints: must start in PLANNED and only transitions PLANNED -> ACTIVE -> CLOSED", async () => {
+    await expect(
+      pool.query(
+        "INSERT INTO sprints (org_id, project_id, number, name, start_date, end_date, status) VALUES ($1, $2, 20, 'Sprint 20', '2026-03-01', '2026-03-14', 'ACTIVE')",
+        [orgA, projA],
+      ),
+    ).rejects.toThrow(/sprint must start in PLANNED/);
+
+    const s = await pool.query<{ id: string }>(
+      "INSERT INTO sprints (org_id, project_id, number, name, start_date, end_date, status) VALUES ($1, $2, 20, 'Sprint 20', '2026-03-01', '2026-03-14', 'PLANNED') RETURNING id",
+      [orgA, projA],
+    );
+    const sprintId = s.rows[0]!.id;
+
+    // Disallowed transition PLANNED -> CLOSED
+    await expect(pool.query("UPDATE sprints SET status = 'CLOSED' WHERE id = $1", [sprintId])).rejects.toThrow(/not allowed/);
+
+    // Allowed PLANNED -> ACTIVE
+    // But projA already has an ACTIVE sprint (Sprint 1), so first close Sprint 1
+    await pool.query("UPDATE sprints SET status = 'CLOSED' WHERE project_id = $1 AND number = 1", [projA]);
+    await expect(pool.query("UPDATE sprints SET status = 'ACTIVE' WHERE id = $1", [sprintId])).resolves.toBeDefined();
+
+    // Disallowed ACTIVE -> PLANNED
+    await expect(pool.query("UPDATE sprints SET status = 'PLANNED' WHERE id = $1", [sprintId])).rejects.toThrow(/not allowed/);
+
+    // Allowed ACTIVE -> CLOSED
+    await expect(pool.query("UPDATE sprints SET status = 'CLOSED' WHERE id = $1", [sprintId])).resolves.toBeDefined();
+
+    // Disallowed CLOSED -> ACTIVE
+    await expect(pool.query("UPDATE sprints SET status = 'ACTIVE' WHERE id = $1", [sprintId])).rejects.toThrow(/not allowed/);
+  });
+
+  it("cross-project foreign key rejection for epics, milestones, sprints and tasks", async () => {
+    const msB = (await pool.query<{ id: string }>(
+      "INSERT INTO milestones (org_id, project_id, slug, title) VALUES ($1, $2, 'ms-b', 'Milestone B') RETURNING id",
+      [orgB, projB],
+    )).rows[0]!.id;
+
+    // Epic in projA cannot point to milestone in projB
+    await expect(
+      pool.query("INSERT INTO epics (org_id, project_id, slug, title, milestone_id) VALUES ($1, $2, 'epic-a', 'Epic A', $3)", [orgA, projA, msB]),
+    ).rejects.toThrow(/epics_milestone_same_project_fk/);
+
+    const epicB = (await pool.query<{ id: string }>(
+      "INSERT INTO epics (org_id, project_id, slug, title) VALUES ($1, $2, 'epic-b', 'Epic B') RETURNING id",
+      [orgB, projB],
+    )).rows[0]!.id;
+
+    const sprintB = (await pool.query<{ id: string }>(
+      "SELECT id FROM sprints WHERE project_id = $1 AND number = 1",
+      [projB],
+    )).rows[0]!.id;
+
+    // Task in projA cannot point to epic in projB
+    await expect(
+      pool.query(
+        "INSERT INTO tasks (org_id, project_id, number, title, epic_id) VALUES ($1, $2, 100, 'Task 100', $3)",
+        [orgA, projA, epicB],
+      ),
+    ).rejects.toThrow(/tasks_epic_same_project_fk/);
+
+    // Task in projA cannot point to sprint in projB
+    await expect(
+      pool.query(
+        "INSERT INTO tasks (org_id, project_id, number, title, sprint_id) VALUES ($1, $2, 101, 'Task 101', $3)",
+        [orgA, projA, sprintB],
+      ),
+    ).rejects.toThrow(/tasks_sprint_same_project_fk/);
+  });
+});
+

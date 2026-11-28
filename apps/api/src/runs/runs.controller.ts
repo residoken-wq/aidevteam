@@ -125,6 +125,19 @@ export class RunsController {
         throw new ConflictException({ statusCode: 409, message: "task_not_dispatchable" });
       }
 
+      // P3-03: Blocked task cannot dispatch (must have all dependencies in DONE; CANCELLED counts as blocked)
+      const blockedRes = await client.query(
+        `SELECT 1
+           FROM task_dependencies td
+           JOIN tasks dt ON dt.id = td.depends_on_task_id
+          WHERE td.org_id = $1 AND td.project_id = $2 AND td.task_id = $3 AND dt.status <> 'DONE'
+          LIMIT 1`,
+        [org.orgId, projectId, task.id],
+      );
+      if ((blockedRes.rowCount ?? 0) > 0) {
+        throw new ConflictException({ statusCode: 409, message: "task_blocked" });
+      }
+
       // Check worker in org
       const workerRes = await client.query<{ id: string; enabled: boolean; type: string; project_id: string | null }>(
         "SELECT id, enabled, type, project_id FROM workers WHERE org_id = $1 AND slug = $2 AND archived_at IS NULL",

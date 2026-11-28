@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { isAllowedTransition, TASK_STATUSES, TASK_TRANSITIONS, TaskCreateSchema, TaskTransitionSchema, TaskUpdateSchema, type TaskStatus } from "./task";
+import { isAllowedTransition, TASK_STATUSES, TASK_TRANSITIONS, TaskCreateSchema, TaskListQuerySchema, TaskTransitionSchema, TaskUpdateSchema, type TaskStatus } from "./task";
 
 describe("STATE_MACHINES.md §1 mirrors TASK_TRANSITIONS", () => {
   const md = readFileSync(path.join(__dirname, "../../../docs/architecture/STATE_MACHINES.md"), "utf8");
@@ -28,15 +28,30 @@ describe("STATE_MACHINES.md §1 mirrors TASK_TRANSITIONS", () => {
 describe("task contracts", () => {
   it("create trims the title and rejects status, ids and unknown fields", () => {
     expect(TaskCreateSchema.parse({ title: "  Fix login  " }).title).toBe("Fix login");
+    expect(TaskCreateSchema.parse({ title: "  Fix login  ", epicSlug: "epic-auth", sprintNumber: 1 })).toEqual({
+      title: "Fix login",
+      epicSlug: "epic-auth",
+      sprintNumber: 1,
+    });
     for (const extra of [{ status: "DONE" }, { orgId: "x" }, { projectId: "x" }, { number: 3 }]) {
       expect(TaskCreateSchema.safeParse({ title: "T", ...extra }).success).toBe(false);
     }
   });
 
-  it("update cannot change status", () => {
+  it("update cannot change status and allows updating/clearing epicSlug and sprintNumber", () => {
     expect(TaskUpdateSchema.safeParse({ status: "DONE" }).success).toBe(false);
     expect(TaskUpdateSchema.safeParse({}).success).toBe(false);
-    expect(TaskUpdateSchema.safeParse({ agentSlug: null }).success).toBe(true);
+    expect(TaskUpdateSchema.safeParse({ agentSlug: null, epicSlug: null, sprintNumber: null }).success).toBe(true);
+    expect(TaskUpdateSchema.safeParse({ epicSlug: "new-epic", sprintNumber: 2 }).success).toBe(true);
+  });
+
+  it("TaskListQuerySchema validates epic and sprint filters", () => {
+    expect(TaskListQuerySchema.parse({ epic: "my-epic", sprint: "3" })).toEqual({
+      limit: 200,
+      offset: 0,
+      epic: "my-epic",
+      sprint: 3,
+    });
   });
 
   it("DONE needs confirmReviewed: true; CANCELLED needs a reason; extras are refused elsewhere", () => {

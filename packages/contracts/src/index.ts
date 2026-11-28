@@ -15,5 +15,6 @@ export * from "./run";
 export * from "./dashboard";
 export * from "./approval";
 export * from "./member";
+export * from "./planning";
 export * from "./error";
 export * from "./openapi";

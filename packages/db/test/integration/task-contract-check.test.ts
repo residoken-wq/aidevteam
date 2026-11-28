@@ -3,7 +3,7 @@ import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { loadMigrations, migrateDown, migrateUp } from "../../src/migrate";
 import { resetSchema, testPool } from "./helpers";
 
-describe("AC-6 Migration 0013 & tasks.contract CHECK constraint", () => {
+describe("AC-6 Migration 0015 & tasks.contract CHECK constraint", () => {
   const pool: Pool = testPool();
   beforeEach(() => resetSchema(pool));
   afterAll(() => pool.end());
@@ -18,9 +18,9 @@ describe("AC-6 Migration 0013 & tasks.contract CHECK constraint", () => {
     );
     expect(colCheck.rows.length).toBe(1);
 
-    // Roll back migration 0013
+    // Roll back migration 0015
     const rolledBack = await migrateDown(pool, 1);
-    expect(rolledBack).toEqual(["0013"]);
+    expect(rolledBack).toEqual(["0015"]);
 
     // Verify contract column is gone
     const colCheckAfter = await pool.query<{ column_name: string }>(
@@ -28,9 +28,9 @@ describe("AC-6 Migration 0013 & tasks.contract CHECK constraint", () => {
     );
     expect(colCheckAfter.rows.length).toBe(0);
 
-    // Re-apply migration 0013
+    // Re-apply migration 0015
     const reApplied = await migrateUp(pool);
-    expect(reApplied).toEqual(["0013"]);
+    expect(reApplied).toEqual(["0015"]);
   }, 30000);
 
   it("DB CHECK blocks contract that is not an object (array, number, string, boolean)", async () => {

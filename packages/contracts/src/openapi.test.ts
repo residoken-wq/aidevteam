@@ -79,6 +79,13 @@ describe("OpenAPI 3.1.0 generation", () => {
       "PATCH /projects/{slug}",
       "POST /projects/{slug}/members",
       "DELETE /projects/{slug}/members",
+      "POST /projects/{slug}/epics",
+      "PATCH /projects/{slug}/epics/{epicSlug}",
+      "POST /projects/{slug}/milestones",
+      "PATCH /projects/{slug}/milestones/{milestoneSlug}",
+      "POST /projects/{slug}/sprints",
+      "PATCH /projects/{slug}/sprints/{number}",
+      "POST /projects/{slug}/sprints/{number}/transitions",
       "POST /provider-accounts",
       "PATCH /provider-accounts/{slug}",
       "POST /provider-accounts/{slug}/license",
@@ -89,6 +96,8 @@ describe("OpenAPI 3.1.0 generation", () => {
       "POST /projects/{projectSlug}/tasks",
       "PATCH /projects/{projectSlug}/tasks/{number}",
       "POST /projects/{projectSlug}/tasks/{number}/transitions",
+      "POST /projects/{projectSlug}/tasks/{number}/dependencies",
+      "DELETE /projects/{projectSlug}/tasks/{number}/dependencies",
       "POST /projects/{projectSlug}/tasks/{number}/dispatch",
       "PUT /projects/{projectSlug}/tasks/{number}/contract",
       "POST /platform/orgs",
@@ -111,7 +120,8 @@ describe("OpenAPI 3.1.0 generation", () => {
   it("AC-4: document JSON does not contain secret-like patterns", () => {
     const json = JSON.stringify(doc);
     expect(json).not.toMatch(/ghp_/);
-    expect(json).not.toMatch(/sk-/);
+    // Key-shaped only: a bare /sk-/ also matches ordinary words such as "task-dependencies".
+    expect(json).not.toMatch(/(^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{16,}/);
     expect(json).not.toMatch(/-----BEGIN/);
     expect(json).not.toMatch(/postgres:\/\//);
   });

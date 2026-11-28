@@ -10,6 +10,8 @@ const EXPECTED_TABLES = [
   "agent_runs",
   "agents",
   "audit_events",
+  "epics",
+  "milestones",
   "oauth_login_states",
   "orgs",
   "platform_admins",
@@ -22,13 +24,15 @@ const EXPECTED_TABLES = [
   "roles",
   "schema_migrations",
   "sessions",
+  "sprints",
+  "task_dependencies",
   "tasks",
   "user_allowlist",
   "users",
   "workers",
 ];
 
-describe("migrations up/down (AC-1)", () => {
+describe("migrations up/down (AC-1)", { timeout: 30_000 }, () => {
   const pool: Pool = testPool();
   beforeEach(() => resetSchema(pool));
   afterAll(() => pool.end());
@@ -45,19 +49,19 @@ describe("migrations up/down (AC-1)", () => {
 
     expect(await migrateUp(pool)).toEqual(all);
     expect(await tableNames(pool)).toEqual(EXPECTED_TABLES);
-  }, 30000);
+  }, 30_000);
 
   it("is idempotent: a second up applies nothing", async () => {
     await migrateUp(pool);
     expect(await migrateUp(pool)).toEqual([]);
     expect((await migrationStatus(pool)).pending).toEqual([]);
-  }, 20000);
+  }, 15_000);
 
   it("serialises concurrent runners (advisory lock): each migration applied once", async () => {
     const results = await Promise.all([migrateUp(pool), migrateUp(pool), migrateUp(pool)]);
     const total = results.flat();
     expect(total.sort()).toEqual(loadMigrations().map((m) => m.version));
-  }, 30000);
+  }, 30_000);
 
   it("fails closed when an applied migration was modified afterwards", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "mig-"));
