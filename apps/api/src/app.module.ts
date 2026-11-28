@@ -26,6 +26,23 @@ import { RbacGuard } from "./rbac/rbac.guard";
 import { RbacService } from "./rbac/rbac.service";
 import { APP_CONFIG, DB_POOL, GITHUB_CLIENT, MOCK_RUNNER } from "./tokens";
 
+export const APP_CONTROLLERS: Type[] = [
+  HealthController,
+  AuthController,
+  OrgController,
+  MembersController,
+  AuditController,
+  ProjectsController,
+  ProviderAccountsController,
+  WorkersController,
+  AgentsController,
+  TasksController,
+  RunsController,
+  PlatformOrgsController,
+  DashboardController,
+  ApprovalsController,
+];
+
 export interface AppOptions {
   config: AppConfig;
   /** Tests inject a fake GitHub client; production uses the HTTP client. */
@@ -44,13 +61,15 @@ class PoolCloser implements OnApplicationShutdown {
   }
 }
 
-@Module({})
+@Module({
+  controllers: APP_CONTROLLERS,
+})
 export class AppModule {
   static forRoot(options: AppOptions): DynamicModule {
     const ownsPool = !options.pool;
     return {
       module: AppModule,
-      controllers: [HealthController, AuthController, OrgController, MembersController, AuditController, ProjectsController, ProviderAccountsController, WorkersController, AgentsController, TasksController, RunsController, PlatformOrgsController, DashboardController, ApprovalsController, ...(options.extraControllers ?? [])],
+      controllers: [...APP_CONTROLLERS, ...(options.extraControllers ?? [])],
       providers: [
         { provide: APP_CONFIG, useValue: options.config },
         { provide: DB_POOL, useValue: options.pool ?? createPool(options.config.databaseUrl) },
