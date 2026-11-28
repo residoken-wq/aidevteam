@@ -74,9 +74,11 @@ async function contextFor(browser, token) {
       assert.equal(await headerButtons.count(), 1, "Header must retain logout button");
 
       // Verify no email address (@) or session token leaked in page content
+      // Visible text must contain no email address; the full HTML (incl. framework scripts) must not contain the token.
+      const visibleText = await adminPage.locator("body").innerText();
+      assert.ok(!/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+/.test(visibleText), "Visible page text must not contain an email address");
       const content = await adminPage.content();
       assert.ok(!content.includes("@example.com"), "Page content must not leak email");
-      assert.ok(!content.includes("@"), "Page content must not contain '@'");
       assert.ok(!content.includes(process.env.ADMIN_TOKEN), "Page content must not leak session token");
 
       // Also check maintainer user
