@@ -19,6 +19,7 @@
 | `members.e2e.cjs` | P2-04: org_admin gán role viewer cho user allowlist → thấy trong bảng → gỡ → biến mất; maintainer không có quyền xem |
 | `a11y.e2e.cjs` | P2-11: a11y — skip link, keyboard navigation, accessible form labels, single h1, html lang="vi", profile trang chỉ đọc không lộ email/token |
 | `app-shell.e2e.cjs` | P2-01: App shell — sidebar theo RBAC, header có logout, mobile viewport không cuộn ngang, aria-current="page" |
+| `task-acceptance.e2e.cjs` | P3-10: Luồng task tạo → gán → bị chặn → sẵn sàng → dispatch; không vượt quyền |
 
 ## Chạy cục bộ
 
