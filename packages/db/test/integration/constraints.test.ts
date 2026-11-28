@@ -234,6 +234,28 @@ describe("agents (P2-05, DB backstop)", () => {
     );
     await expect(insert("a-cross-pa", { providerId: pa.rows[0]!.id })).rejects.toThrow(/agents_provider_same_org_fk/);
   });
+
+  it("P3-05: enforces capabilities array limit (<= 20) and max_active_tasks range (1..50)", async () => {
+    const validCaps = Array.from({ length: 20 }, (_, i) => `cap-${i}`);
+    const r = await pool.query<{ id: string }>(
+      "INSERT INTO agents (org_id, slug, name, capabilities, max_active_tasks) VALUES ($1, 'a-cap-20', 'A', $2, 50) RETURNING id",
+      [orgA, validCaps],
+    );
+    expect(r.rowCount).toBe(1);
+
+    const tooManyCaps = Array.from({ length: 21 }, (_, i) => `cap-${i}`);
+    await expect(
+      pool.query("INSERT INTO agents (org_id, slug, name, capabilities) VALUES ($1, 'a-cap-21', 'A', $2)", [orgA, tooManyCaps]),
+    ).rejects.toThrow(/agents_capabilities_len_check/);
+
+    await expect(
+      pool.query("INSERT INTO agents (org_id, slug, name, max_active_tasks) VALUES ($1, 'a-max-0', 'A', 0)", [orgA]),
+    ).rejects.toThrow(/agents_max_active_tasks_range/);
+
+    await expect(
+      pool.query("INSERT INTO agents (org_id, slug, name, max_active_tasks) VALUES ($1, 'a-max-51', 'A', 51)", [orgA]),
+    ).rejects.toThrow(/agents_max_active_tasks_range/);
+  });
 });
 
 describe("tasks (P3-02, DB backstop for STATE_MACHINES §1)", () => {
@@ -279,6 +301,20 @@ describe("tasks (P3-02, DB backstop for STATE_MACHINES §1)", () => {
     const id = (await insert()).rows[0]!.id;
     await expect(pool.query("UPDATE tasks SET number = 999 WHERE id = $1", [id])).rejects.toThrow(/immutable/);
     await expect(pool.query("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 9999, 'X')", [orgB, projectA])).rejects.toThrow(/tasks_project_same_org_fk/);
+  });
+
+  it("P3-05: enforces required_capabilities array limit (<= 10)", async () => {
+    const validCaps = Array.from({ length: 10 }, (_, i) => `cap-${i}`);
+    const r = await pool.query<{ id: string }>(
+      "INSERT INTO tasks (org_id, project_id, number, title, required_capabilities) VALUES ($1, $2, $3, 'T-10', $4) RETURNING id",
+      [orgA, projectA, ++n, validCaps],
+    );
+    expect(r.rowCount).toBe(1);
+
+    const tooManyCaps = Array.from({ length: 11 }, (_, i) => `cap-${i}`);
+    await expect(
+      pool.query("INSERT INTO tasks (org_id, project_id, number, title, required_capabilities) VALUES ($1, $2, $3, 'T-11', $4)", [orgA, projectA, ++n, tooManyCaps]),
+    ).rejects.toThrow(/tasks_required_capabilities_len_check/);
   });
 });
 

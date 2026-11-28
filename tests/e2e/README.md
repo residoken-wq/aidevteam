@@ -6,6 +6,7 @@
 | `binding-rules.e2e.cjs` | P2-09: org_admin đổi account sang approved → maintainer gắn được vào agent; account prohibited → gắn bị từ chối (thấy thông báo lỗi) |
 | `workers.e2e.cjs` | P2-08: tạo worker mock gắn dự án → đường dẫn lồng nhau / thư mục hệ thống bị từ chối → tắt/bật → lưu trữ giải phóng đường dẫn; viewer chỉ đọc |
 | `agents.e2e.cjs` | P2-05: tạo sơ đồ agent có tài khoản provider và cấp trên → vòng lặp bị từ chối → không lưu trữ được agent còn cấp dưới → gỡ cấp dưới rồi lưu trữ; viewer chỉ đọc |
+| `agent-assignment.e2e.cjs` | P3-05: Gán agent — agent max 1 → gán task 1 OK, gán task 2 báo quá tải; task yêu cầu capability agent không có → báo thiếu năng lực; viewer chỉ đọc |
 | `tasks.e2e.cjs` | P3-02/P3-04: Kanban — HTML trong task hiển thị dạng text → kéo thả BACKLOG→TODO → kéo sai bị từ chối → đi tới DONE có xác nhận → hủy có lý do → bảng cũ nhận 409 và tải lại; viewer chỉ đọc |
 | `task-dependencies.e2e.cjs` | P3-03: Phụ thuộc task — B phụ thuộc A hiện "Bị chặn", dispatch B bị từ chối, A phụ thuộc B báo vòng lặp |
 | `planning.e2e.cjs` | P3-01: Kế hoạch (epic, milestone, sprint) — tạo epic + sprint → bắt đầu sprint → tạo task gắn epic/sprint → lọc Kanban theo sprint; viewer chỉ đọc |

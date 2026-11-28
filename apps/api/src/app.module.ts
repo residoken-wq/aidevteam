@@ -16,6 +16,7 @@ import { WorkersController } from "./workers/workers.controller";
 import { AgentsController } from "./agents/agents.controller";
 import { TasksController } from "./tasks/tasks.controller";
 import { ProjectTaskDependenciesController, TaskDependenciesController } from "./tasks/task-dependencies.controller";
+import { TaskContractController } from "./tasks/task-contract.controller";
 import { TaskActivityController } from "./tasks/task-activity.controller";
 import { RunsController } from "./runs/runs.controller";
 import { RunWorker } from "./runs/run-worker.service";
@@ -42,6 +43,7 @@ export const APP_CONTROLLERS: Type[] = [
   TasksController,
   TaskDependenciesController,
   ProjectTaskDependenciesController,
+  TaskContractController,
   TaskActivityController,
   RunsController,
   PlatformOrgsController,

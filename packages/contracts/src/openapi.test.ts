@@ -100,6 +100,7 @@ describe("OpenAPI 3.1.0 generation", () => {
       "DELETE /projects/{projectSlug}/tasks/{number}/dependencies",
       "POST /projects/{projectSlug}/tasks/{number}/comments",
       "POST /projects/{projectSlug}/tasks/{number}/dispatch",
+      "PUT /projects/{projectSlug}/tasks/{number}/contract",
       "POST /platform/orgs",
       "PATCH /platform/orgs/{slug}",
     ]);

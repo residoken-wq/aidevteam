@@ -1,4 +1,4 @@
--- 0015_task_activity (up) — P3-07: Task activity timeline and comments.
+-- 0017_task_activity (up) — P3-07: Task activity timeline and comments.
 CREATE TABLE task_comments (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id         uuid NOT NULL REFERENCES orgs (id),

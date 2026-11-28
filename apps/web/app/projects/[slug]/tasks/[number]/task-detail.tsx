@@ -113,6 +113,12 @@ export function TaskDetailView({
       <div>
         <strong>Ưu tiên:</strong> {PRIORITY[task.priority]}
       </div>
+      <div>
+        <strong>Năng lực yêu cầu:</strong>{" "}
+        {task.requiredCapabilities && task.requiredCapabilities.length > 0
+          ? task.requiredCapabilities.join(", ")
+          : "(không có)"}
+      </div>
       {task.agentSlug ? (
         <div>
           <strong>Agent:</strong> {task.agentSlug}

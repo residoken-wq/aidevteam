@@ -18,13 +18,22 @@ interface Row {
   reports_to_slug: string | null;
   enabled: boolean;
   description: string | null;
+  capabilities: string[];
+  max_active_tasks: number;
+  active_task_count: number | string;
   created_at: Date;
   updated_at: Date;
   archived_at: Date | null;
 }
 
 const SELECT = `SELECT a.id, a.slug, a.name, a.title, a.model, pa.slug AS provider_account_slug, m.slug AS reports_to_slug,
-                       a.enabled, a.description, a.created_at, a.updated_at, a.archived_at
+                       a.enabled, a.description, a.capabilities, a.max_active_tasks,
+                       (SELECT count(*)::int
+                          FROM tasks t
+                         WHERE t.org_id = a.org_id
+                           AND t.agent_id = a.id
+                           AND t.status IN ('TODO', 'IN_PROGRESS', 'IN_REVIEW')) AS active_task_count,
+                       a.created_at, a.updated_at, a.archived_at
                   FROM agents a
                   LEFT JOIN provider_accounts pa ON pa.id = a.provider_account_id AND pa.org_id = a.org_id
                   LEFT JOIN agents m ON m.id = a.reports_to_agent_id AND m.org_id = a.org_id`;
@@ -38,6 +47,9 @@ const toDto = (r: Row): Agent => ({
   reportsToSlug: r.reports_to_slug,
   enabled: r.enabled,
   description: r.description,
+  capabilities: r.capabilities ?? [],
+  maxActiveTasks: r.max_active_tasks,
+  activeTaskCount: Number(r.active_task_count ?? 0),
   createdAt: r.created_at.toISOString(),
   updatedAt: r.updated_at.toISOString(),
   archivedAt: r.archived_at ? r.archived_at.toISOString() : null,
@@ -82,9 +94,21 @@ export class AgentsController {
       const managerId = input.reportsToSlug ? await this.managerId(c, org.orgId, input.reportsToSlug) : null;
       try {
         const r = await c.query<{ id: string }>(
-          `INSERT INTO agents (org_id, slug, name, title, model, provider_account_id, reports_to_agent_id, description, created_by_user_id)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-          [org.orgId, input.slug, input.name, input.title ?? null, input.model ?? null, providerId, managerId, input.description ?? null, getAuth(req).userId],
+          `INSERT INTO agents (org_id, slug, name, title, model, provider_account_id, reports_to_agent_id, description, capabilities, max_active_tasks, created_by_user_id)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+          [
+            org.orgId,
+            input.slug,
+            input.name,
+            input.title ?? null,
+            input.model ?? null,
+            providerId,
+            managerId,
+            input.description ?? null,
+            input.capabilities ?? [],
+            input.maxActiveTasks ?? 3,
+            getAuth(req).userId,
+          ],
         );
         return this.findById(c, org.orgId, r.rows[0]!.id);
       } catch (err) {
@@ -121,6 +145,8 @@ export class AgentsController {
                 provider_account_id = CASE WHEN $9::boolean THEN $10::uuid ELSE provider_account_id END,
                 reports_to_agent_id = CASE WHEN $11::boolean THEN $12::uuid ELSE reports_to_agent_id END,
                 description = CASE WHEN $13::boolean THEN $14 ELSE description END,
+                capabilities = CASE WHEN $15::boolean THEN $16::text[] ELSE capabilities END,
+                max_active_tasks = COALESCE($17, max_active_tasks),
                 updated_at = now()
           WHERE org_id = $1 AND id = $2 AND archived_at IS NULL`,
         [
@@ -138,6 +164,9 @@ export class AgentsController {
           managerId ?? null,
           input.description !== undefined,
           input.description ?? null,
+          input.capabilities !== undefined,
+          input.capabilities ?? null,
+          input.maxActiveTasks ?? null,
         ],
       );
       return this.findById(c, org.orgId, current.id);

@@ -245,6 +245,11 @@ export function Board({
                       {t.agentSlug ? ` · Agent: ${t.agentSlug}` : ""}
                     </small>
                   </div>
+                  {t.requiredCapabilities && t.requiredCapabilities.length > 0 ? (
+                    <div>
+                      <small>Yêu cầu: {t.requiredCapabilities.join(", ")}</small>
+                    </div>
+                  ) : null}
                   {t.description ? (
                     <details>
                       <summary>Mô tả</summary>
@@ -385,6 +390,11 @@ function CreateTaskForm({
     const epicSlug = String(d.get("epicSlug") ?? "");
     const sprintNumberStr = String(d.get("sprintNumber") ?? "");
     const sprintNumber = sprintNumberStr ? Number(sprintNumberStr) : undefined;
+    const reqCapsRaw = String(d.get("requiredCapabilities") ?? "");
+    const requiredCapabilities = reqCapsRaw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     const r = await sendJson("POST", `/api/projects/${encodeURIComponent(projectSlug)}/tasks`, {
       title: String(d.get("title") ?? ""),
       priority: String(d.get("priority") ?? "medium"),
@@ -392,6 +402,7 @@ function CreateTaskForm({
       ...(agentSlug ? { agentSlug } : {}),
       ...(epicSlug ? { epicSlug } : {}),
       ...(sprintNumber !== undefined ? { sprintNumber } : {}),
+      ...(requiredCapabilities.length > 0 ? { requiredCapabilities } : {}),
     });
     if (!r.ok) return setError(r.error);
     setError(null);
@@ -450,6 +461,9 @@ function CreateTaskForm({
               </option>
             ))}
         </select>
+      </label>{" "}
+      <label>
+        Năng lực yêu cầu (cách nhau bởi dấu phẩy) <input name="requiredCapabilities" placeholder="backend, nodejs" />
       </label>
       <br />
       <label>
