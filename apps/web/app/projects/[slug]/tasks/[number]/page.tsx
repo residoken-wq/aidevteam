@@ -1,8 +1,9 @@
-import type { Project, Task, TaskDependencies } from "@aidevteam/contracts";
+import type { Project, Task, TaskActivityResponse, TaskDependencies } from "@aidevteam/contracts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiGet, can, type Me } from "../../../../../lib/server-api";
 import { TaskDetailView } from "./task-detail";
+import { TaskActivityView } from "./task-activity";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export default async function TaskDetailPage({
   const project = await apiGet<Project>(`/projects/${slug}`);
   const task = await apiGet<Task>(`/projects/${encodeURIComponent(slug)}/tasks/${numberStr}`);
   const deps = await apiGet<TaskDependencies>(`/projects/${encodeURIComponent(slug)}/tasks/${numberStr}/dependencies`);
+  const activity = await apiGet<TaskActivityResponse>(`/projects/${encodeURIComponent(slug)}/tasks/${numberStr}/activity`);
 
   if (project === null || task === null || deps === null) notFound();
 
@@ -47,6 +49,13 @@ export default async function TaskDetailPage({
         projectSlug={slug}
         task={task}
         initialDeps={deps}
+        canWrite={canWrite}
+      />
+      <hr style={{ margin: "1rem 0" }} />
+      <TaskActivityView
+        projectSlug={slug}
+        taskNumber={task.number}
+        initialActivity={activity ?? { items: [], limit: 50, offset: 0 }}
         canWrite={canWrite}
       />
     </div>
