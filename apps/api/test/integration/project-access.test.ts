@@ -48,7 +48,6 @@ const send = (method: "get" | "post" | "patch" | "delete", path: string, who: st
 let projA1Id: string;
 let projA2Id: string;
 let projB1Id: string;
-let taskA1Id: string;
 let runA1Id: string;
 
 beforeAll(async () => {
@@ -98,7 +97,6 @@ beforeAll(async () => {
   expect(p2.status).toBe(201);
 
   const orgARow = (await pool.query<{ id: string }>("SELECT id FROM orgs WHERE slug = 'org-test-a'")).rows[0]!;
-  const orgBRow = (await pool.query<{ id: string }>("SELECT id FROM orgs WHERE slug = 'org-test-b'")).rows[0]!;
 
   projA1Id = (await pool.query<{ id: string }>("SELECT id FROM projects WHERE slug = 'proj-alpha'")).rows[0]!.id;
   projA2Id = (await pool.query<{ id: string }>("SELECT id FROM projects WHERE slug = 'proj-beta'")).rows[0]!.id;
@@ -117,7 +115,6 @@ beforeAll(async () => {
   // Create a task and run in proj-alpha
   const t1 = await send("post", "/projects/proj-alpha/tasks", "admin").send({ title: "Task 1 in Alpha" });
   expect(t1.status).toBe(201);
-  taskA1Id = (await pool.query<{ id: string }>("SELECT id FROM tasks WHERE project_id = $1 AND number = 1", [projA1Id])).rows[0]!.id;
 
   // Transition task to TODO so dispatch is possible
   await send("post", "/projects/proj-alpha/tasks/1/transitions", "admin").send({
@@ -418,7 +415,7 @@ describe("AC-7: Audit events and member endpoints", () => {
     expect(assignRes.status).toBe(200);
     expect(assignRes.body.changed).toBe(true);
 
-    const assignAudit = await pool.query<{ actor_github_user_id: string; target_id: string; metadata: any }>(
+    const assignAudit = await pool.query<{ actor_github_user_id: string; target_id: string; metadata: { githubUserId?: string; access?: string } }>(
       "SELECT actor_github_user_id, target_id, metadata FROM audit_events WHERE action = 'project.member_assigned' ORDER BY id DESC LIMIT 1",
     );
     expect(assignAudit.rows.length).toBe(1);
@@ -452,7 +449,7 @@ describe("AC-7: Audit events and member endpoints", () => {
     expect(unassignRes.status).toBe(200);
     expect(unassignRes.body.changed).toBe(true);
 
-    const unassignAudit = await pool.query<{ actor_github_user_id: string; target_id: string; metadata: any }>(
+    const unassignAudit = await pool.query<{ actor_github_user_id: string; target_id: string; metadata: { githubUserId?: string; access?: string } }>(
       "SELECT actor_github_user_id, target_id, metadata FROM audit_events WHERE action = 'project.member_unassigned' ORDER BY id DESC LIMIT 1",
     );
     expect(unassignAudit.rows.length).toBe(1);
