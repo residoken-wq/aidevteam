@@ -10,10 +10,12 @@ import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
 import { OrgController } from "./org/org.controller";
 import { MembersController } from "./org/members.controller";
+import { ProjectStatsController } from "./projects/project-stats.controller";
 import { ProjectsController } from "./projects/projects.controller";
 import { ProviderAccountsController } from "./provider-accounts/provider-accounts.controller";
 import { WorkersController } from "./workers/workers.controller";
 import { AgentsController } from "./agents/agents.controller";
+import { TaskSearchController } from "./tasks/task-search.controller";
 import { TasksController } from "./tasks/tasks.controller";
 import { ProjectTaskDependenciesController, TaskDependenciesController } from "./tasks/task-dependencies.controller";
 import { RunsController } from "./runs/runs.controller";
@@ -34,10 +36,12 @@ export const APP_CONTROLLERS: Type[] = [
   OrgController,
   MembersController,
   AuditController,
+  ProjectStatsController,
   ProjectsController,
   ProviderAccountsController,
   WorkersController,
   AgentsController,
+  TaskSearchController,
   TasksController,
   TaskDependenciesController,
   ProjectTaskDependenciesController,
