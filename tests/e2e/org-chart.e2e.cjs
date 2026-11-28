@@ -13,7 +13,8 @@ const assert = require("node:assert/strict");
 const BASE = process.env.BASE_URL;
 
 async function contextFor(browser, token) {
-  const ctx = await browser.newContext();
+  // Tall viewport: agents left by earlier E2E files push nodes down; HTML5 drag needs both nodes on screen.
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 2400 } });
   await ctx.addCookies([
     {
       name: "__Host-cc_session",
