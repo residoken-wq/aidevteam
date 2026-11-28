@@ -37,6 +37,7 @@ export function AssignRoleForm() {
           <option value="viewer">Chỉ xem (viewer)</option>
           <option value="maintainer">Vận hành (maintainer)</option>
           <option value="org_admin">Quản trị tổ chức (org_admin)</option>
+          <option value="project_member">Thành viên dự án (project_member)</option>
         </select>
       </label>{" "}
       <button type="submit">Gán vai trò</button>

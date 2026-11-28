@@ -114,6 +114,18 @@ describe("navItems (AC-1)", () => {
     expect(items.find((i) => i.href === "/platform/orgs")?.section).toBe("platform");
   });
 
+  it("returns concise sidebar for project_member (Dự án, Agent, Worker)", () => {
+    const perms = Array.from(ROLE_PERMISSIONS.project_member);
+    const me = fakeMe({ roles: ["project_member"], permissions: perms });
+    const items = navItems(me);
+
+    expect(items.map((i) => i.label)).toEqual(["Dự án", "Agent", "Worker"]);
+    expect(items.map((i) => i.href)).not.toContain("/dashboard");
+    expect(items.map((i) => i.href)).not.toContain("/provider-accounts");
+    expect(items.map((i) => i.href)).not.toContain("/approvals");
+    expect(items.map((i) => i.href)).not.toContain("/members");
+  });
+
   it("default deny: unknown or strange permissions do not add any links", () => {
     const me = fakeMe({
       roles: ["custom"],
