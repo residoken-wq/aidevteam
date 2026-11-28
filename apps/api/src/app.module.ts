@@ -61,9 +61,7 @@ class PoolCloser implements OnApplicationShutdown {
   }
 }
 
-@Module({
-  controllers: APP_CONTROLLERS,
-})
+@Module({})
 export class AppModule {
   static forRoot(options: AppOptions): DynamicModule {
     const ownsPool = !options.pool;

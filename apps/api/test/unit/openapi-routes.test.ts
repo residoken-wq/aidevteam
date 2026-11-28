@@ -7,7 +7,7 @@ import {
   ErrorResponseSchema,
   ProjectCreateSchema,
 } from "@aidevteam/contracts";
-import { AppModule } from "../../src/app.module";
+import { APP_CONTROLLERS } from "../../src/app.module";
 import { parseOr422, rethrowConflict } from "../../src/validation";
 
 function normalizeRoutePath(controllerPrefix: string | undefined, methodPath: string | undefined): string {
@@ -20,9 +20,9 @@ function normalizeRoutePath(controllerPrefix: string | undefined, methodPath: st
 
 describe("Route ↔ OpenAPI spec parity (AC-2)", () => {
   it("Nest controller routes exactly match OpenAPI spec operations", () => {
-    // 1. Get controller classes from AppModule metadata
-    const controllers = Reflect.getMetadata("controllers", AppModule) as Type[] | undefined;
-    expect(controllers, "AppModule must have controllers metadata").toBeDefined();
+    // 1. Controller classes: the same list AppModule.forRoot() registers
+    const controllers: Type[] | undefined = APP_CONTROLLERS;
+    expect(controllers, "APP_CONTROLLERS must be defined").toBeDefined();
     expect(Array.isArray(controllers)).toBe(true);
     expect(controllers!.length).toBeGreaterThan(0);
 
