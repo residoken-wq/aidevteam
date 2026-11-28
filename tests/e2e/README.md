@@ -3,6 +3,7 @@
 | Test | Phạm vi |
 |---|---|
 | `provider-accounts.e2e.cjs` | P2-07: tạo → dán nhầm secret bị từ chối, có hướng dẫn và bị xóa khỏi trang → đổi tham chiếu → lưu trữ; viewer chỉ đọc |
+| `binding-rules.e2e.cjs` | P2-09: org_admin đổi account sang approved → maintainer gắn được vào agent; account prohibited → gắn bị từ chối (thấy thông báo lỗi) |
 | `workers.e2e.cjs` | P2-08: tạo worker mock gắn dự án → đường dẫn lồng nhau / thư mục hệ thống bị từ chối → tắt/bật → lưu trữ giải phóng đường dẫn; viewer chỉ đọc |
 | `agents.e2e.cjs` | P2-05: tạo sơ đồ agent có tài khoản provider và cấp trên → vòng lặp bị từ chối → không lưu trữ được agent còn cấp dưới → gỡ cấp dưới rồi lưu trữ; viewer chỉ đọc |
 | `tasks.e2e.cjs` | P3-02/P3-04: Kanban — HTML trong task hiển thị dạng text → kéo thả BACKLOG→TODO → kéo sai bị từ chối → đi tới DONE có xác nhận → hủy có lý do → bảng cũ nhận 409 và tải lại; viewer chỉ đọc |
@@ -13,6 +14,7 @@
 | `dashboard.e2e.cjs` | P2-02: org mới → dashboard hiện 0 và "Chưa có dữ liệu"; tạo 1 project + 1 task → số project đang dùng và số task BACKLOG tăng đúng 1 |
 | `approvals.e2e.cjs` | P6-06: Approval Center chỉ đọc — banner + "Chưa có bản ghi duyệt" khi rỗng; chèn bản ghi giả qua psql → hiện đủ cột, đúng environment, không có button/form, không có link github khi chưa cấu hình APPROVAL_REPO; viewer xem được |
 | `members.e2e.cjs` | P2-04: org_admin gán role viewer cho user allowlist → thấy trong bảng → gỡ → biến mất; maintainer không có quyền xem |
+| `a11y.e2e.cjs` | P2-11: a11y — skip link, keyboard navigation, accessible form labels, single h1, html lang="vi", profile trang chỉ đọc không lộ email/token |
 | `app-shell.e2e.cjs` | P2-01: App shell — sidebar theo RBAC, header có logout, mobile viewport không cuộn ngang, aria-current="page" |
 
 ## Chạy cục bộ

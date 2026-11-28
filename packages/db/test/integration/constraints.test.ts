@@ -149,6 +149,36 @@ describe("provider_accounts.secret_ref (P2-07, defence in depth)", () => {
   );
 });
 
+describe("provider_accounts.license_status (P2-09)", () => {
+  it("defaults to 'unverified'", async () => {
+    const slug = `pa-${Math.random().toString(36).slice(2, 10)}`;
+    const r = await pool.query<{ license_status: string }>(
+      "INSERT INTO provider_accounts (org_id, slug, name, provider, secret_ref) VALUES ($1, $2, 'X', 'anthropic', 'env:AIDEV_SECRET_FOO') RETURNING license_status",
+      [orgA, slug],
+    );
+    expect(r.rows[0]!.license_status).toBe("unverified");
+  });
+
+  it.each(["approved", "unverified", "prohibited"])("accepts status %s", async (status) => {
+    const slug = `pa-${Math.random().toString(36).slice(2, 10)}`;
+    const r = await pool.query(
+      "INSERT INTO provider_accounts (org_id, slug, name, provider, secret_ref, license_status) VALUES ($1, $2, 'X', 'anthropic', 'env:AIDEV_SECRET_FOO', $3)",
+      [orgA, slug, status],
+    );
+    expect(r.rowCount).toBe(1);
+  });
+
+  it.each(["ok", "invalid", "ACTIVE", "pending"])("rejects invalid status %s", async (status) => {
+    const slug = `pa-${Math.random().toString(36).slice(2, 10)}`;
+    await expect(
+      pool.query(
+        "INSERT INTO provider_accounts (org_id, slug, name, provider, secret_ref, license_status) VALUES ($1, $2, 'X', 'anthropic', 'env:AIDEV_SECRET_FOO', $3)",
+        [orgA, slug, status],
+      ),
+    ).rejects.toThrow(/check constraint/);
+  });
+});
+
 describe("workers (P2-08, DB backstop)", () => {
   const insert = (slug: string, path: string, type = "mock", org = orgA) =>
     pool.query("INSERT INTO workers (org_id, slug, name, type, workspace_path) VALUES ($1, $2, 'W', $3, $4)", [org, slug, type, path]);

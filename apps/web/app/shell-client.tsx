@@ -26,6 +26,9 @@ export function ShellClient({
 
   return (
     <div className="app-shell">
+      <a href="#main-content" className="skip-link">
+        Bỏ qua tới nội dung chính
+      </a>
       <header className="app-header">
         <div className="app-header-left">
           <Link href="/" className="app-brand">
@@ -38,9 +41,9 @@ export function ShellClient({
           ) : null}
         </div>
         <div className="app-header-right">
-          <span className="app-user-info">
+          <Link href="/profile" className="app-user-info">
             {me.githubLogin ?? `GitHub #${me.githubUserId}`}
-          </span>
+          </Link>
           <form method="post" action="/auth/logout" className="logout-form">
             <button type="submit" className="logout-button">
               Đăng xuất
@@ -74,7 +77,9 @@ export function ShellClient({
             </nav>
           ) : null}
         </aside>
-        <div className="app-main-content">{children}</div>
+        <main id="main-content" className="app-main-content" tabIndex={-1}>
+          {children}
+        </main>
       </div>
     </div>
   );

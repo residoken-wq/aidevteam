@@ -46,6 +46,15 @@ async function contextFor(browser, token) {
       await page.getByLabel("Tham chiếu secret").fill("env:AIDEV_SECRET_AGENT_E2E_PA");
       await page.getByRole("button", { name: "Tạo tài khoản" }).click();
       await page.getByTestId("pa-agent-e2e-pa").waitFor();
+      if (process.env.ADMIN_TOKEN) {
+        const apage = await (await contextFor(browser, process.env.ADMIN_TOKEN)).newPage();
+        await apage.goto(`${BASE}/provider-accounts`);
+        const row = apage.getByTestId("pa-agent-e2e-pa");
+        await row.locator('select[name="licenseStatus"]').selectOption("approved");
+        await row.getByRole("button", { name: "Đổi giấy phép", exact: true }).click();
+        await row.getByTestId("license-status").filter({ hasText: "Đã duyệt" }).waitFor();
+        await apage.close();
+      }
       await page.goto(`${BASE}/agents`);
       await create(page, "lead-e2e", { title: "Tech Lead", model: "claude-sonnet-x.y", pa: "agent-e2e-pa" });
       await page.getByTestId("agent-lead-e2e").filter({ hasText: "agent-e2e-pa" }).filter({ hasText: "Tech Lead" }).waitFor();

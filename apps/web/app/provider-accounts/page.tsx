@@ -1,18 +1,25 @@
 import type { ProviderAccount } from "@aidevteam/contracts";
 import Link from "next/link";
 import { apiGet, can, type Me } from "../../lib/server-api";
-import { CreateProviderAccountForm, ProviderAccountRowActions } from "./forms";
+import { ChangeLicenseForm, CreateProviderAccountForm, ProviderAccountRowActions } from "./forms";
 
 export const dynamic = "force-dynamic";
+
+const LICENSE_LABELS: Record<string, string> = {
+  approved: "Đã duyệt",
+  unverified: "Chưa xác minh",
+  prohibited: "Cấm",
+};
 
 export default async function ProviderAccountsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const showArchived = (await searchParams).archived === "true";
   const me = await apiGet<Me>("/auth/me");
   const data = await apiGet<{ items: ProviderAccount[] }>(`/provider-accounts?archived=${showArchived ? "true" : "false"}`);
   const canWrite = can(me, "provider_account:write");
+  const canLicense = can(me, "provider_account:license");
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link>
       </p>
@@ -35,6 +42,7 @@ export default async function ProviderAccountsPage({ searchParams }: { searchPar
                   <th>Tên</th>
                   <th>Provider</th>
                   <th>Tham chiếu secret</th>
+                  <th>Giấy phép</th>
                   <th>Trạng thái</th>
                   {canWrite ? <th>Thao tác</th> : null}
                 </tr>
@@ -48,6 +56,15 @@ export default async function ProviderAccountsPage({ searchParams }: { searchPar
                     <td>
                       <code>{a.secretRef}</code>
                     </td>
+                    <td>
+                      <span data-testid="license-status">{LICENSE_LABELS[a.licenseStatus] ?? a.licenseStatus}</span>
+                      {canLicense && !a.archivedAt ? (
+                        <>
+                          {" "}
+                          <ChangeLicenseForm slug={a.slug} currentStatus={a.licenseStatus} />
+                        </>
+                      ) : null}
+                    </td>
                     <td>{a.archivedAt ? "Đã lưu trữ" : "Đang dùng"}</td>
                     {canWrite ? <td>{a.archivedAt ? null : <ProviderAccountRowActions slug={a.slug} name={a.name} />}</td> : null}
                   </tr>
@@ -57,6 +74,6 @@ export default async function ProviderAccountsPage({ searchParams }: { searchPar
           )}
         </>
       )}
-    </main>
+    </div>
   );
 }

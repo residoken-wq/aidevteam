@@ -22,6 +22,7 @@ describe("permissionsFor", () => {
     expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("audit:read"))).toEqual(["org_admin"]);
     expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("member:read"))).toEqual(["org_admin"]);
     expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("member:write"))).toEqual(["org_admin"]);
+    expect(ROLE_KEYS.filter((r) => ROLE_PERMISSIONS[r].has("provider_account:license"))).toEqual(["org_admin"]);
   });
 
   it("roles are nested viewer ⊂ maintainer ⊂ org_admin", () => {

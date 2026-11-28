@@ -19,12 +19,12 @@ export default async function TaskRunsPage({
   const me = await apiGet<Me>("/auth/me");
   if (!can(me, "run:read")) {
     return (
-      <main>
+      <div>
         <p>
           <Link href={`/projects/${encodeURIComponent(slug)}/tasks`}>← Task dự án</Link>
         </p>
         <p role="status">Bạn chưa có quyền xem lịch sử chạy.</p>
-      </main>
+      </div>
     );
   }
 
@@ -34,7 +34,7 @@ export default async function TaskRunsPage({
   if (data === null) notFound();
 
   return (
-    <main>
+    <div>
       <p>
         <Link href={`/projects/${encodeURIComponent(slug)}/tasks`}>← Task dự án</Link>
       </p>
@@ -71,6 +71,6 @@ export default async function TaskRunsPage({
           </tbody>
         </table>
       )}
-    </main>
+    </div>
   );
 }

@@ -165,6 +165,11 @@ export const providerAccounts = pgTable(
     /** Pointer only (env:AIDEV_SECRET_… or file:/run/secrets/…), never the credential. */
     secretRef: text("secret_ref").notNull(),
     description: text("description"),
+    licenseStatus: text("license_status", { enum: ["approved", "unverified", "prohibited"] })
+      .notNull()
+      .default("unverified"),
+    licenseStatusChangedAt: ts("license_status_changed_at"),
+    licenseStatusChangedByUserId: uuid("license_status_changed_by_user_id").references(() => users.id),
     createdByUserId: uuid("created_by_user_id").references(() => users.id),
     createdAt: ts("created_at").notNull().defaultNow(),
     updatedAt: ts("updated_at").notNull().defaultNow(),

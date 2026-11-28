@@ -470,6 +470,120 @@ describe("AC-7: redaction of tokens and emails in output", () => {
   });
 });
 
+describe("P2-09 AC-5 dispatch binding & license rules", () => {
+  it("AC-5a: worker bound to another project -> 409 worker_project_mismatch, no run created", async () => {
+    // Create project gamma in org A and a worker attached to project gamma
+    await write("post", "/projects", "maintA").send({ slug: "gamma", name: "Project Gamma" }).expect(201);
+    const gammaProj = (await pool.query<{ id: string }>("SELECT id FROM projects WHERE slug = 'gamma'")).rows[0]!.id;
+    await pool.query(
+      `INSERT INTO workers (org_id, slug, name, type, workspace_path, project_id, enabled)
+       SELECT id, 'worker-gamma-bound', 'Worker Gamma', 'mock', '/tmp/worker-gamma-bound', $1, true
+         FROM orgs WHERE slug = 'org-test-a'`,
+      [gammaProj],
+    );
+
+    const countBefore = (await pool.query<{ count: number }>("SELECT count(*)::int AS count FROM agent_runs")).rows[0]!.count;
+
+    // Dispatch on project alpha with worker bound to project gamma -> 409 worker_project_mismatch
+    const res = await write("post", "/projects/alpha/tasks/1/dispatch", "maintA")
+      .send({ workerSlug: "worker-gamma-bound" })
+      .expect(409);
+    expect(res.body.message).toBe("worker_project_mismatch");
+
+    const countAfter = (await pool.query<{ count: number }>("SELECT count(*)::int AS count FROM agent_runs")).rows[0]!.count;
+    expect(countAfter).toBe(countBefore);
+  });
+
+  it("AC-5b: task with disabled or archived agent -> 409 agent_not_dispatchable, no run created", async () => {
+    const orgAId = (await pool.query<{ id: string }>("SELECT id FROM orgs WHERE slug = 'org-test-a'")).rows[0]!.id;
+    const task1Id = (await pool.query<{ id: string }>("SELECT id FROM tasks WHERE number = 1 AND project_id = (SELECT id FROM projects WHERE slug = 'alpha')")).rows[0]!.id;
+
+    // Create disabled agent
+    const agentRes = await pool.query<{ id: string }>(
+      "INSERT INTO agents (org_id, slug, name, enabled) VALUES ($1, 'agent-disabled-dispatch', 'Disabled Agent', false) RETURNING id",
+      [orgAId],
+    );
+    const agentId = agentRes.rows[0]!.id;
+
+    // Attach agent to task 1
+    await pool.query("UPDATE tasks SET agent_id = $1 WHERE id = $2", [agentId, task1Id]);
+
+    const countBefore = (await pool.query<{ count: number }>("SELECT count(*)::int AS count FROM agent_runs")).rows[0]!.count;
+
+    const res = await write("post", "/projects/alpha/tasks/1/dispatch", "maintA")
+      .send({ workerSlug: "mock-worker-a" })
+      .expect(409);
+    expect(res.body.message).toBe("agent_not_dispatchable");
+
+    const countAfter = (await pool.query<{ count: number }>("SELECT count(*)::int AS count FROM agent_runs")).rows[0]!.count;
+    expect(countAfter).toBe(countBefore);
+
+    // If agent is enabled but archived -> also 409 agent_not_dispatchable
+    await pool.query("UPDATE agents SET enabled = true, archived_at = now() WHERE id = $1", [agentId]);
+    const resArchived = await write("post", "/projects/alpha/tasks/1/dispatch", "maintA")
+      .send({ workerSlug: "mock-worker-a" })
+      .expect(409);
+    expect(resArchived.body.message).toBe("agent_not_dispatchable");
+
+    // Reset task 1
+    await pool.query("UPDATE tasks SET agent_id = NULL WHERE id = $1", [task1Id]);
+  });
+
+  it("AC-5c: agent's provider account demoted to prohibited -> 409 provider_account_not_licensed, no run created", async () => {
+    const orgAId = (await pool.query<{ id: string }>("SELECT id FROM orgs WHERE slug = 'org-test-a'")).rows[0]!.id;
+    const task1Id = (await pool.query<{ id: string }>("SELECT id FROM tasks WHERE number = 1 AND project_id = (SELECT id FROM projects WHERE slug = 'alpha')")).rows[0]!.id;
+
+    // Create provider account with approved status
+    const paRes = await pool.query<{ id: string }>(
+      "INSERT INTO provider_accounts (org_id, slug, name, provider, secret_ref, license_status) VALUES ($1, 'pa-for-dispatch', 'PA Dispatch', 'anthropic', 'env:AIDEV_SECRET_DISPATCH', 'approved') RETURNING id",
+      [orgAId],
+    );
+    const paId = paRes.rows[0]!.id;
+
+    // Create agent with this account
+    const agentRes = await pool.query<{ id: string }>(
+      "INSERT INTO agents (org_id, slug, name, enabled, provider_account_id) VALUES ($1, 'agent-licensed-dispatch', 'Licensed Agent', true, $2) RETURNING id",
+      [orgAId, paId],
+    );
+    const agentId = agentRes.rows[0]!.id;
+
+    await pool.query("UPDATE tasks SET agent_id = $1 WHERE id = $2", [agentId, task1Id]);
+
+    // First: dispatch works when approved
+    await write("post", "/projects/alpha/tasks/1/dispatch", "maintA")
+      .send({ workerSlug: "mock-worker-a" })
+      .expect(201);
+    await pool.query("DELETE FROM agent_runs");
+
+    // Demote account to prohibited
+    await pool.query("UPDATE provider_accounts SET license_status = 'prohibited' WHERE id = $1", [paId]);
+
+    const countBefore = (await pool.query<{ count: number }>("SELECT count(*)::int AS count FROM agent_runs")).rows[0]!.count;
+
+    const res = await write("post", "/projects/alpha/tasks/1/dispatch", "maintA")
+      .send({ workerSlug: "mock-worker-a" })
+      .expect(409);
+    expect(res.body.message).toBe("provider_account_not_licensed");
+
+    const countAfter = (await pool.query<{ count: number }>("SELECT count(*)::int AS count FROM agent_runs")).rows[0]!.count;
+    expect(countAfter).toBe(countBefore);
+
+    // Reset task 1
+    await pool.query("UPDATE tasks SET agent_id = NULL WHERE id = $1", [task1Id]);
+  });
+
+  it("AC-5d: task without agent + worker without project -> 201 as before", async () => {
+    const task1Id = (await pool.query<{ id: string }>("SELECT id FROM tasks WHERE number = 1 AND project_id = (SELECT id FROM projects WHERE slug = 'alpha')")).rows[0]!.id;
+    await pool.query("UPDATE tasks SET agent_id = NULL WHERE id = $1", [task1Id]);
+    await pool.query("DELETE FROM agent_runs");
+
+    const res = await write("post", "/projects/alpha/tasks/1/dispatch", "maintA")
+      .send({ workerSlug: "mock-worker-a" })
+      .expect(201);
+    expect(res.body.status).toBe("QUEUED");
+  });
+});
+
 describe("AC-8: static checks (no child_process, no agy/antigravity)", () => {
   it("apps/api/src contains no child_process imports and no agy or antigravity strings", () => {
     const srcDir = path.resolve(__dirname, "../../src");

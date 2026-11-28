@@ -92,7 +92,10 @@ export function ProviderAccountRowActions({ slug, name }: { slug: string; name: 
     <span>
       {rotating ? (
         <form onSubmit={rotate} aria-label={`Đổi tham chiếu ${slug}`} style={{ display: "inline" }}>
-          <input name="secretRef" required autoComplete="off" spellCheck={false} placeholder={REF_HINT} /> <button type="submit">Lưu</button>{" "}
+          <label>
+            Tham chiếu secret mới <input name="secretRef" required autoComplete="off" spellCheck={false} placeholder={REF_HINT} />
+          </label>{" "}
+          <button type="submit">Lưu</button>{" "}
           <button type="button" onClick={() => setRotating(false)}>
             Hủy
           </button>
@@ -109,5 +112,33 @@ export function ProviderAccountRowActions({ slug, name }: { slug: string; name: 
       )}
       {error ? <span role="alert"> {error}</span> : null}
     </span>
+  );
+}
+
+export function ChangeLicenseForm({ slug, currentStatus }: { slug: string; currentStatus: string }) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
+  async function onChangeLicense(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const d = new FormData(e.currentTarget);
+    const r = await sendJson("POST", `/api/provider-accounts/${encodeURIComponent(slug)}/license`, {
+      licenseStatus: String(d.get("licenseStatus") ?? ""),
+    });
+    if (!r.ok) return setError(r.error);
+    setError(null);
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={onChangeLicense} aria-label={`Đổi giấy phép ${slug}`} style={{ display: "inline" }}>
+      <select name="licenseStatus" aria-label={`Giấy phép ${slug}`} defaultValue={currentStatus}>
+        <option value="approved">Đã duyệt</option>
+        <option value="unverified">Chưa xác minh</option>
+        <option value="prohibited">Cấm</option>
+      </select>{" "}
+      <button type="submit">Đổi giấy phép</button>
+      {error ? <span role="alert"> {error}</span> : null}
+    </form>
   );
 }

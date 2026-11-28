@@ -24,6 +24,9 @@ const CONFLICTS: Record<string, string> = {
   worker_busy: "Worker đang bận thực hiện lượt chạy khác.",
   queue_full: "Hàng đợi đã đầy (tối đa 20 lượt chạy chờ). Vui lòng thử lại sau.",
   worker_not_dispatchable: "Worker không khả dụng hoặc không phải worker mock đang bật.",
+  worker_project_mismatch: "Worker đã gắn với dự án khác, không tương thích với dự án của task.",
+  agent_not_dispatchable: "Agent đã bị vô hiệu hóa hoặc đã lưu trữ, không thể nhận việc.",
+  provider_account_not_licensed: "Tài khoản provider chưa được duyệt hoặc đã bị cấm/lưu trữ.",
   task_not_dispatchable: "Chỉ có thể chạy task ở trạng thái Cần làm hoặc Đang làm.",
   run_not_cancellable: "Chỉ có thể hủy lượt chạy đang ở hàng đợi hoặc đang chạy.",
   cannot_change_own_roles: "Không thể tự thay đổi vai trò của chính mình.",
@@ -34,6 +37,7 @@ const SPECIFIC_422: Record<string, string> = {
   user_not_allowlisted: "Người dùng chưa có trong danh sách được phép (allowlist).",
   user_disabled: "Tài khoản người dùng đã bị vô hiệu hóa.",
   role_not_found: "Vai trò không tồn tại trong tổ chức.",
+  provider_account_not_licensed: "Tài khoản provider chưa được duyệt hoặc đã bị cấm/lưu trữ.",
 };
 
 export function apiErrorMessage(status: number, body: unknown): string {
