@@ -19,6 +19,9 @@ export function navItems(me: Me | null): NavItem[] {
     if (can(me, "project:read")) {
       items.push({ href: "/projects", label: "Dự án", section: "main" });
     }
+    if (can(me, "task:read")) {
+      items.push({ href: "/tasks", label: "Tìm task", section: "main" });
+    }
     if (can(me, "agent:read")) {
       items.push({ href: "/agents", label: "Agent", section: "main" });
     }

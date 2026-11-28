@@ -221,3 +221,61 @@ export type TaskActivityResponse = z.infer<typeof TaskActivityResponseSchema>;
 
 export type Task = z.infer<typeof TaskSchema>;
 export type TaskTransition = z.infer<typeof TaskTransitionSchema>;
+
+export const TaskSearchStatusSchema = z
+  .union([z.string(), z.array(z.string())])
+  .refine((val) => {
+    const raw = Array.isArray(val) ? val.flatMap((s) => s.split(",")) : val.split(",");
+    const cleaned = raw.map((s) => s.trim()).filter((s) => s.length > 0);
+    if (cleaned.length === 0) return false;
+    return cleaned.every((s) => (TASK_STATUSES as readonly string[]).includes(s));
+  }, "status: must be one or more valid task statuses");
+
+export function parseTaskSearchStatuses(val: string | string[] | undefined): TaskStatus[] | undefined {
+  if (!val) return undefined;
+  const raw = Array.isArray(val) ? val.flatMap((s) => s.split(",")) : val.split(",");
+  return raw.map((s) => s.trim()).filter((s) => s.length > 0) as TaskStatus[];
+}
+
+export const TaskSearchQuerySchema = z
+  .object({
+    q: z.string().min(1, "q: at least 1 character").max(100, "q: at most 100 characters").optional(),
+    project: SlugSchema.optional(),
+    agent: z.union([SlugSchema, z.literal("none")]).optional(),
+    status: TaskSearchStatusSchema.optional(),
+    priority: z.enum(TASK_PRIORITIES).optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(50),
+    offset: z.coerce.number().int().min(0).max(100_000).default(0),
+    archived: z.enum(["true", "false"]).default("false"),
+    includeArchived: z.enum(["true", "false"]).optional(),
+  })
+  .strict();
+
+export type TaskSearchQuery = z.infer<typeof TaskSearchQuerySchema>;
+
+export const TaskSearchItemSchema = z
+  .object({
+    projectSlug: z.string(),
+    projectName: z.string(),
+    number: z.number().int().positive(),
+    title: z.string(),
+    status: z.enum(TASK_STATUSES),
+    priority: z.enum(TASK_PRIORITIES),
+    agentSlug: z.string().nullable(),
+    updatedAt: z.string(),
+  })
+  .strict();
+
+export type TaskSearchItem = z.infer<typeof TaskSearchItemSchema>;
+
+export const TaskSearchResponseSchema = z
+  .object({
+    items: z.array(TaskSearchItemSchema),
+    limit: z.number().int().min(1).max(100),
+    offset: z.number().int().min(0),
+    total: z.number().int().min(0),
+  })
+  .strict();
+
+export type TaskSearchResponse = z.infer<typeof TaskSearchResponseSchema>;
+

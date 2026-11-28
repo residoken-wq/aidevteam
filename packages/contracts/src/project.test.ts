@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { ProjectCreateSchema, ProjectListQuerySchema, ProjectUpdateSchema } from "./project";
+import {
+  ProjectCreateSchema,
+  ProjectListQuerySchema,
+  ProjectStatsQuerySchema,
+  ProjectStatsResponseSchema,
+  ProjectUpdateSchema,
+} from "./project";
 
 describe("ProjectCreateSchema", () => {
   it("accepts a valid project and trims the name", () => {
@@ -37,3 +43,43 @@ describe("ProjectListQuerySchema", () => {
     expect(ProjectListQuerySchema.safeParse({ org_id: "x" }).success).toBe(false);
   });
 });
+
+describe("ProjectStatsQuerySchema (P3-08 AC-4, AC-5)", () => {
+  it("defaults archived to false", () => {
+    expect(ProjectStatsQuerySchema.parse({})).toEqual({ archived: "false" });
+  });
+
+  it("accepts archived and includeArchived", () => {
+    expect(ProjectStatsQuerySchema.parse({ archived: "true" })).toEqual({ archived: "true" });
+    expect(ProjectStatsQuerySchema.parse({ includeArchived: "true" })).toEqual({ archived: "false", includeArchived: "true" });
+  });
+
+  it("rejects unknown fields (AC-5)", () => {
+    expect(ProjectStatsQuerySchema.safeParse({ unknown: "val" }).success).toBe(false);
+    expect(ProjectStatsQuerySchema.safeParse({ org_id: "x" }).success).toBe(false);
+  });
+});
+
+describe("ProjectStatsResponseSchema (P3-08 AC-4)", () => {
+  it("validates valid stats response", () => {
+    const data = {
+      items: [
+        {
+          projectSlug: "proj-1",
+          projectName: "Project 1",
+          counts: {
+            BACKLOG: 2,
+            TODO: 3,
+            IN_PROGRESS: 1,
+            IN_REVIEW: 0,
+            DONE: 4,
+            CANCELLED: 1,
+          },
+          total: 11,
+        },
+      ],
+    };
+    expect(ProjectStatsResponseSchema.safeParse(data).success).toBe(true);
+  });
+});
+

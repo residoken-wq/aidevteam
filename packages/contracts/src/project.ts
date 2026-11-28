@@ -76,3 +76,45 @@ export type ProjectMember = z.infer<typeof ProjectMemberSchema>;
 export type ProjectMemberAssign = z.infer<typeof ProjectMemberAssignSchema>;
 export type ProjectMemberUnassign = z.infer<typeof ProjectMemberUnassignSchema>;
 export type ProjectMemberResult = z.infer<typeof ProjectMemberResultSchema>;
+
+export const ProjectStatsCountsSchema = z
+  .object({
+    BACKLOG: z.number().int().min(0),
+    TODO: z.number().int().min(0),
+    IN_PROGRESS: z.number().int().min(0),
+    IN_REVIEW: z.number().int().min(0),
+    DONE: z.number().int().min(0),
+    CANCELLED: z.number().int().min(0),
+  })
+  .strict();
+
+export type ProjectStatsCounts = z.infer<typeof ProjectStatsCountsSchema>;
+
+export const ProjectStatsItemSchema = z
+  .object({
+    projectSlug: z.string(),
+    projectName: z.string(),
+    counts: ProjectStatsCountsSchema,
+    total: z.number().int().min(0),
+  })
+  .strict();
+
+export type ProjectStatsItem = z.infer<typeof ProjectStatsItemSchema>;
+
+export const ProjectStatsResponseSchema = z
+  .object({
+    items: z.array(ProjectStatsItemSchema),
+  })
+  .strict();
+
+export type ProjectStatsResponse = z.infer<typeof ProjectStatsResponseSchema>;
+
+export const ProjectStatsQuerySchema = z
+  .object({
+    archived: z.enum(["true", "false"]).default("false"),
+    includeArchived: z.enum(["true", "false"]).optional(),
+  })
+  .strict();
+
+export type ProjectStatsQuery = z.infer<typeof ProjectStatsQuerySchema>;
+
