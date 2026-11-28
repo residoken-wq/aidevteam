@@ -74,7 +74,7 @@ async function contextFor(browser, token) {
       await inCol(page, "BACKLOG", 3).waitFor();
       const card = page.getByTestId("task-1");
       await card.getByText("<b>Task một</b>").waitFor();
-      await card.locator("summary").click();
+      await card.locator("summary", { hasText: "Mô tả" }).click();
       await card.getByText(XSS).waitFor();
       assert.equal(await card.locator("script, img, b").count(), 0, "HTML from task text was rendered");
       assert.equal(await page.evaluate(() => globalThis.__xss), undefined, "script from task text ran");
