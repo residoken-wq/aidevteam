@@ -26,7 +26,7 @@ function fakeMe(opts: {
 }
 
 describe("navItems (AC-1)", () => {
-  it("returns all 7 main nav links for org_admin", () => {
+  it("returns all 8 main nav links for org_admin", () => {
     const perms = Array.from(ROLE_PERMISSIONS.org_admin);
     const me = fakeMe({ roles: ["org_admin"], permissions: perms });
     const items = navItems(me);
@@ -34,6 +34,7 @@ describe("navItems (AC-1)", () => {
     expect(items.map((i) => i.label)).toEqual([
       "Tổng quan",
       "Dự án",
+      "Tìm task",
       "Agent",
       "Tài khoản provider",
       "Worker",
@@ -43,7 +44,7 @@ describe("navItems (AC-1)", () => {
     expect(items.every((i) => i.section === "main")).toBe(true);
   });
 
-  it("returns 6 main links for maintainer (excludes Thành viên)", () => {
+  it("returns 7 main links for maintainer (excludes Thành viên)", () => {
     const perms = Array.from(ROLE_PERMISSIONS.maintainer);
     const me = fakeMe({ roles: ["maintainer"], permissions: perms });
     const items = navItems(me);
@@ -51,6 +52,7 @@ describe("navItems (AC-1)", () => {
     expect(items.map((i) => i.label)).toEqual([
       "Tổng quan",
       "Dự án",
+      "Tìm task",
       "Agent",
       "Tài khoản provider",
       "Worker",
@@ -59,7 +61,7 @@ describe("navItems (AC-1)", () => {
     expect(items.map((i) => i.href)).not.toContain("/members");
   });
 
-  it("returns 6 main links for viewer (excludes Thành viên and Quản trị tổ chức)", () => {
+  it("returns 7 main links for viewer (excludes Thành viên and Quản trị tổ chức)", () => {
     const perms = Array.from(ROLE_PERMISSIONS.viewer);
     const me = fakeMe({ roles: ["viewer"], permissions: perms });
     const items = navItems(me);
@@ -67,6 +69,7 @@ describe("navItems (AC-1)", () => {
     expect(items.map((i) => i.label)).toEqual([
       "Tổng quan",
       "Dự án",
+      "Tìm task",
       "Agent",
       "Tài khoản provider",
       "Worker",
@@ -105,6 +108,7 @@ describe("navItems (AC-1)", () => {
     expect(items.map((i) => i.label)).toEqual([
       "Tổng quan",
       "Dự án",
+      "Tìm task",
       "Agent",
       "Tài khoản provider",
       "Worker",
@@ -114,12 +118,12 @@ describe("navItems (AC-1)", () => {
     expect(items.find((i) => i.href === "/platform/orgs")?.section).toBe("platform");
   });
 
-  it("returns concise sidebar for project_member (Dự án, Agent, Worker)", () => {
+  it("returns concise sidebar for project_member (Dự án, Tìm task, Agent, Worker)", () => {
     const perms = Array.from(ROLE_PERMISSIONS.project_member);
     const me = fakeMe({ roles: ["project_member"], permissions: perms });
     const items = navItems(me);
 
-    expect(items.map((i) => i.label)).toEqual(["Dự án", "Agent", "Worker"]);
+    expect(items.map((i) => i.label)).toEqual(["Dự án", "Tìm task", "Agent", "Worker"]);
     expect(items.map((i) => i.href)).not.toContain("/dashboard");
     expect(items.map((i) => i.href)).not.toContain("/provider-accounts");
     expect(items.map((i) => i.href)).not.toContain("/approvals");
@@ -152,6 +156,7 @@ describe("navSections", () => {
     expect(sections.main.map((i) => i.label)).toEqual([
       "Tổng quan",
       "Dự án",
+      "Tìm task",
       "Agent",
       "Tài khoản provider",
       "Worker",

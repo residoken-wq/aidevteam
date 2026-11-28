@@ -36,10 +36,7 @@ const send = (method: "get" | "post" | "patch" | "delete", path: string, who: st
 
 let orgAId: string;
 let orgBId: string;
-let userAdminAId: string;
-let userViewerAId: string;
 let userPmAId: string;
-let userPmUnassignedId: string;
 let projA1Id: string;
 let projA2Id: string;
 let projB1Id: string;
