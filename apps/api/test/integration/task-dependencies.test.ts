@@ -398,3 +398,29 @@ describe("AC-5 Audit logging on real changes", () => {
     expect(Number(countAfter)).toBe(Number(countBefore) + 1);
   });
 });
+
+describe("Project-wide dependency edges (Kanban, one request)", () => {
+  it("returns every edge of the project with both ends' number, title and status", async () => {
+    const res = await sendReq("get", "/projects/proj-dep/task-dependencies", "viewer");
+    expect(res.status).toBe(200);
+    const pairs = res.body.items.map((e: { task: { number: number }; dependsOn: { number: number } }) => [e.task.number, e.dependsOn.number]);
+    // Same edges as the per-task endpoint reports
+    for (const [n] of pairs) {
+      const per = await sendReq("get", DEPS("proj-dep", n), "viewer");
+      const expected = per.body.dependsOn.map((d: { number: number }) => [n, d.number]);
+      expect(pairs.filter(([t]: number[]) => t === n)).toEqual(expected);
+    }
+    expect(pairs.length).toBeGreaterThan(0);
+    for (const e of res.body.items) {
+      expect(typeof e.task.title).toBe("string");
+      expect(typeof e.dependsOn.status).toBe("string");
+    }
+  });
+
+  it("is empty for a project without dependencies and hidden across orgs", async () => {
+    const empty = await sendReq("get", "/projects/proj-b/task-dependencies", "maintB");
+    expect(empty.status).toBe(200);
+    expect(empty.body.items).toEqual([]);
+    expect((await sendReq("get", "/projects/proj-dep/task-dependencies", "maintB")).status).toBe(404);
+  });
+});

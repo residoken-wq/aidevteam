@@ -13,6 +13,7 @@ import {
 } from "@nestjs/common";
 import {
   TaskDependencyChangeSchema,
+  type ProjectTaskDependencies,
   type TaskDependencies,
   type TaskDependencyResult,
 } from "@aidevteam/contracts";
@@ -297,5 +298,51 @@ export class TaskDependenciesController {
     } finally {
       client.release();
     }
+  }
+}
+
+interface EdgeRow {
+  task_number: number;
+  task_title: string;
+  task_status: DepRow["status"];
+  dep_number: number;
+  dep_title: string;
+  dep_status: DepRow["status"];
+}
+
+/** P3-03: every dependency edge of a project in one request (the Kanban board must not call one endpoint per task). */
+@Controller("projects/:projectSlug/task-dependencies")
+export class ProjectTaskDependenciesController {
+  constructor(@Inject(DB_POOL) private readonly pool: Pool) {}
+
+  @RequirePermission("task:read")
+  @Get()
+  async list(@Req() req: Request, @Param("projectSlug") projectSlug: string): Promise<ProjectTaskDependencies> {
+    const org = getOrg(req);
+    const auth = getAuth(req);
+    const project = await verifyProjectScope({
+      pool: this.pool,
+      orgId: org.orgId,
+      userId: auth.userId,
+      roles: org.roles,
+      requiredAccess: "read",
+      projectSlug,
+    });
+    const r = await this.pool.query<EdgeRow>(
+      `SELECT t.number AS task_number, t.title AS task_title, t.status AS task_status,
+              d.number AS dep_number, d.title AS dep_title, d.status AS dep_status
+         FROM task_dependencies td
+         JOIN tasks t ON t.id = td.task_id AND t.org_id = td.org_id AND t.project_id = td.project_id
+         JOIN tasks d ON d.id = td.depends_on_task_id AND d.org_id = td.org_id AND d.project_id = td.project_id
+        WHERE td.org_id = $1 AND td.project_id = $2
+        ORDER BY t.number ASC, d.number ASC`,
+      [org.orgId, project.id],
+    );
+    return {
+      items: r.rows.map((e) => ({
+        task: { number: e.task_number, title: e.task_title, status: e.task_status },
+        dependsOn: { number: e.dep_number, title: e.dep_title, status: e.dep_status },
+      })),
+    };
   }
 }

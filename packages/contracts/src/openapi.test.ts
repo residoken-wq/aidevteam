@@ -112,7 +112,8 @@ describe("OpenAPI 3.1.0 generation", () => {
   it("AC-4: document JSON does not contain secret-like patterns", () => {
     const json = JSON.stringify(doc);
     expect(json).not.toMatch(/ghp_/);
-    expect(json).not.toMatch(/sk-/);
+    // Key-shaped only: a bare /sk-/ also matches ordinary words such as "task-dependencies".
+    expect(json).not.toMatch(/(^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{16,}/);
     expect(json).not.toMatch(/-----BEGIN/);
     expect(json).not.toMatch(/postgres:\/\//);
   });

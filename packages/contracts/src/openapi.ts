@@ -33,6 +33,7 @@ import {
 import {
   TaskCreateSchema,
   TaskDependenciesSchema,
+  ProjectTaskDependenciesSchema,
   TaskDependencyChangeSchema,
   TaskDependencyResultSchema,
   TaskListQuerySchema,
@@ -746,6 +747,19 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
     },
   },
 
+  // ProjectTaskDependenciesController (/projects/:projectSlug/task-dependencies)
+  {
+    method: "GET",
+    path: "/projects/{projectSlug}/task-dependencies",
+    summary: "List every task dependency edge of a project",
+    permission: "task:read",
+    responses: {
+      200: ProjectTaskDependenciesSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
   // TaskDependenciesController (/projects/:projectSlug/tasks/:number/dependencies)
   {
     method: "GET",

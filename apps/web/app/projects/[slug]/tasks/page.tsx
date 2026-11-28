@@ -1,4 +1,4 @@
-import type { Agent, Project, Task, TaskDependencies, Worker } from "@aidevteam/contracts";
+import type { Agent, Project, ProjectTaskDependencies, Task, TaskDependencies, Worker } from "@aidevteam/contracts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiGet, can, type Me } from "../../../../lib/server-api";
@@ -23,16 +23,15 @@ export default async function TasksPage({ params }: { params: Promise<{ slug: st
         .map((w) => ({ slug: w.slug, name: w.name }))
     : [];
 
+  // One request for every edge of the project (not one per task), then group per task number.
   const depsMap: Record<number, TaskDependencies> = {};
   if (data?.items && data.items.length > 0) {
-    const depsResults = await Promise.all(
-      data.items.map(async (t) => {
-        const dep = await apiGet<TaskDependencies>(`/projects/${slug}/tasks/${t.number}/dependencies`);
-        return [t.number, dep] as const;
-      }),
-    );
-    for (const [num, dep] of depsResults) {
-      if (dep) depsMap[num] = dep;
+    const edges = (await apiGet<ProjectTaskDependencies>(`/projects/${encodeURIComponent(slug)}/task-dependencies`))?.items ?? [];
+    const entry = (n: number): TaskDependencies => (depsMap[n] ??= { dependsOn: [], blockedBy: [], dependents: [] });
+    for (const e of edges) {
+      entry(e.task.number).dependsOn.push(e.dependsOn);
+      if (e.dependsOn.status !== "DONE") entry(e.task.number).blockedBy.push(e.dependsOn);
+      entry(e.dependsOn.number).dependents.push(e.task);
     }
   }
 
