@@ -17,10 +17,12 @@ interface Row {
   description: string | null;
   status: Task["status"];
   priority: Task["priority"];
+  agent_id: string | null;
   agent_slug: string | null;
   cancel_reason: string | null;
   epic_slug: string | null;
   sprint_number: number | null;
+  required_capabilities: string[];
   created_at: Date;
   updated_at: Date;
 }
@@ -30,8 +32,10 @@ interface ProjectRef {
   archived: boolean;
 }
 
-const SELECT = `SELECT t.id, t.number, p.slug AS project_slug, t.title, t.description, t.status, t.priority, a.slug AS agent_slug,
-                       t.cancel_reason, e.slug AS epic_slug, s.number AS sprint_number, t.created_at, t.updated_at
+const SELECT = `SELECT t.id, t.number, p.slug AS project_slug, t.title, t.description, t.status, t.priority,
+                       t.agent_id, a.slug AS agent_slug,
+                       t.cancel_reason, e.slug AS epic_slug, s.number AS sprint_number,
+                       t.required_capabilities, t.created_at, t.updated_at
                   FROM tasks t
                   JOIN projects p ON p.id = t.project_id AND p.org_id = t.org_id
                   LEFT JOIN agents a ON a.id = t.agent_id AND a.org_id = t.org_id
@@ -49,6 +53,7 @@ const toDto = (r: Row): Task => ({
   cancelReason: r.cancel_reason,
   epicSlug: r.epic_slug,
   sprintNumber: r.sprint_number,
+  requiredCapabilities: r.required_capabilities ?? [],
   createdAt: r.created_at.toISOString(),
   updatedAt: r.updated_at.toISOString(),
 });
@@ -100,14 +105,27 @@ export class TasksController {
       const project = await this.writableProject(c, req, projectSlug);
       // Serialise numbering per project; the unique (project_id, number) constraint is the backstop.
       await c.query("SELECT pg_advisory_xact_lock(hashtext('tasks:' || $1::text))", [project.id]);
-      const agentId = input.agentSlug ? await this.agentId(c, org.orgId, input.agentSlug) : null;
+      const agentId = input.agentSlug
+        ? await this.validateAndAssignAgent(c, org.orgId, input.agentSlug, input.requiredCapabilities ?? [])
+        : null;
       const epicId = input.epicSlug ? await this.epicId(c, org.orgId, project.id, input.epicSlug) : null;
       const sprintId = input.sprintNumber !== undefined ? await this.sprintId(c, org.orgId, project.id, input.sprintNumber) : null;
       const r = await c.query<{ id: string }>(
-        `INSERT INTO tasks (org_id, project_id, number, title, description, priority, agent_id, epic_id, sprint_id, created_by_user_id)
-         SELECT $1, $2, COALESCE(MAX(number), 0) + 1, $3, $4, $5, $6, $7, $8, $9 FROM tasks WHERE project_id = $2
+        `INSERT INTO tasks (org_id, project_id, number, title, description, priority, agent_id, epic_id, sprint_id, required_capabilities, created_by_user_id)
+         SELECT $1, $2, COALESCE(MAX(number), 0) + 1, $3, $4, $5, $6, $7, $8, $9, $10 FROM tasks WHERE project_id = $2
          RETURNING id`,
-        [org.orgId, project.id, input.title, input.description ?? null, input.priority ?? "medium", agentId, epicId, sprintId, getAuth(req).userId],
+        [
+          org.orgId,
+          project.id,
+          input.title,
+          input.description ?? null,
+          input.priority ?? "medium",
+          agentId,
+          epicId,
+          sprintId,
+          input.requiredCapabilities ?? [],
+          getAuth(req).userId,
+        ],
       );
       const created = await this.findById(c, org.orgId, r.rows[0]!.id);
       await this.audit(c, req, "task.created", created, {});
@@ -125,9 +143,28 @@ export class TasksController {
       const project = await this.writableProject(c, req, projectSlug);
       const current = await this.find(c, org.orgId, project.id, number);
       if (current.status === "DONE" || current.status === "CANCELLED") throw new ConflictException({ statusCode: 409, message: "task_closed" });
-      const agentId = input.agentSlug === undefined ? undefined : input.agentSlug === null ? null : await this.agentId(c, org.orgId, input.agentSlug);
+
+      const effectiveRequiredCapabilities =
+        input.requiredCapabilities !== undefined ? input.requiredCapabilities : (current.required_capabilities ?? []);
+
+      let agentId: string | null | undefined;
+      if (input.agentSlug === undefined) {
+        agentId = undefined;
+        // If requiredCapabilities is updated and task currently has an agent, validate current agent
+        if (input.requiredCapabilities !== undefined && current.agent_id !== null && current.agent_slug !== null) {
+          await this.validateAndAssignAgent(c, org.orgId, current.agent_slug, effectiveRequiredCapabilities, current.id);
+        }
+      } else if (input.agentSlug === null) {
+        // Unassigning agent is always allowed
+        agentId = null;
+      } else {
+        // Assigning new agent
+        agentId = await this.validateAndAssignAgent(c, org.orgId, input.agentSlug, effectiveRequiredCapabilities, current.id);
+      }
+
       const epicId = input.epicSlug === undefined ? undefined : input.epicSlug === null ? null : await this.epicId(c, org.orgId, project.id, input.epicSlug);
       const sprintId = input.sprintNumber === undefined ? undefined : input.sprintNumber === null ? null : await this.sprintId(c, org.orgId, project.id, input.sprintNumber);
+
       const r = await c.query(
         `UPDATE tasks
             SET title = COALESCE($3, title),
@@ -136,6 +173,7 @@ export class TasksController {
                 agent_id = CASE WHEN $7::boolean THEN $8::uuid ELSE agent_id END,
                 epic_id = CASE WHEN $9::boolean THEN $10::uuid ELSE epic_id END,
                 sprint_id = CASE WHEN $11::boolean THEN $12::uuid ELSE sprint_id END,
+                required_capabilities = CASE WHEN $13::boolean THEN $14::text[] ELSE required_capabilities END,
                 updated_at = now()
           WHERE org_id = $1 AND id = $2 AND status NOT IN ('DONE', 'CANCELLED')`,
         [
@@ -151,6 +189,8 @@ export class TasksController {
           epicId ?? null,
           sprintId !== undefined,
           sprintId ?? null,
+          input.requiredCapabilities !== undefined,
+          input.requiredCapabilities ?? null,
         ],
       );
       if (r.rowCount === 0) throw new ConflictException({ statusCode: 409, message: "task_closed" });
@@ -168,22 +208,56 @@ export class TasksController {
     const input = parseOr422(TaskTransitionSchema, body);
     if (!isAllowedTransition(input.expectedFrom, input.to)) throw unprocessable("to", `transition ${input.expectedFrom} -> ${input.to} is not allowed`);
     const org = getOrg(req);
-    const project = await this.writableProject(this.pool, req, projectSlug);
-    const current = await this.find(this.pool, org.orgId, project.id, number);
-    const r = await this.pool.query<{ id: string }>(
-      `UPDATE tasks SET status = $3, cancel_reason = $4, updated_at = now()
-        WHERE org_id = $1 AND id = $2 AND status = $5
-       RETURNING id`,
-      [org.orgId, current.id, input.to, input.to === "CANCELLED" ? input.reason! : null, input.expectedFrom],
-    );
-    // Another request (or a stale board) changed the status first: tell the client, never overwrite.
-    if (r.rowCount === 0) throw new ConflictException({ statusCode: 409, message: "task_status_changed" });
-    const row = await this.findById(this.pool, org.orgId, current.id);
-    await this.audit(this.pool, req, "task.transitioned", row, {
-      from: input.expectedFrom,
-      to: input.to,
-      ...(input.to === "DONE" ? { confirmedReviewed: "true" } : {}),
-      ...(input.to === "CANCELLED" ? { fields: "reason" } : {}),
+
+    const row = await this.tx(async (c) => {
+      const project = await this.writableProject(c, req, projectSlug);
+      const current = await this.find(c, org.orgId, project.id, number);
+
+      // Rule: Chuyển trạng thái task sang TODO/IN_PROGRESS khi agent đã đủ tải (task khác chiếm chỗ) → 409 agent_at_capacity
+      const isBecomingActive =
+        (input.to === "TODO" || input.to === "IN_PROGRESS") &&
+        current.status === "BACKLOG";
+
+      if (isBecomingActive && current.agent_id !== null) {
+        await c.query("SELECT pg_advisory_xact_lock(hashtext('agent:' || $1::text))", [current.agent_id]);
+        const agentRes = await c.query<{ max_active_tasks: number }>(
+          "SELECT max_active_tasks FROM agents WHERE org_id = $1 AND id = $2",
+          [org.orgId, current.agent_id],
+        );
+        if (agentRes.rows[0]) {
+          const maxActive = agentRes.rows[0].max_active_tasks;
+          const countRes = await c.query<{ count: number }>(
+            `SELECT count(*)::int AS count
+               FROM tasks
+              WHERE org_id = $1
+                AND agent_id = $2
+                AND status IN ('TODO', 'IN_PROGRESS', 'IN_REVIEW')
+                AND id <> $3`,
+            [org.orgId, current.agent_id, current.id],
+          );
+          const activeCount = Number(countRes.rows[0]?.count ?? 0);
+          if (activeCount >= maxActive) {
+            throw new ConflictException({ statusCode: 409, message: "agent_at_capacity" });
+          }
+        }
+      }
+
+      const r = await c.query<{ id: string }>(
+        `UPDATE tasks SET status = $3, cancel_reason = $4, updated_at = now()
+          WHERE org_id = $1 AND id = $2 AND status = $5
+         RETURNING id`,
+        [org.orgId, current.id, input.to, input.to === "CANCELLED" ? input.reason! : null, input.expectedFrom],
+      );
+      // Another request (or a stale board) changed the status first: tell the client, never overwrite.
+      if (r.rowCount === 0) throw new ConflictException({ statusCode: 409, message: "task_status_changed" });
+      const updated = await this.findById(c, org.orgId, current.id);
+      await this.audit(c, req, "task.transitioned", updated, {
+        from: input.expectedFrom,
+        to: input.to,
+        ...(input.to === "DONE" ? { confirmedReviewed: "true" } : {}),
+        ...(input.to === "CANCELLED" ? { fields: "reason" } : {}),
+      });
+      return updated;
     });
     return toDto(row);
   }
@@ -210,10 +284,88 @@ export class TasksController {
     return p;
   }
 
-  private async agentId(c: PoolClient, orgId: string, slug: string): Promise<string> {
-    const r = await c.query<{ id: string }>("SELECT id FROM agents WHERE org_id = $1 AND slug = $2 AND archived_at IS NULL", [orgId, slug]);
-    if (!r.rows[0]) throw unprocessable("agentSlug", "unknown or archived agent");
-    return r.rows[0].id;
+  private async validateAndAssignAgent(
+    c: PoolClient,
+    orgId: string,
+    agentSlug: string,
+    requiredCapabilities: string[],
+    currentTaskId?: string,
+  ): Promise<string> {
+    const r = await c.query<{
+      id: string;
+      slug: string;
+      enabled: boolean;
+      archived_at: Date | null;
+      capabilities: string[];
+      max_active_tasks: number;
+      provider_account_id: string | null;
+      pa_archived_at: Date | null;
+      pa_license_status: string | null;
+    }>(
+      `SELECT a.id, a.slug, a.enabled, a.archived_at, a.capabilities, a.max_active_tasks,
+              a.provider_account_id, pa.archived_at AS pa_archived_at, pa.license_status AS pa_license_status
+         FROM agents a
+         LEFT JOIN provider_accounts pa ON pa.id = a.provider_account_id AND pa.org_id = a.org_id
+        WHERE a.org_id = $1 AND a.slug = $2`,
+      [orgId, agentSlug],
+    );
+
+    if (!r.rows[0]) throw unprocessable("agentSlug", "unknown agent");
+    const agent = r.rows[0];
+
+    // Rule: Agent archived hoặc enabled = false → 422 agent_not_assignable
+    if (agent.archived_at !== null || !agent.enabled) {
+      throw new UnprocessableEntityException({
+        statusCode: 422,
+        message: "agent_not_assignable",
+        issues: [{ path: "agentSlug", message: "agent_not_assignable" }],
+      });
+    }
+
+    // Rule: Agent có provider account mà account archived hoặc license_status <> 'approved' → 422 provider_account_not_licensed
+    if (agent.provider_account_id !== null) {
+      if (agent.pa_archived_at !== null || agent.pa_license_status !== "approved") {
+        throw new UnprocessableEntityException({
+          statusCode: 422,
+          message: "provider_account_not_licensed",
+          issues: [{ path: "agentSlug", message: "provider_account_not_licensed" }],
+        });
+      }
+    }
+
+    // Rule: Thiếu capability: required_capabilities ⊄ agent.capabilities → 422 agent_capability_mismatch
+    const agentCaps = new Set(agent.capabilities ?? []);
+    const missing = requiredCapabilities.filter((cap) => !agentCaps.has(cap));
+    if (missing.length > 0) {
+      throw new UnprocessableEntityException({
+        statusCode: 422,
+        message: "agent_capability_mismatch",
+        missing,
+        issues: [
+          { path: "requiredCapabilities", message: "agent_capability_mismatch", missing },
+          ...missing.map((tag) => ({ path: "requiredCapabilities", message: `missing: ${tag}`, tag })),
+        ],
+      });
+    }
+
+    // Rule: Advisory lock & Quá tải
+    await c.query("SELECT pg_advisory_xact_lock(hashtext('agent:' || $1::text))", [agent.id]);
+
+    const activeRes = await c.query<{ count: number }>(
+      `SELECT count(*)::int AS count
+         FROM tasks
+        WHERE org_id = $1
+          AND agent_id = $2
+          AND status IN ('TODO', 'IN_PROGRESS', 'IN_REVIEW')
+          ${currentTaskId ? "AND id <> $3" : ""}`,
+      currentTaskId ? [orgId, agent.id, currentTaskId] : [orgId, agent.id],
+    );
+    const activeCount = Number(activeRes.rows[0]?.count ?? 0);
+    if (activeCount >= agent.max_active_tasks) {
+      throw new ConflictException({ statusCode: 409, message: "agent_at_capacity" });
+    }
+
+    return agent.id;
   }
 
   private async epicId(c: PoolClient, orgId: string, projectId: string, slug: string): Promise<string> {
