@@ -10,7 +10,11 @@ export default async function AgentsPage({ searchParams }: { searchParams: Promi
   const me = await apiGet<Me>("/auth/me");
   const data = await apiGet<{ items: Agent[] }>(`/agents?archived=${showArchived ? "true" : "false"}&limit=100`);
   const canWrite = can(me, "agent:write");
-  const accounts = canWrite ? ((await apiGet<{ items: ProviderAccount[] }>("/provider-accounts?limit=100"))?.items ?? []).map((a) => a.slug) : [];
+  const accounts = canWrite
+    ? ((await apiGet<{ items: ProviderAccount[] }>("/provider-accounts?limit=100"))?.items ?? [])
+        .filter((a) => a.licenseStatus === "approved" && !a.archivedAt)
+        .map((a) => a.slug)
+    : [];
   const activeAgents = (data?.items ?? []).filter((a) => !a.archivedAt).map((a) => a.slug);
 
   return (

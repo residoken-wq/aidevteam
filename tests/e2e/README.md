@@ -3,6 +3,7 @@
 | Test | Phạm vi |
 |---|---|
 | `provider-accounts.e2e.cjs` | P2-07: tạo → dán nhầm secret bị từ chối, có hướng dẫn và bị xóa khỏi trang → đổi tham chiếu → lưu trữ; viewer chỉ đọc |
+| `binding-rules.e2e.cjs` | P2-09: org_admin đổi account sang approved → maintainer gắn được vào agent; account prohibited → gắn bị từ chối (thấy thông báo lỗi) |
 | `workers.e2e.cjs` | P2-08: tạo worker mock gắn dự án → đường dẫn lồng nhau / thư mục hệ thống bị từ chối → tắt/bật → lưu trữ giải phóng đường dẫn; viewer chỉ đọc |
 | `agents.e2e.cjs` | P2-05: tạo sơ đồ agent có tài khoản provider và cấp trên → vòng lặp bị từ chối → không lưu trữ được agent còn cấp dưới → gỡ cấp dưới rồi lưu trữ; viewer chỉ đọc |
 | `tasks.e2e.cjs` | P3-02/P3-04: Kanban — HTML trong task hiển thị dạng text → kéo thả BACKLOG→TODO → kéo sai bị từ chối → đi tới DONE có xác nhận → hủy có lý do → bảng cũ nhận 409 và tải lại; viewer chỉ đọc |

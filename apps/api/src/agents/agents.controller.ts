@@ -164,8 +164,17 @@ export class AgentsController {
   }
 
   private async providerAccountId(c: PoolClient, orgId: string, slug: string): Promise<string> {
-    const r = await c.query<{ id: string }>("SELECT id FROM provider_accounts WHERE org_id = $1 AND slug = $2 AND archived_at IS NULL", [orgId, slug]);
-    if (!r.rows[0]) throw unprocessable("providerAccountSlug", "unknown or archived provider account");
+    const r = await c.query<{ id: string; license_status: string; archived_at: Date | null }>(
+      "SELECT id, license_status, archived_at FROM provider_accounts WHERE org_id = $1 AND slug = $2",
+      [orgId, slug],
+    );
+    if (!r.rows[0] || r.rows[0].archived_at !== null || r.rows[0].license_status !== "approved") {
+      throw new UnprocessableEntityException({
+        statusCode: 422,
+        message: "provider_account_not_licensed",
+        issues: [{ path: "providerAccountSlug", message: "provider_account_not_licensed" }],
+      });
+    }
     return r.rows[0].id;
   }
 

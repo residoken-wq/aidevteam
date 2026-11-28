@@ -103,8 +103,8 @@ export class RunsController {
       const projectId = projRes.rows[0].id;
 
       // Check task in org
-      const taskRes = await client.query<{ id: string; status: string; number: number }>(
-        "SELECT id, status, number FROM tasks WHERE org_id = $1 AND project_id = $2 AND number = $3",
+      const taskRes = await client.query<{ id: string; status: string; number: number; agent_id: string | null }>(
+        "SELECT id, status, number, agent_id FROM tasks WHERE org_id = $1 AND project_id = $2 AND number = $3",
         [org.orgId, projectId, number],
       );
       if (!taskRes.rows[0]) throw new NotFoundException({ statusCode: 404, message: "task_not_found" });
@@ -116,8 +116,8 @@ export class RunsController {
       }
 
       // Check worker in org
-      const workerRes = await client.query<{ id: string; enabled: boolean; type: string }>(
-        "SELECT id, enabled, type FROM workers WHERE org_id = $1 AND slug = $2 AND archived_at IS NULL",
+      const workerRes = await client.query<{ id: string; enabled: boolean; type: string; project_id: string | null }>(
+        "SELECT id, enabled, type, project_id FROM workers WHERE org_id = $1 AND slug = $2 AND archived_at IS NULL",
         [org.orgId, input.workerSlug],
       );
       if (!workerRes.rows[0]) throw new NotFoundException({ statusCode: 404, message: "worker_not_found" });
@@ -125,6 +125,37 @@ export class RunsController {
 
       if (!worker.enabled || worker.type !== "mock") {
         throw new ConflictException({ statusCode: 409, message: "worker_not_dispatchable" });
+      }
+
+      if (worker.project_id !== null && worker.project_id !== projectId) {
+        throw new ConflictException({ statusCode: 409, message: "worker_project_mismatch" });
+      }
+
+      if (task.agent_id !== null) {
+        const agentRes = await client.query<{
+          id: string;
+          enabled: boolean;
+          archived_at: Date | null;
+          provider_account_id: string | null;
+          pa_archived_at: Date | null;
+          pa_license_status: string | null;
+        }>(
+          `SELECT a.id, a.enabled, a.archived_at, a.provider_account_id,
+                  pa.archived_at AS pa_archived_at, pa.license_status AS pa_license_status
+             FROM agents a
+             LEFT JOIN provider_accounts pa ON pa.id = a.provider_account_id AND pa.org_id = a.org_id
+            WHERE a.id = $1 AND a.org_id = $2`,
+          [task.agent_id, org.orgId],
+        );
+        const agent = agentRes.rows[0];
+        if (!agent || agent.archived_at !== null || !agent.enabled) {
+          throw new ConflictException({ statusCode: 409, message: "agent_not_dispatchable" });
+        }
+        if (agent.provider_account_id !== null) {
+          if (agent.pa_archived_at !== null || agent.pa_license_status !== "approved") {
+            throw new ConflictException({ statusCode: 409, message: "provider_account_not_licensed" });
+          }
+        }
       }
 
       // Check org queue depth > 20 QUEUED -> 429

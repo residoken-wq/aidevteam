@@ -22,6 +22,7 @@
 | `agent:write` | ✅ | ✅ | ❌ | P2-05 |
 | `provider_account:read` | ✅ | ✅ | ✅ | Chỉ thấy `secret_ref`, không bao giờ thấy secret (P1-07) |
 | `provider_account:write` | ✅ | ✅ | ❌ | P2-07 |
+| `provider_account:license` | ✅ | ❌ | ❌ | P2-09 (REQUIRES_OWNER_APPROVAL) |
 | `worker:read` | ✅ | ✅ | ✅ | |
 | `worker:write` | ✅ | ✅ | ❌ | P2-08; chỉ worker loại mock ở 0.1 |
 | `task:read` | ✅ | ✅ | ✅ | |
