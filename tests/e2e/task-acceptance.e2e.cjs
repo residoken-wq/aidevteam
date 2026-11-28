@@ -238,7 +238,8 @@ async function contextFor(browser, token) {
 
       // Verify run A appears in /runs
       await maintPage.goto(`${BASE}/runs`);
-      await maintPage.getByRole("link", { name: runAId }).waitFor();
+      // /runs links each row to its detail page with the text "Chi tiết" (not the run id): match by href.
+      await maintPage.locator(`a[href="/runs/${runAId}"]`).waitFor();
 
       // Cancel run A to free worker mock
       await maintCtx.request.post(`${BASE}/api/runs/${runAId}/cancel`, {
@@ -364,12 +365,12 @@ async function contextFor(browser, token) {
     });
 
     await step("Step 7b: unassigned project_member cannot view project, tasks, run, or activity (404), and search/runs exclude data", async () => {
-      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}`)).status(), 404);
-      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}/tasks`)).status(), 404);
-      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}/tasks/1`)).status(), 404);
-      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}/tasks/2`)).status(), 404);
-      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}/tasks/2/activity`)).status(), 404);
-      assert.equal((await pmCtx.request.get(`${BASE}/api/runs/${runBId}`)).status(), 404);
+      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}`)).status(), 404, "project_member (unassigned): GET project");
+      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}/tasks`)).status(), 404, "project_member (unassigned): GET tasks");
+      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}/tasks/1`)).status(), 404, "project_member (unassigned): GET task 1");
+      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}/tasks/2`)).status(), 404, "project_member (unassigned): GET task 2");
+      assert.equal((await pmCtx.request.get(`${BASE}/api/projects/${PROJ}/tasks/2/activity`)).status(), 404, "project_member (unassigned): GET task 2 activity");
+      assert.equal((await pmCtx.request.get(`${BASE}/api/runs/${runBId}`)).status(), 404, "project_member (unassigned): GET run B");
 
       // Search tasks
       const searchRes = await pmCtx.request.get(`${BASE}/api/tasks/search?q=Task`);

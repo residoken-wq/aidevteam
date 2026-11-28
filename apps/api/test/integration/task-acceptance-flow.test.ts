@@ -375,6 +375,19 @@ describe("P3-10 AC-2: Authorization and security verification (Step 7)", () => {
     expect(runIds).not.toContain(runBId);
   });
 
+  it("project_member assigned to ANOTHER project still cannot view this project (404)", async () => {
+    // Mirrors the E2E environment, where 900000006 already has an assignment on another project.
+    expect((await sendReq("post", "/projects", "admin").send({ slug: "other-accept-proj", name: "Other Accept Project" })).status).toBe(201);
+    const assign = await sendReq("post", "/projects/other-accept-proj/members", "admin").send({ githubUserId: 900000006, access: "read" });
+    expect([200, 201]).toContain(assign.status);
+    expect((await sendReq("get", "/projects/other-accept-proj", "pm")).status).toBe(200);
+    expect((await sendReq("get", `/projects/${PROJ}`, "pm")).status).toBe(404);
+    expect((await sendReq("get", TASKS, "pm")).status).toBe(404);
+    expect((await sendReq("get", TASK(1), "pm")).status).toBe(404);
+    expect((await sendReq("get", TASK(2), "pm")).status).toBe(404);
+    expect((await sendReq("get", ACTIVITY(2), "pm")).status).toBe(404);
+  });
+
   it("body containing foreign orgId or projectId is rejected with 422 Unprocessable Entity", async () => {
     const foreignId = "11111111-1111-1111-1111-111111111111";
 
