@@ -38,6 +38,41 @@ export const ProjectSchema = z
 
 export const ProjectListQuerySchema = ListQuerySchema;
 
+export const ProjectMemberAccessSchema = z.enum(["read", "write"]);
+export type ProjectMemberAccess = z.infer<typeof ProjectMemberAccessSchema>;
+
+export const ProjectMemberSchema = z
+  .object({
+    githubUserId: z.number().int().positive(),
+    githubLogin: z.string().nullable(),
+    access: ProjectMemberAccessSchema,
+    createdAt: z.string(),
+  })
+  .strict();
+
+export const ProjectMemberAssignSchema = z
+  .object({
+    githubUserId: z.number().int().positive(),
+    access: ProjectMemberAccessSchema,
+  })
+  .strict();
+
+export const ProjectMemberUnassignSchema = z
+  .object({
+    githubUserId: z.number().int().positive(),
+  })
+  .strict();
+
+export const ProjectMemberResultSchema = z
+  .object({
+    changed: z.boolean(),
+  })
+  .strict();
+
 export type ProjectCreate = z.infer<typeof ProjectCreateSchema>;
 export type ProjectUpdate = z.infer<typeof ProjectUpdateSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
+export type ProjectMember = z.infer<typeof ProjectMemberSchema>;
+export type ProjectMemberAssign = z.infer<typeof ProjectMemberAssignSchema>;
+export type ProjectMemberUnassign = z.infer<typeof ProjectMemberUnassignSchema>;
+export type ProjectMemberResult = z.infer<typeof ProjectMemberResultSchema>;

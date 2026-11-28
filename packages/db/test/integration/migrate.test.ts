@@ -13,6 +13,7 @@ const EXPECTED_TABLES = [
   "oauth_login_states",
   "orgs",
   "platform_admins",
+  "project_assignments",
   "projects",
   "provider_accounts",
   "rate_limit_hits",

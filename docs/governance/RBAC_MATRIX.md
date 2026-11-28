@@ -12,27 +12,28 @@
 
 ## Ma trận
 
-| Permission | org_admin | maintainer | viewer | Ghi chú |
-|---|---|---|---|---|
-| `dashboard:read` | ✅ | ✅ | ✅ | P2-02 |
-| `org:read` | ✅ | ✅ | ✅ | Thông tin org đang làm việc |
-| `project:read` | ✅ | ✅ | ✅ | |
-| `project:write` | ✅ | ✅ | ❌ | P2-10 |
-| `agent:read` | ✅ | ✅ | ✅ | |
-| `agent:write` | ✅ | ✅ | ❌ | P2-05 |
-| `provider_account:read` | ✅ | ✅ | ✅ | Chỉ thấy `secret_ref`, không bao giờ thấy secret (P1-07) |
-| `provider_account:write` | ✅ | ✅ | ❌ | P2-07 |
-| `provider_account:license` | ✅ | ❌ | ❌ | P2-09 (REQUIRES_OWNER_APPROVAL) |
-| `worker:read` | ✅ | ✅ | ✅ | |
-| `worker:write` | ✅ | ✅ | ❌ | P2-08; chỉ worker loại mock ở 0.1 |
-| `task:read` | ✅ | ✅ | ✅ | |
-| `task:write` | ✅ | ✅ | ❌ | P3-02/P3-04 |
-| `dispatch:execute` | ✅ | ✅ | ❌ | P4 — chỉ mock worker |
-| `run:read` | ✅ | ✅ | ✅ | Log đã redact |
-| `approval:read` | ✅ | ✅ | ✅ | Approval Center chỉ đọc (O-07); **không có permission ghi approval** |
-| `audit:read` | ✅ | ❌ | ❌ | Audit log của org |
-| `member:read` | ✅ | ❌ | ❌ | P2-04 (REQUIRES_OWNER_APPROVAL) |
-| `member:write` | ✅ | ❌ | ❌ | P2-04 (REQUIRES_OWNER_APPROVAL) |
+| Permission | org_admin | maintainer | viewer | project_member | Ghi chú |
+|---|---|---|---|---|---|
+| `dashboard:read` | ✅ | ✅ | ✅ | ❌ | P2-02 |
+| `org:read` | ✅ | ✅ | ✅ | ❌ | Thông tin org đang làm việc |
+| `project:read` | ✅ | ✅ | ✅ | ✅ | P2-13: project_member lọc theo assignment |
+| `project:write` | ✅ | ✅ | ❌ | ❌ | P2-10 |
+| `project:assign` | ✅ | ❌ | ❌ | ❌ | P2-13 (REQUIRES_OWNER_APPROVAL) |
+| `agent:read` | ✅ | ✅ | ✅ | ✅ | |
+| `agent:write` | ✅ | ✅ | ❌ | ❌ | P2-05 |
+| `provider_account:read` | ✅ | ✅ | ✅ | ❌ | Chỉ thấy `secret_ref`, không bao giờ thấy secret (P1-07) |
+| `provider_account:write` | ✅ | ✅ | ❌ | ❌ | P2-07 |
+| `provider_account:license` | ✅ | ❌ | ❌ | ❌ | P2-09 (REQUIRES_OWNER_APPROVAL) |
+| `worker:read` | ✅ | ✅ | ✅ | ✅ | |
+| `worker:write` | ✅ | ✅ | ❌ | ❌ | P2-08; chỉ worker loại mock ở 0.1 |
+| `task:read` | ✅ | ✅ | ✅ | ✅ | P2-13: project_member lọc theo assignment |
+| `task:write` | ✅ | ✅ | ❌ | ✅ | P2-13: project_member cần assignment write |
+| `dispatch:execute` | ✅ | ✅ | ❌ | ✅ | P4 — chỉ mock worker; P2-13 cần assignment write |
+| `run:read` | ✅ | ✅ | ✅ | ✅ | Log đã redact; P2-13: project_member lọc theo assignment |
+| `approval:read` | ✅ | ✅ | ✅ | ❌ | Approval Center chỉ đọc (O-07); **không có permission ghi approval** |
+| `audit:read` | ✅ | ❌ | ❌ | ❌ | Audit log của org |
+| `member:read` | ✅ | ❌ | ❌ | ❌ | P2-04 (REQUIRES_OWNER_APPROVAL) |
+| `member:write` | ✅ | ❌ | ❌ | ❌ | P2-04 (REQUIRES_OWNER_APPROVAL) |
 
 ## Quản trị nền tảng (platform admin) — P2-03
 

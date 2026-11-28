@@ -8,6 +8,7 @@ export const PERMISSIONS = [
   "org:read",
   "project:read",
   "project:write",
+  "project:assign",
   "agent:read",
   "agent:write",
   "provider_account:read",
@@ -27,7 +28,7 @@ export const PERMISSIONS = [
 
 export type Permission = (typeof PERMISSIONS)[number];
 
-export const ROLE_KEYS = ["org_admin", "maintainer", "viewer"] as const;
+export const ROLE_KEYS = ["org_admin", "maintainer", "viewer", "project_member"] as const;
 export type RoleKey = (typeof ROLE_KEYS)[number];
 
 const READ_ONLY: Permission[] = [
@@ -52,10 +53,28 @@ const MAINTAINER: Permission[] = [
   "dispatch:execute",
 ];
 
+const PROJECT_MEMBER: Permission[] = [
+  "project:read",
+  "agent:read",
+  "worker:read",
+  "task:read",
+  "task:write",
+  "dispatch:execute",
+  "run:read",
+];
+
 export const ROLE_PERMISSIONS: Readonly<Record<RoleKey, ReadonlySet<Permission>>> = {
-  org_admin: new Set<Permission>([...MAINTAINER, "provider_account:license", "audit:read", "member:read", "member:write"]),
+  org_admin: new Set<Permission>([
+    ...MAINTAINER,
+    "project:assign",
+    "provider_account:license",
+    "audit:read",
+    "member:read",
+    "member:write",
+  ]),
   maintainer: new Set<Permission>(MAINTAINER),
   viewer: new Set<Permission>(READ_ONLY),
+  project_member: new Set<Permission>(PROJECT_MEMBER),
 };
 
 /**

@@ -369,3 +369,35 @@ describe("agent_runs (P4-01, DB backstop for STATE_MACHINES §2)", () => {
     await expect(insert("QUEUED", { worker: workerB })).rejects.toThrow(/agent_runs_worker_same_org_fk/);
   });
 });
+
+describe("project_assignments (P2-13, DB backstop)", () => {
+  let projectA: string;
+  let projectB: string;
+  let userA: string;
+
+  beforeAll(async () => {
+    projectA = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'pa-proj-a', 'PA Proj A') RETURNING id", [orgA])).rows[0]!.id;
+    projectB = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'pa-proj-b', 'PA Proj B') RETURNING id", [orgB])).rows[0]!.id;
+    userA = (await pool.query<{ id: string }>("INSERT INTO users (github_user_id) VALUES (9990001) RETURNING id")).rows[0]!.id;
+  });
+
+  it("rejects cross-org project FK", async () => {
+    await expect(
+      pool.query("INSERT INTO project_assignments (org_id, project_id, user_id, access) VALUES ($1, $2, $3, 'read')", [orgA, projectB, userA]),
+    ).rejects.toThrow(/project_assignments_project_same_org_fk/);
+  });
+
+  it("rejects invalid access value", async () => {
+    await expect(
+      pool.query("INSERT INTO project_assignments (org_id, project_id, user_id, access) VALUES ($1, $2, $3, 'admin')", [orgA, projectA, userA]),
+    ).rejects.toThrow(/project_assignments_access_check/);
+  });
+
+  it("enforces primary key (project_id, user_id)", async () => {
+    await pool.query("INSERT INTO project_assignments (org_id, project_id, user_id, access) VALUES ($1, $2, $3, 'read')", [orgA, projectA, userA]);
+    await expect(
+      pool.query("INSERT INTO project_assignments (org_id, project_id, user_id, access) VALUES ($1, $2, $3, 'write')", [orgA, projectA, userA]),
+    ).rejects.toThrow(/project_assignments_pkey/);
+  });
+});
+
