@@ -751,6 +751,7 @@ describe("P3-09: GET /runs (AC-1, AC-2, project-scoping, cross-org)", () => {
     const resBoth = await api().get("/runs").set("Cookie", as("pmA")).expect(200);
     expect(resBoth.body.total).toBe(2);
     expect(resBoth.body.items).toHaveLength(2);
+    expect(resBoth.body.items.some((r: { id: string }) => r.id === dDelta.body.id)).toBe(true);
     const slugs = resBoth.body.items.map((r: { projectSlug: string }) => r.projectSlug);
     expect(slugs).toContain("alpha");
     expect(slugs).toContain("delta");
