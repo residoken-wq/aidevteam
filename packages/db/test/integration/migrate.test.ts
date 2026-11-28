@@ -22,6 +22,7 @@ const EXPECTED_TABLES = [
   "roles",
   "schema_migrations",
   "sessions",
+  "task_dependencies",
   "tasks",
   "user_allowlist",
   "users",

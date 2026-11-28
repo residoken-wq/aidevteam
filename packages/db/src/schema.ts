@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { bigint, boolean, customType, foreignKey, index, integer, jsonb, pgTable, primaryKey, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, check, customType, foreignKey, index, integer, jsonb, pgTable, primaryKey, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 
 /**
  * Typed Drizzle view of the schema created by migrations/*.up.sql.
@@ -268,6 +268,7 @@ export const tasks = pgTable(
   (t) => [
     unique("tasks_project_number_unique").on(t.projectId, t.number),
     unique("tasks_id_org_unique").on(t.id, t.orgId),
+    unique("tasks_id_project_org_unique").on(t.id, t.projectId, t.orgId),
     foreignKey({ name: "tasks_project_same_org_fk", columns: [t.projectId, t.orgId], foreignColumns: [projects.id, projects.orgId] }),
     foreignKey({ name: "tasks_agent_same_org_fk", columns: [t.agentId, t.orgId], foreignColumns: [agents.id, agents.orgId] }),
     index("tasks_org_project_status_idx").on(t.orgId, t.projectId, t.status),
@@ -330,6 +331,36 @@ export const projectAssignments = pgTable(
   ],
 );
 
+export const taskDependencies = pgTable(
+  "task_dependencies",
+  {
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    projectId: uuid("project_id").notNull(),
+    taskId: uuid("task_id").notNull(),
+    dependsOnTaskId: uuid("depends_on_task_id").notNull(),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.taskId, t.dependsOnTaskId] }),
+    check("task_dependencies_no_self_dep", sql`${t.taskId} <> ${t.dependsOnTaskId}`),
+    foreignKey({
+      name: "task_dependencies_task_same_project_fk",
+      columns: [t.taskId, t.projectId, t.orgId],
+      foreignColumns: [tasks.id, tasks.projectId, tasks.orgId],
+    }),
+    foreignKey({
+      name: "task_dependencies_depends_on_same_project_fk",
+      columns: [t.dependsOnTaskId, t.projectId, t.orgId],
+      foreignColumns: [tasks.id, tasks.projectId, tasks.orgId],
+    }),
+    index("task_dependencies_org_project_task_idx").on(t.orgId, t.projectId, t.taskId),
+    index("task_dependencies_org_project_depends_on_idx").on(t.orgId, t.projectId, t.dependsOnTaskId),
+  ],
+);
+
 export const allTables = {
   agent_runs: agentRuns,
   agents,
@@ -345,6 +376,7 @@ export const allTables = {
   role_bindings: roleBindings,
   roles,
   sessions,
+  task_dependencies: taskDependencies,
   tasks,
   user_allowlist: userAllowlist,
   users,

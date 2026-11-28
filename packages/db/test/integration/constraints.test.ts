@@ -401,3 +401,49 @@ describe("project_assignments (P2-13, DB backstop)", () => {
   });
 });
 
+describe("task_dependencies (P3-03, DB backstop)", () => {
+  let projectA: string;
+  let projectB: string;
+  let taskA1: string;
+  let taskA2: string;
+  let taskB1: string;
+
+  beforeAll(async () => {
+    projectA = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'td-proj-a', 'TD Proj A') RETURNING id", [orgA])).rows[0]!.id;
+    projectB = (await pool.query<{ id: string }>("INSERT INTO projects (org_id, slug, name) VALUES ($1, 'td-proj-b', 'TD Proj B') RETURNING id", [orgB])).rows[0]!.id;
+    taskA1 = (await pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 1, 'Task A1') RETURNING id", [orgA, projectA])).rows[0]!.id;
+    taskA2 = (await pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 2, 'Task A2') RETURNING id", [orgA, projectA])).rows[0]!.id;
+    taskB1 = (await pool.query<{ id: string }>("INSERT INTO tasks (org_id, project_id, number, title) VALUES ($1, $2, 1, 'Task B1') RETURNING id", [orgB, projectB])).rows[0]!.id;
+  });
+
+  it("allows valid dependency in the same project", async () => {
+    const res = await pool.query(
+      "INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $4) RETURNING task_id",
+      [orgA, projectA, taskA2, taskA1],
+    );
+    expect(res.rowCount).toBe(1);
+    await pool.query("DELETE FROM task_dependencies WHERE task_id = $1 AND depends_on_task_id = $2", [taskA2, taskA1]);
+  });
+
+  it("rejects self-dependency (task_id = depends_on_task_id)", async () => {
+    await expect(
+      pool.query("INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $3)", [orgA, projectA, taskA1]),
+    ).rejects.toThrow(/task_dependencies_no_self_dep/);
+  });
+
+  it("rejects cross-project dependency", async () => {
+    await expect(
+      pool.query("INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $4)", [orgA, projectA, taskA1, taskB1]),
+    ).rejects.toThrow(/task_dependencies_depends_on_same_project_fk/);
+  });
+
+  it("enforces primary key (task_id, depends_on_task_id)", async () => {
+    await pool.query("INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $4)", [orgA, projectA, taskA2, taskA1]);
+    await expect(
+      pool.query("INSERT INTO task_dependencies (org_id, project_id, task_id, depends_on_task_id) VALUES ($1, $2, $3, $4)", [orgA, projectA, taskA2, taskA1]),
+    ).rejects.toThrow(/task_dependencies_pkey/);
+    await pool.query("DELETE FROM task_dependencies WHERE task_id = $1 AND depends_on_task_id = $2", [taskA2, taskA1]);
+  });
+});
+
+
