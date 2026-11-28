@@ -33,9 +33,13 @@ import {
   AgentUpdateSchema,
 } from "./agent";
 import {
+  ProjectTaskDependenciesSchema,
+  TaskActivityQuerySchema,
+  TaskActivityResponseSchema,
+  TaskCommentCreateSchema,
+  TaskCommentSchema,
   TaskCreateSchema,
   TaskDependenciesSchema,
-  ProjectTaskDependenciesSchema,
   TaskDependencyChangeSchema,
   TaskDependencyResultSchema,
   TaskListQuerySchema,
@@ -1100,6 +1104,38 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
       401: ErrorResponseSchema,
       403: ErrorResponseSchema,
       404: ErrorResponseSchema,
+    },
+  },
+
+  // TaskActivityController (/projects/:projectSlug/tasks/:number/activity, /projects/:projectSlug/tasks/:number/comments)
+  {
+    method: "GET",
+    path: "/projects/{projectSlug}/tasks/{number}/activity",
+    summary: "Get task activity timeline and comments",
+    permission: "task:read",
+    query: TaskActivityQuerySchema,
+    responses: {
+      200: TaskActivityResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "POST",
+    path: "/projects/{projectSlug}/tasks/{number}/comments",
+    summary: "Add a comment to task",
+    permission: "task:write",
+    request: TaskCommentCreateSchema,
+    responses: {
+      201: TaskCommentSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+      429: ErrorResponseSchema,
     },
   },
 

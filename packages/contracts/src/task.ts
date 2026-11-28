@@ -166,6 +166,59 @@ export const TaskDependencyResultSchema = z
   .strict();
 export type TaskDependencyResult = z.infer<typeof TaskDependencyResultSchema>;
 
+export const TaskCommentCreateSchema = z
+  .object({
+    body: z
+      .string()
+      .min(1, "body is required")
+      .max(5000, "body: at most 5000 characters")
+      .refine((s) => s.trim().length > 0, "body cannot be empty"),
+  })
+  .strict();
+export type TaskCommentCreate = z.infer<typeof TaskCommentCreateSchema>;
+
+export const TaskCommentSchema = z
+  .object({
+    id: z.string().uuid(),
+    body: z.string(),
+    createdAt: z.string(),
+    authorGithubUserId: z.number().int().positive().nullable(),
+    authorLogin: z.string().nullable(),
+  })
+  .strict();
+export type TaskComment = z.infer<typeof TaskCommentSchema>;
+
+export const TaskActivityItemSchema = z
+  .object({
+    id: z.string().optional(),
+    kind: z.enum(["event", "comment"]),
+    at: z.string(),
+    actorGithubUserId: z.number().int().positive().nullable(),
+    actorLogin: z.string().nullable(),
+    action: z.string().optional(),
+    details: z.record(z.string(), z.unknown()).optional(),
+    body: z.string().optional(),
+  })
+  .strict();
+export type TaskActivityItem = z.infer<typeof TaskActivityItemSchema>;
+
+export const TaskActivityQuerySchema = z
+  .object({
+    limit: z.coerce.number().int().min(1).max(200).default(50),
+    offset: z.coerce.number().int().min(0).max(100_000).default(0),
+  })
+  .strict();
+export type TaskActivityQuery = z.infer<typeof TaskActivityQuerySchema>;
+
+export const TaskActivityResponseSchema = z
+  .object({
+    items: z.array(TaskActivityItemSchema),
+    limit: z.number().int().positive(),
+    offset: z.number().int().min(0),
+  })
+  .strict();
+export type TaskActivityResponse = z.infer<typeof TaskActivityResponseSchema>;
+
 export type Task = z.infer<typeof TaskSchema>;
 export type TaskTransition = z.infer<typeof TaskTransitionSchema>;
 
