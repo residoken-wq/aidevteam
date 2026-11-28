@@ -16,6 +16,7 @@ import { WorkersController } from "./workers/workers.controller";
 import { AgentsController } from "./agents/agents.controller";
 import { TasksController } from "./tasks/tasks.controller";
 import { ProjectTaskDependenciesController, TaskDependenciesController } from "./tasks/task-dependencies.controller";
+import { TaskContractController } from "./tasks/task-contract.controller";
 import { RunsController } from "./runs/runs.controller";
 import { RunWorker } from "./runs/run-worker.service";
 import { defaultMockRunner, type MockRunner } from "./runs/mock-runner";
@@ -41,6 +42,7 @@ export const APP_CONTROLLERS: Type[] = [
   TasksController,
   TaskDependenciesController,
   ProjectTaskDependenciesController,
+  TaskContractController,
   RunsController,
   PlatformOrgsController,
   DashboardController,
