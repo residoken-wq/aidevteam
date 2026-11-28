@@ -70,6 +70,8 @@ function resolvePath(pathTemplate: string): string {
   return pathTemplate
     .replace(/\{projectSlug\}/g, "does-not-exist")
     .replace(/\{slug\}/g, "does-not-exist")
+    .replace(/\{epicSlug\}/g, "does-not-exist")
+    .replace(/\{milestoneSlug\}/g, "does-not-exist")
     .replace(/\{number\}/g, "999999")
     .replace(
       /\{id\}/g,
