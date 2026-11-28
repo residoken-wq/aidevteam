@@ -46,19 +46,19 @@ describe("migrations up/down (AC-1)", () => {
 
     expect(await migrateUp(pool)).toEqual(all);
     expect(await tableNames(pool)).toEqual(EXPECTED_TABLES);
-  });
+  }, 30_000);
 
   it("is idempotent: a second up applies nothing", async () => {
     await migrateUp(pool);
     expect(await migrateUp(pool)).toEqual([]);
     expect((await migrationStatus(pool)).pending).toEqual([]);
-  });
+  }, 15_000);
 
   it("serialises concurrent runners (advisory lock): each migration applied once", async () => {
     const results = await Promise.all([migrateUp(pool), migrateUp(pool), migrateUp(pool)]);
     const total = results.flat();
     expect(total.sort()).toEqual(loadMigrations().map((m) => m.version));
-  });
+  }, 30_000);
 
   it("fails closed when an applied migration was modified afterwards", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "mig-"));

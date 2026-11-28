@@ -12,7 +12,6 @@ import {
   Req,
 } from "@nestjs/common";
 import {
-  TaskDependenciesSchema,
   TaskDependencyChangeSchema,
   type TaskDependencies,
   type TaskDependencyResult,
