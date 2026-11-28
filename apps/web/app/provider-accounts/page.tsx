@@ -19,7 +19,7 @@ export default async function ProviderAccountsPage({ searchParams }: { searchPar
   const canLicense = can(me, "provider_account:license");
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link>
       </p>
@@ -74,6 +74,6 @@ export default async function ProviderAccountsPage({ searchParams }: { searchPar
           )}
         </>
       )}
-    </main>
+    </div>
   );
 }

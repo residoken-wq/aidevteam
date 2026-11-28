@@ -18,7 +18,7 @@ export default async function AgentsPage({ searchParams }: { searchParams: Promi
   const activeAgents = (data?.items ?? []).filter((a) => !a.archivedAt).map((a) => a.slug);
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link> · <Link href="/agents/chart">Sơ đồ tổ chức</Link>
       </p>
@@ -69,6 +69,6 @@ export default async function AgentsPage({ searchParams }: { searchParams: Promi
           )}
         </>
       )}
-    </main>
+    </div>
   );
 }

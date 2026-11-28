@@ -12,7 +12,7 @@ export default async function PlatformOrgsPage({ searchParams }: { searchParams:
   const canWrite = canPlatform(me, "platform:org:write");
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link>
       </p>
@@ -58,6 +58,6 @@ export default async function PlatformOrgsPage({ searchParams }: { searchParams:
           )}
         </>
       )}
-    </main>
+    </div>
   );
 }

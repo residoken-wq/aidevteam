@@ -9,7 +9,7 @@ export default async function ApprovalsPage() {
   const data = await apiGet<{ items: Approval[] }>("/approvals");
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link>
       </p>
@@ -67,6 +67,6 @@ export default async function ApprovalsPage() {
           </tbody>
         </table>
       )}
-    </main>
+    </div>
   );
 }

@@ -92,7 +92,10 @@ export function ProviderAccountRowActions({ slug, name }: { slug: string; name: 
     <span>
       {rotating ? (
         <form onSubmit={rotate} aria-label={`Đổi tham chiếu ${slug}`} style={{ display: "inline" }}>
-          <input name="secretRef" required autoComplete="off" spellCheck={false} placeholder={REF_HINT} /> <button type="submit">Lưu</button>{" "}
+          <label>
+            Tham chiếu secret mới <input name="secretRef" required autoComplete="off" spellCheck={false} placeholder={REF_HINT} />
+          </label>{" "}
+          <button type="submit">Lưu</button>{" "}
           <button type="button" onClick={() => setRotating(false)}>
             Hủy
           </button>

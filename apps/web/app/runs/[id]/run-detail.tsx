@@ -4,7 +4,7 @@ import { CancelRunButton } from "./cancel-button";
 
 export function RunDetail({ run, canCancel }: { run: Run; canCancel: boolean }) {
   return (
-    <main>
+    <div>
       <p>
         <Link href={`/projects/${encodeURIComponent(run.projectSlug)}/tasks`}>← Task dự án</Link>
         {" · "}
@@ -66,6 +66,6 @@ export function RunDetail({ run, canCancel }: { run: Run; canCancel: boolean }) 
           {run.log ?? "(không có log)"}
         </pre>
       </section>
-    </main>
+    </div>
   );
 }

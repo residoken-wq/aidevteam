@@ -13,9 +13,9 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
   const me = await apiGet<Me>("/auth/me");
   if (!can(me, "run:read")) {
     return (
-      <main>
+      <div>
         <p role="status">Bạn chưa có quyền xem lượt chạy này.</p>
-      </main>
+      </div>
     );
   }
 
