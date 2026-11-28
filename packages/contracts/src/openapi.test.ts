@@ -90,6 +90,7 @@ describe("OpenAPI 3.1.0 generation", () => {
       "PATCH /projects/{projectSlug}/tasks/{number}",
       "POST /projects/{projectSlug}/tasks/{number}/transitions",
       "POST /projects/{projectSlug}/tasks/{number}/dispatch",
+      "PUT /projects/{projectSlug}/tasks/{number}/contract",
       "POST /platform/orgs",
       "PATCH /platform/orgs/{slug}",
     ]);

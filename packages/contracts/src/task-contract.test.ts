@@ -5,7 +5,7 @@ import {
   isDenylistedPath,
   TaskContractSchema,
 } from "./task-contract";
-import { buildAgentPrompt, escapeUntrustedTaskData } from "./task-prompt";
+import { buildAgentPrompt } from "./task-prompt";
 
 describe("AC-1 TaskContractSchema", () => {
   const validContract = {

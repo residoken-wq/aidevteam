@@ -56,10 +56,6 @@ const validContract: TaskContract = {
   notes: "Follow OAuth 2.1 recommendations",
 };
 
-let projAId: string;
-let task1Id: string;
-let taskDoneId: string;
-let taskCancelledId: string;
 
 beforeAll(async () => {
   const url = process.env.TEST_DATABASE_URL;
@@ -108,7 +104,6 @@ beforeAll(async () => {
   // Create project in org-test-a
   const p = await send("post", "/projects", "admin").send({ slug: "proj-contract", name: "Contract Project" });
   expect(p.status).toBe(201);
-  projAId = p.body.id;
 
   // Create task 1 (TODO)
   const t1 = await send("post", "/projects/proj-contract/tasks", "maint").send({
@@ -116,13 +111,11 @@ beforeAll(async () => {
     description: "Initial description",
   });
   expect(t1.status).toBe(201);
-  task1Id = t1.body.id;
 
   // Create task 2 and transition to DONE
   const tDone = await send("post", "/projects/proj-contract/tasks", "maint").send({
     title: "Task Done",
   });
-  taskDoneId = tDone.body.id;
   await send("post", `/projects/proj-contract/tasks/${tDone.body.number}/transitions`, "maint").send({
     expectedFrom: "BACKLOG",
     to: "TODO",
@@ -145,7 +138,6 @@ beforeAll(async () => {
   const tCancel = await send("post", "/projects/proj-contract/tasks", "maint").send({
     title: "Task Cancelled",
   });
-  taskCancelledId = tCancel.body.id;
   await send("post", `/projects/proj-contract/tasks/${tCancel.body.number}/transitions`, "maint").send({
     expectedFrom: "BACKLOG",
     to: "CANCELLED",
