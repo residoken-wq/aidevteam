@@ -111,6 +111,11 @@ jobs:
         if: steps.detect.outputs.node == 'true'
         run: pnpm test
 
+      # P1-03: docs/api/openapi.json must match the Zod contract registry (`pnpm test` above builds packages/*).
+      - name: OpenAPI spec up to date
+        if: steps.detect.outputs.node == 'true'
+        run: pnpm openapi:check
+
       - name: Script tests (progress report)
         if: steps.detect.outputs.node == 'true'
         run: pnpm test:scripts
