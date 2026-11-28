@@ -13,6 +13,19 @@ export const AgentTitleSchema = z
   .transform((v) => v.trim())
   .pipe(z.string().min(1, "title must not be blank").max(120, "title: at most 120 characters"));
 
+export const AgentCapabilitiesSchema = z
+  .array(SlugSchema)
+  .max(20, "capabilities: at most 20 tags")
+  .refine((items) => new Set(items).size === items.length, {
+    message: "capabilities: duplicate tags are not allowed",
+  });
+
+export const AgentMaxActiveTasksSchema = z
+  .number()
+  .int()
+  .min(1, "maxActiveTasks must be between 1 and 50")
+  .max(50, "maxActiveTasks must be between 1 and 50");
+
 export const AgentCreateSchema = z
   .object({
     slug: SlugSchema,
@@ -22,6 +35,8 @@ export const AgentCreateSchema = z
     providerAccountSlug: SlugSchema.optional(),
     reportsToSlug: SlugSchema.optional(),
     description: DescriptionSchema.optional(),
+    capabilities: AgentCapabilitiesSchema.optional(),
+    maxActiveTasks: AgentMaxActiveTasksSchema.optional(),
   })
   .strict();
 
@@ -34,6 +49,8 @@ export const AgentUpdateSchema = z
     reportsToSlug: SlugSchema.nullable().optional(),
     enabled: z.boolean().optional(),
     description: DescriptionSchema.nullable().optional(),
+    capabilities: AgentCapabilitiesSchema.optional(),
+    maxActiveTasks: AgentMaxActiveTasksSchema.optional(),
   })
   .strict()
   .refine((v) => Object.values(v).some((x) => x !== undefined), "nothing to update");
@@ -48,6 +65,9 @@ export const AgentSchema = z
     reportsToSlug: z.string().nullable(),
     enabled: z.boolean(),
     description: z.string().nullable(),
+    capabilities: z.array(SlugSchema),
+    maxActiveTasks: z.number().int(),
+    activeTaskCount: z.number().int(),
     createdAt: z.string(),
     updatedAt: z.string(),
     archivedAt: z.string().nullable(),

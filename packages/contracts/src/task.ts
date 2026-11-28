@@ -32,6 +32,13 @@ const TitleSchema = z
 /** Untrusted plain text. Never rendered as HTML and never interpreted as instructions (CLAUDE.md §2 rule 9). */
 export const TaskDescriptionSchema = z.string().max(10_000, "description: at most 10000 characters");
 
+export const TaskRequiredCapabilitiesSchema = z
+  .array(SlugSchema)
+  .max(10, "requiredCapabilities: at most 10 tags")
+  .refine((items) => new Set(items).size === items.length, {
+    message: "requiredCapabilities: duplicate tags are not allowed",
+  });
+
 export const TaskCreateSchema = z
   .object({
     title: TitleSchema,
@@ -40,6 +47,7 @@ export const TaskCreateSchema = z
     agentSlug: SlugSchema.optional(),
     epicSlug: SlugSchema.optional(),
     sprintNumber: z.number().int().positive().optional(),
+    requiredCapabilities: TaskRequiredCapabilitiesSchema.optional(),
   })
   .strict();
 
@@ -52,6 +60,7 @@ export const TaskUpdateSchema = z
     agentSlug: SlugSchema.nullable().optional(),
     epicSlug: SlugSchema.nullable().optional(),
     sprintNumber: z.number().int().positive().nullable().optional(),
+    requiredCapabilities: TaskRequiredCapabilitiesSchema.optional(),
   })
   .strict()
   .refine((v) => Object.values(v).some((x) => x !== undefined), "nothing to update");
@@ -93,6 +102,7 @@ export const TaskSchema = z
     cancelReason: z.string().nullable(),
     epicSlug: z.string().nullable(),
     sprintNumber: z.number().int().positive().nullable(),
+    requiredCapabilities: z.array(SlugSchema),
     createdAt: z.string(),
     updatedAt: z.string(),
   })

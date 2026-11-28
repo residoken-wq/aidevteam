@@ -38,6 +38,7 @@ const CONFLICTS: Record<string, string> = {
   worker_project_mismatch: "Worker đã gắn với dự án khác, không tương thích với dự án của task.",
   agent_not_dispatchable: "Agent đã bị vô hiệu hóa hoặc đã lưu trữ, không thể nhận việc.",
   provider_account_not_licensed: "Tài khoản provider chưa được duyệt hoặc đã bị cấm/lưu trữ.",
+  agent_at_capacity: "Agent đã đủ số việc tối đa đang làm, không thể nhận thêm task.",
   task_not_dispatchable: "Chỉ có thể chạy task ở trạng thái Cần làm hoặc Đang làm.",
   run_not_cancellable: "Chỉ có thể hủy lượt chạy đang ở hàng đợi hoặc đang chạy.",
   cannot_change_own_roles: "Không thể tự thay đổi vai trò của chính mình.",
@@ -49,14 +50,24 @@ const SPECIFIC_422: Record<string, string> = {
   user_disabled: "Tài khoản người dùng đã bị vô hiệu hóa.",
   role_not_found: "Vai trò không tồn tại trong tổ chức.",
   provider_account_not_licensed: "Tài khoản provider chưa được duyệt hoặc đã bị cấm/lưu trữ.",
+  agent_not_assignable: "Agent đã bị vô hiệu hóa hoặc đã lưu trữ, không thể nhận việc.",
+  agent_capability_mismatch: "Agent không có đủ năng lực (capability) yêu cầu cho task.",
+  path_forbidden: "Đường dẫn không được phép hoặc thuộc danh sách cấm (denylist).",
 };
 
 export function apiErrorMessage(status: number, body: unknown): string {
-  const b = (typeof body === "object" && body !== null ? body : {}) as { message?: unknown; issues?: Array<{ path?: unknown; message?: unknown; problem?: unknown }> };
+  const b = (typeof body === "object" && body !== null ? body : {}) as {
+    message?: unknown;
+    missing?: unknown[];
+    issues?: Array<{ path?: unknown; message?: unknown; problem?: unknown; missing?: unknown[] }>;
+  };
   if (status === 422 && Array.isArray(b.issues) && b.issues.some((i) => i?.problem === "secret_like")) {
     return "Giá trị vừa nhập trông giống một secret thật. Không dán secret vào đây — đặt secret trên máy worker rồi nhập tham chiếu (env:AIDEV_SECRET_… hoặc file:/run/secrets/…).";
   }
   if (status === 422 && typeof b.message === "string" && Object.prototype.hasOwnProperty.call(SPECIFIC_422, b.message)) {
+    if (b.message === "agent_capability_mismatch" && Array.isArray(b.missing) && b.missing.length > 0) {
+      return `Agent không có đủ năng lực yêu cầu cho task (thiếu: ${b.missing.join(", ")}).`;
+    }
     return SPECIFIC_422[b.message]!;
   }
   if (status === 422 && Array.isArray(b.issues)) {
@@ -73,10 +84,10 @@ export function apiErrorMessage(status: number, body: unknown): string {
 }
 
 export async function sendJson<T = unknown>(
-  method: "POST" | "PATCH" | "DELETE",
+  method: "POST" | "PATCH" | "DELETE" | "PUT",
   url: string,
   body?: unknown,
-): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
+): Promise<{ ok: true; data: T } | { ok: false; error: string; issues?: Array<{ path?: string; message?: string }> }> {
   const res = await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
@@ -87,5 +98,10 @@ export async function sendJson<T = unknown>(
     const data = (await res.json().catch(() => null)) as T;
     return { ok: true, data };
   }
-  return { ok: false, error: apiErrorMessage(res.status, await res.json().catch(() => null)) };
+  const errBody = await res.json().catch(() => null);
+  const issues =
+    errBody && typeof errBody === "object" && Array.isArray((errBody as { issues?: unknown }).issues)
+      ? ((errBody as { issues: Array<{ path?: string; message?: string }> }).issues)
+      : undefined;
+  return { ok: false, error: apiErrorMessage(res.status, errBody), issues };
 }

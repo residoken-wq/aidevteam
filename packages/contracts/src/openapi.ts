@@ -46,6 +46,11 @@ import {
   TaskUpdateSchema,
 } from "./task";
 import {
+  TaskContractResponseSchema,
+  TaskContractSchema,
+  TaskPromptResponseSchema,
+} from "./task-contract";
+import {
   DispatchRunSchema,
   RunListQuerySchema,
   RunSchema,
@@ -1054,6 +1059,47 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
       404: ErrorResponseSchema,
       409: ErrorResponseSchema,
       422: ErrorResponseSchema,
+    },
+  },
+
+  // TaskContractController (/projects/:projectSlug/tasks/:number/contract)
+  {
+    method: "GET",
+    path: "/projects/{projectSlug}/tasks/{number}/contract",
+    summary: "Get task contract and effective forbidden paths",
+    permission: "task:read",
+    responses: {
+      200: TaskContractResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "PUT",
+    path: "/projects/{projectSlug}/tasks/{number}/contract",
+    summary: "Update task contract",
+    permission: "task:write",
+    request: TaskContractSchema,
+    responses: {
+      200: TaskContractResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
+      409: ErrorResponseSchema,
+      422: ErrorResponseSchema,
+    },
+  },
+  {
+    method: "GET",
+    path: "/projects/{projectSlug}/tasks/{number}/contract/prompt",
+    summary: "Preview generated agent prompt for task",
+    permission: "task:read",
+    responses: {
+      200: TaskPromptResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+      404: ErrorResponseSchema,
     },
   },
 
