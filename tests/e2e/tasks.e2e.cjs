@@ -103,6 +103,8 @@ async function contextFor(browser, token) {
       await inCol(page, "IN_REVIEW", 1).waitFor();
       await moveVia(page, 1, "Hoàn thành");
       await inCol(page, "DONE", 1).waitFor();
+      // The card can reach the DONE column before the re-render drops its controls: wait for the button to go away.
+      await page.getByTestId("task-1").getByRole("button", { name: "Chuyển" }).waitFor({ state: "detached", timeout: 10_000 });
       assert.equal(await page.getByTestId("task-1").getByRole("button", { name: "Chuyển" }).count(), 0, "a DONE card still offers moves");
     });
 

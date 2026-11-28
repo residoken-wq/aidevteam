@@ -458,6 +458,31 @@ export const taskDependencies = pgTable(
   ],
 );
 
+export const taskComments = pgTable(
+  "task_comments",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    projectId: uuid("project_id").notNull(),
+    taskId: uuid("task_id").notNull(),
+    authorUserId: uuid("author_user_id").references(() => users.id),
+    body: text("body").notNull(),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    check("task_comments_body_check", sql`char_length(${t.body}) BETWEEN 1 AND 5000`),
+    foreignKey({
+      name: "task_comments_task_same_project_fk",
+      columns: [t.taskId, t.projectId, t.orgId],
+      foreignColumns: [tasks.id, tasks.projectId, tasks.orgId],
+    }),
+    index("task_comments_org_project_task_idx").on(t.orgId, t.projectId, t.taskId, t.createdAt),
+    index("task_comments_author_idx").on(t.authorUserId),
+  ],
+);
+
 export const allTables = {
   agent_runs: agentRuns,
   agents,
@@ -476,6 +501,7 @@ export const allTables = {
   roles,
   sessions,
   sprints,
+  task_comments: taskComments,
   task_dependencies: taskDependencies,
   tasks,
   user_allowlist: userAllowlist,
