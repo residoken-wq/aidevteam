@@ -572,8 +572,8 @@
         "post-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "\"assigned-project access\" chưa có trong mô hình (role theo org) → tách sang P2-13 (Owner 28/11/2026)",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#41; ma trận RBAC sinh từ registry OpenAPI × 7 actor, cross-tenant, body orgId; \"assigned-project access\" → P2-13",
       "source": "Master Plan v1.0.0",
       "master_plan": {
         "depends_on": "P2-03,P2-09,P2-10",
@@ -589,8 +589,8 @@
         "post-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "Owner yêu cầu 28/11/2026 (tách từ acceptance P2-12). Thiết kế RBAC REQUIRES_OWNER_APPROVAL trước khi giao agent.",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#42; phương án A: role project_member + project_assignments (read/write), project:assign (org_admin), REQUIRES_OWNER_APPROVAL; sửa lỗ hổng viewer+project_member ghi mọi project",
       "source": "Owner 28/11/2026 (ngoài Master Plan v1.0.0)",
       "master_plan": {
         "depends_on": "P2-04,P2-12",
