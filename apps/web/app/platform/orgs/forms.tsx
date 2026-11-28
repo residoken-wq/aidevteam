@@ -68,7 +68,10 @@ export function OrgRowActions({ slug, name, archived }: { slug: string; name: st
         </button>
       ) : renaming ? (
         <form onSubmit={rename} aria-label={`Đổi tên ${slug}`} style={{ display: "inline" }}>
-          <input name="name" required maxLength={200} defaultValue={name} /> <button type="submit">Lưu</button>{" "}
+          <label>
+            Tên tổ chức mới <input name="name" required maxLength={200} defaultValue={name} />
+          </label>{" "}
+          <button type="submit">Lưu</button>{" "}
           <button type="button" onClick={() => setRenaming(false)}>
             Hủy
           </button>

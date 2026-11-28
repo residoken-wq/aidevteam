@@ -71,7 +71,10 @@ export function ProjectRowActions({ slug, name }: { slug: string; name: string }
     <span>
       {editing ? (
         <form onSubmit={rename} aria-label={`Đổi tên ${slug}`} style={{ display: "inline" }}>
-          <input name="name" defaultValue={name} required maxLength={120} /> <button type="submit">Lưu</button>{" "}
+          <label>
+            Tên dự án mới <input name="name" defaultValue={name} required maxLength={120} />
+          </label>{" "}
+          <button type="submit">Lưu</button>{" "}
           <button type="button" onClick={() => setEditing(false)}>
             Hủy
           </button>

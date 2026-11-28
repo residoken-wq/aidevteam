@@ -12,7 +12,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
   const canWrite = can(me, "project:write");
 
   return (
-    <main>
+    <div>
       <p>
         <Link href="/">← Trang chủ</Link>
       </p>
@@ -55,6 +55,6 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
           )}
         </>
       )}
-    </main>
+    </div>
   );
 }
