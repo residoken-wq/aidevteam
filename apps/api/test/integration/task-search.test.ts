@@ -338,7 +338,7 @@ describe("P3-08 AC-3: RBAC / project-scope for project_member and viewer", () =>
 
 describe("P3-08 AC-4: Stats by project with status breakdown", () => {
   it("returns status breakdown per project for org_admin and viewer", async () => {
-    const res = await send("get", "/projects/stats", "admin_a");
+    const res = await send("get", "/stats/projects", "admin_a");
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(2);
 
@@ -368,7 +368,7 @@ describe("P3-08 AC-4: Stats by project with status breakdown", () => {
   });
 
   it("project_member sees stats only for assigned projects", async () => {
-    const res = await send("get", "/projects/stats", "pm_assigned");
+    const res = await send("get", "/stats/projects", "pm_assigned");
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
     expect(res.body.items[0].projectSlug).toBe("proj-a1");
@@ -376,7 +376,7 @@ describe("P3-08 AC-4: Stats by project with status breakdown", () => {
   });
 
   it("project_member with no assignments sees empty stats list", async () => {
-    const res = await send("get", "/projects/stats", "pm_unassigned");
+    const res = await send("get", "/stats/projects", "pm_unassigned");
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(0);
   });
@@ -402,8 +402,18 @@ describe("P3-08 AC-5: Query validation rejects invalid input with 422", () => {
   });
 
   it("rejects unknown fields on stats", async () => {
-    const res = await send("get", "/projects/stats?unexpected=1", "admin_a");
+    const res = await send("get", "/stats/projects?unexpected=1", "admin_a");
     expect(res.status).toBe(422);
     expect(res.body.message).toBe("validation_failed");
+  });
+});
+
+describe("P3-08 routing: stats do not shadow project slugs", () => {
+  it("a project with slug 'stats' is still reachable at GET /projects/stats", async () => {
+    const created = await send("post", "/projects", "admin_a").send({ slug: "stats", name: "Project named stats" });
+    expect([201, 409]).toContain(created.status);
+    const res = await send("get", "/projects/stats", "admin_a");
+    expect(res.status).toBe(200);
+    expect(res.body.slug).toBe("stats");
   });
 });

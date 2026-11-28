@@ -24,12 +24,12 @@ interface Row {
   total: number;
 }
 
-@Controller("projects")
+@Controller("stats")
 export class ProjectStatsController {
   constructor(@Inject(DB_POOL) private readonly pool: Pool) {}
 
   @RequirePermission("project:read")
-  @Get("stats")
+  @Get("projects")
   async stats(@Req() req: Request, @Query() query: unknown): Promise<ProjectStatsResponse> {
     const q = parseOr422(ProjectStatsQuerySchema, query);
     const org = getOrg(req);

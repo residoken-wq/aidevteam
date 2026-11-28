@@ -361,7 +361,7 @@ export const API_OPERATIONS: OpenApiOperationDef[] = [
   // ProjectsController (/projects)
   {
     method: "GET",
-    path: "/projects/stats",
+    path: "/stats/projects",
     summary: "Get task status statistics by project",
     permission: "project:read",
     query: ProjectStatsQuerySchema,

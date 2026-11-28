@@ -47,7 +47,7 @@ export default async function TasksSearchPage({ searchParams }: PageProps) {
 
   const [searchResults, statsResults, projectsList, agentsList] = await Promise.all([
     canReadTask ? apiGet<TaskSearchResponse>(`/tasks/search?${queryParts.join("&")}`) : null,
-    canReadProject ? apiGet<ProjectStatsResponse>("/projects/stats") : null,
+    canReadProject ? apiGet<ProjectStatsResponse>("/stats/projects") : null,
     canReadProject ? apiGet<{ items: Project[] }>("/projects") : null,
     canReadAgent ? apiGet<{ items: Agent[] }>("/agents") : null,
   ]);
