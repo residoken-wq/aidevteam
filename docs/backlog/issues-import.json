@@ -196,15 +196,17 @@
         "post-0.1",
         "phase:1"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#38 (+#39 CI openapi:check); docs/api/openapi.json OpenAPI 3.1 từ Zod, không dependency mới",
       "source": "Master Plan v1.0.0",
       "master_plan": {
         "depends_on": "P1-01",
         "output": "openapi.yaml",
         "acceptance": "Contract tests validate schema; error formats",
         "responsible": "Backend Dev"
-      }
+      },
+      "coverage": "partial",
+      "remaining": "SDK client generation (web dùng chung type @aidevteam/contracts)"
     },
     {
       "id": "P1-04",
@@ -519,8 +521,8 @@
         "post-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#37; license_status provider account (mặc định unverified), quyền provider_account:license (org_admin, REQUIRES_OWNER_APPROVAL), chặn gắn/dispatch không hợp lệ",
       "source": "Master Plan v1.0.0",
       "master_plan": {
         "depends_on": "P2-07,P2-08",
@@ -553,8 +555,8 @@
         "post-0.1",
         "phase:2"
       ],
-      "status": "TODO",
-      "notes": "",
+      "status": "MERGED",
+      "notes": "residoken-wq/aidevteam#36; /profile chỉ đọc, skip link, 1 <main>, nhãn form; chỉ tiếng Việt",
       "source": "Master Plan v1.0.0",
       "master_plan": {
         "depends_on": "P2-01",
@@ -571,13 +573,30 @@
         "phase:2"
       ],
       "status": "TODO",
-      "notes": "",
+      "notes": "\"assigned-project access\" chưa có trong mô hình (role theo org) → tách sang P2-13 (Owner 28/11/2026)",
       "source": "Master Plan v1.0.0",
       "master_plan": {
         "depends_on": "P2-03,P2-09,P2-10",
         "output": "Test evidence",
         "acceptance": "Cross-tenant deny and assigned-project access verified",
         "responsible": "QA Agent"
+      }
+    },
+    {
+      "id": "P2-13",
+      "title": "[P2-13] Project-scoped access (assigned projects)",
+      "labels": [
+        "post-0.1",
+        "phase:2"
+      ],
+      "status": "TODO",
+      "notes": "Owner yêu cầu 28/11/2026 (tách từ acceptance P2-12). Thiết kế RBAC REQUIRES_OWNER_APPROVAL trước khi giao agent.",
+      "source": "Owner 28/11/2026 (ngoài Master Plan v1.0.0)",
+      "master_plan": {
+        "depends_on": "P2-04,P2-12",
+        "output": "Project assignment API/UI + enforcement",
+        "acceptance": "Assigned-project access verified; unassigned project denied; cross-tenant deny",
+        "responsible": "Backend Dev"
       }
     },
     {
