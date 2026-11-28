@@ -17,6 +17,7 @@ import { testConfig } from "../helpers";
  *   900000004: org_admin (org-test-b)
  *   900000005: project_member (org-test-a)
  *   900000006: project_member (org-test-a)
+ *   900000007: viewer + project_member (org-test-a) — mixed roles
  */
 
 const ORIGIN = "https://cc.example.com";
@@ -61,7 +62,7 @@ beforeAll(async () => {
   await migrateUp(pool);
   await seed(pool, { NODE_ENV: "test" });
 
-  for (const id of [900000003, 900000004, 900000005, 900000006]) {
+  for (const id of [900000003, 900000004, 900000005, 900000006, 900000007]) {
     await pool.query("INSERT INTO user_allowlist (github_user_id, note) VALUES ($1, 'fake') ON CONFLICT DO NOTHING", [id]);
   }
 
@@ -71,6 +72,8 @@ beforeAll(async () => {
   await grantRole(pool, 900000004, "org-test-b", "org_admin");
   await grantRole(pool, 900000005, "org-test-a", "project_member");
   await grantRole(pool, 900000006, "org-test-a", "project_member");
+  await grantRole(pool, 900000007, "org-test-a", "viewer");
+  await grantRole(pool, 900000007, "org-test-a", "project_member");
 
   for (const [who, id] of [
     ["admin", 900000001],
@@ -79,6 +82,7 @@ beforeAll(async () => {
     ["adminB", 900000004],
     ["pm5", 900000005],
     ["pm6", 900000006],
+    ["mixed", 900000007],
   ] as const) {
     tokens[who] = await sessionFor(id);
   }
@@ -482,5 +486,41 @@ describe("AC-7: Audit events and member endpoints", () => {
     expect((await send("post", "/projects/proj-beta/members", "maint").send({ githubUserId: 900000006, access: "read" })).status).toBe(403);
     expect((await send("post", "/projects/proj-beta/members", "viewer").send({ githubUserId: 900000006, access: "read" })).status).toBe(403);
     expect((await send("post", "/projects/proj-beta/members", "pm5").send({ githubUserId: 900000006, access: "read" })).status).toBe(403);
+  });
+});
+
+describe("Mixed roles: viewer + project_member", () => {
+  // Permissions are the union of roles, so project_member's task:write/dispatch:execute must not become org-wide
+  // just because viewer makes the user org-wide for reads.
+  it("reads org-wide (viewer) but cannot write to an unassigned project", async () => {
+    expect((await send("get", "/projects/proj-alpha", "mixed")).status).toBe(200);
+    expect((await send("get", "/projects/proj-alpha/tasks", "mixed")).status).toBe(200);
+    const before = await pool.query<{ title: string; status: string }>(
+      "SELECT title, status FROM tasks WHERE project_id = $1 AND number = 1",
+      [projA1Id],
+    );
+    expect((await send("post", "/projects/proj-alpha/tasks", "mixed").send({ title: "Mixed X" })).status).toBe(403);
+    expect((await send("patch", "/projects/proj-alpha/tasks/1", "mixed").send({ title: "Hijacked" })).status).toBe(403);
+    expect(
+      (await send("post", "/projects/proj-alpha/tasks/1/dispatch", "mixed").send({ workerSlug: "mock-w" })).status,
+    ).toBe(403);
+    expect((await send("post", `/runs/${runA1Id}/cancel`, "mixed")).status).toBe(403);
+    const after = await pool.query<{ title: string; status: string }>(
+      "SELECT title, status FROM tasks WHERE project_id = $1 AND number = 1",
+      [projA1Id],
+    );
+    expect(after.rows).toEqual(before.rows);
+    const created = await pool.query("SELECT 1 FROM tasks WHERE title = 'Mixed X'");
+    expect(created.rowCount).toBe(0);
+  });
+
+  it("writes only in a project assigned with access=write", async () => {
+    const assign = await send("post", "/projects/proj-beta/members", "admin").send({ githubUserId: 900000007, access: "write" });
+    expect([200, 201]).toContain(assign.status);
+    expect((await send("post", "/projects/proj-beta/tasks", "mixed").send({ title: "Mixed in Beta" })).status).toBe(201);
+    expect((await send("post", "/projects/proj-alpha/tasks", "mixed").send({ title: "Mixed X" })).status).toBe(403);
+    const del = await send("delete", "/projects/proj-beta/members", "admin").send({ githubUserId: 900000007 });
+    expect(del.status).toBe(200);
+    expect((await send("post", "/projects/proj-beta/tasks", "mixed").send({ title: "Mixed again" })).status).toBe(403);
   });
 });

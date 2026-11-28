@@ -11,6 +11,16 @@ export function isProjectScoped(roles: readonly string[]): boolean {
   return !roles.some((r) => r === "org_admin" || r === "maintainer" || r === "viewer");
 }
 
+/**
+ * Whether the user's org-wide roles alone grant `access` on every project of the org. Permissions are the union of
+ * all roles, so a viewer who is also project_member holds task:write via project_member — that write must stay
+ * limited to assigned projects. Only org_admin/maintainer write org-wide; viewer reads org-wide.
+ */
+export function hasOrgWideAccess(roles: readonly string[], access: ProjectAccess): boolean {
+  if (access === "write") return roles.some((r) => r === "org_admin" || r === "maintainer");
+  return !isProjectScoped(roles);
+}
+
 export interface VerifyProjectScopeOptions {
   pool: Pool | PoolClient;
   orgId: string;
@@ -52,8 +62,8 @@ export async function verifyProjectScope(opts: VerifyProjectScopeOptions): Promi
     throw new NotFoundException();
   }
 
-  // 2. Org-wide roles bypass assignment check
-  if (!isProjectScoped(roles)) {
+  // 2. Org-wide roles bypass the assignment check only for the access they grant themselves
+  if (hasOrgWideAccess(roles, requiredAccess)) {
     return { id: projectRow.id, slug: projectRow.slug };
   }
 
@@ -64,7 +74,8 @@ export async function verifyProjectScope(opts: VerifyProjectScopeOptions): Promi
   );
 
   if (!assignment.rows[0]) {
-    // AC-1, AC-2, AC-3: unassigned project returns 404
+    // AC-1, AC-2, AC-3: unassigned project returns 404 — unless the user can already see it org-wide (viewer), then 403
+    if (hasOrgWideAccess(roles, "read")) throw new ForbiddenException();
     throw new NotFoundException();
   }
 
